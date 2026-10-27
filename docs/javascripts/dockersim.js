@@ -883,9 +883,90 @@ To generate this message, Docker took the following steps:
 
 
   /* --------------------------------------------- page de lab : terminal + tutoriel */
+  const attendre = (ms) => new Promise((ok) => setTimeout(ok, ms)); // const attendreG
   const echapper = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   // Mise en forme légère dans les textes du tutoriel : **gras** et `code`.
   const enrichir = (s) => echapper(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
+  const mouvementReduit = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Conti, le robot du lab : SVG animé par CSS (classes parle, content, pensif). */
+  const ROBOT = `<svg class="robot" viewBox="0 0 120 140" aria-hidden="true">
+      <g class="rb-corps">
+        <line x1="60" y1="8" x2="60" y2="24" stroke="#a0a4a0" stroke-width="3"/>
+        <circle class="rb-lampe" cx="60" cy="8" r="6" fill="#eeff57"/>
+        <rect class="rb-tete" x="22" y="24" width="76" height="56" rx="18" fill="#1f9e91"/>
+        <rect x="31" y="33" width="58" height="38" rx="11" fill="#0a0006"/>
+        <g class="rb-yeux"><ellipse class="rb-oeil" cx="47" cy="49" rx="6" ry="7" fill="#5affb6"/><ellipse class="rb-oeil" cx="73" cy="49" rx="6" ry="7" fill="#5affb6"/></g>
+        <g class="rb-yeux-joie"><path d="M41 51 q6 -9 12 0" stroke="#5affb6" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M67 51 q6 -9 12 0" stroke="#5affb6" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+        <rect class="rb-bouche" x="52" y="60" width="16" height="4" rx="2" fill="#5affb6"/>
+        <circle cx="22" cy="52" r="5" fill="#187b73"/><circle cx="98" cy="52" r="5" fill="#187b73"/>
+        <rect x="34" y="84" width="52" height="40" rx="12" fill="#1d1d1d" stroke="#1f9e91" stroke-width="2"/>
+        <rect x="42" y="94" width="36" height="5" rx="2.5" fill="url(#rb-grad)"/>
+        <circle cx="50" cy="110" r="3.5" fill="#ff84ef"/><circle cx="60" cy="110" r="3.5" fill="#00eaff"/><circle cx="70" cy="110" r="3.5" fill="#eeff57"/>
+        <g class="rb-bras-g"><rect x="18" y="88" width="16" height="9" rx="4.5" fill="#1f9e91"/></g>
+        <g class="rb-bras-d"><rect x="86" y="88" width="16" height="9" rx="4.5" fill="#1f9e91"/></g>
+      </g>
+      <defs><linearGradient id="rb-grad" x1="0" x2="1"><stop offset="0" stop-color="#ff1a1a"/><stop offset=".3" stop-color="#eeff57"/><stop offset=".55" stop-color="#5affb6"/><stop offset=".8" stop-color="#00eaff"/><stop offset="1" stop-color="#859cff"/></linearGradient></defs>
+    </svg>`;
+
+  function scene(nom, attente) {
+    return `<div class="robot-scene${attente ? " en-attente" : ""}">
+        <div class="robot-boite">${ROBOT}</div>
+        <div class="robot-bulle" role="status" aria-live="polite">
+          <div class="robot-nom">${echapper(nom)}</div>
+          <div class="robot-texte"></div>
+          <button type="button" class="robot-passer" hidden>Passer ▸</button>
+        </div>
+      </div>`;
+  }
+
+  // Fait parler le robot : texte tapé lettre par lettre, bouche animée. Rend une promesse.
+  function dire(sceneEl, phrases, opts = {}) {
+    const texte = sceneEl.querySelector(".robot-texte");
+    const robot = sceneEl.querySelector(".robot");
+    const passer = sceneEl.querySelector(".robot-passer");
+    if (!opts.ajout) texte.innerHTML = "";
+    let vite = mouvementReduit() || !!opts.instant;
+    passer.hidden = vite;
+    passer.onclick = () => { vite = true; };
+    sceneEl.classList.add("parle");
+    return (async () => {
+      for (const phrase of phrases) {
+        const p = document.createElement("p");
+        if (opts.classe) p.className = opts.classe;
+        texte.appendChild(p);
+        const html = enrichir(phrase);
+        if (vite) { p.innerHTML = html; continue; }
+        // On tape le texte brut, puis on remet la mise en forme à la fin de la phrase.
+        const brut = Array.from(phrase.replace(/\*\*|`/g, "")); // par caractère, émojis compris
+        for (let k = 1; k <= brut.length; k++) {
+          if (vite) break;
+          p.textContent = brut.slice(0, k).join("");
+          const ch = brut[k - 1];
+          await attendre(/[.!?]/.test(ch) ? 220 : /[,:;]/.test(ch) ? 110 : 20 + Math.random() * 18);
+        }
+        p.innerHTML = html;
+        if (!vite) await attendre(380);
+      }
+      sceneEl.classList.remove("parle");
+      passer.hidden = true;
+      void robot;
+    })();
+  }
+
+  function reagir(sceneEl, humeur) {
+    sceneEl.classList.remove("content", "pensif");
+    void sceneEl.offsetWidth; // relance l'animation
+    sceneEl.classList.add(humeur);
+  }
+
+  function popXP(sceneEl, points) {
+    const pop = document.createElement("div");
+    pop.className = "xp-pop";
+    pop.textContent = `+${points} XP`;
+    sceneEl.appendChild(pop);
+    setTimeout(() => pop.remove(), 1600);
+  }
 
   function creerLab(racine) {
     if (racine.dataset.pret) return;
@@ -899,51 +980,79 @@ To generate this message, Docker took the following steps:
     const guide = racine.querySelector(".lab-droite");
     creer(term);
     fetch(new URL(`../assets/labs/${nom}.json`, scriptCourant)).then((r) => r.json()).then((lab) => {
-      let courant = 0;
+      let courant = 0; let xp = 0;
       const etapes = lab.etapes;
+      const nomRobot = lab.robotNom || "Conti";
+      const indiceUtilise = new Set();
       guide.innerHTML = `
         <header class="lab-entete">
           <div class="lab-sur">Lab interactif${lab.duree ? " · " + echapper(lab.duree) : ""}</div>
           <h2 class="lab-titre">${echapper(lab.titre)}</h2>
-          ${lab.intro ? `<p class="lab-intro">${enrichir(lab.intro)}</p>` : ""}
-          <div class="lab-progression"><div class="lab-barre"><span></span></div><span class="lab-compte"></span></div>
+          <div class="lab-progression"><div class="lab-barre"><span></span></div><span class="lab-compte"></span><span class="lab-xp">0 XP</span></div>
+          <div class="lab-accueil">${scene(nomRobot)}</div>
         </header>
         <ol class="lab-etapes">${etapes.map((e, i) => `
           <li class="lab-etape" data-i="${i}">
             <button type="button" class="lab-tete"><span class="lab-pastille">${i + 1}</span><span class="lab-nom">${echapper(e.titre)}</span></button>
             <div class="lab-corps">
-              ${e.pourquoi ? `<p class="lab-pourquoi">${enrichir(e.pourquoi)}</p>` : ""}
-              <p class="lab-consigne"><strong>À faire :</strong> ${enrichir(e.consigne)}</p>
-              <div class="lab-commande"><code>${echapper(e.commande)}</code>
-                <span class="lab-boutons"><button type="button" class="lab-inserer">Insérer dans le terminal</button><button type="button" class="lab-copier">Copier</button></span></div>
-              ${e.options && e.options.length ? `<dl class="lab-options">${e.options.map(([o, x]) => `<dt><code>${echapper(o)}</code></dt><dd>${enrichir(x)}</dd>`).join("")}</dl>` : ""}
-              ${e.sortie ? `<div class="lab-attendu"><div class="lab-libelle">Tu dois voir à peu près :</div><pre>${echapper(e.sortie)}</pre></div>` : ""}
-              ${e.remarque ? `<p class="lab-remarque"><strong>À remarquer :</strong> ${enrichir(e.remarque)}</p>` : ""}
-              ${e.indice ? `<details class="lab-indice"><summary>Besoin d'un indice ?</summary><p>${enrichir(e.indice)}</p></details>` : ""}
-              <p class="lab-bravo" hidden></p>
+              ${scene(nomRobot, true)}
+              <div class="lab-details">
+                ${e.pourquoi ? `<p class="lab-pourquoi">${enrichir(e.pourquoi)}</p>` : ""}
+                <p class="lab-consigne"><strong>À faire :</strong> ${enrichir(e.consigne)}</p>
+                <div class="lab-commande"><code>${echapper(e.commande)}</code>
+                  <span class="lab-boutons"><button type="button" class="lab-inserer">Insérer dans le terminal</button><button type="button" class="lab-copier">Copier</button></span></div>
+                ${e.options && e.options.length ? `<dl class="lab-options">${e.options.map(([o, x]) => `<dt><code>${echapper(o)}</code></dt><dd>${enrichir(x)}</dd>`).join("")}</dl>` : ""}
+                ${e.sortie ? `<div class="lab-attendu"><div class="lab-libelle">Tu dois voir à peu près :</div><pre>${echapper(e.sortie)}</pre></div>` : ""}
+                ${e.remarque ? `<p class="lab-remarque"><strong>À remarquer :</strong> ${enrichir(e.remarque)}</p>` : ""}
+                ${e.indice ? `<details class="lab-indice"><summary>Besoin d'un indice ?</summary><p>${enrichir(e.indice)}</p></details>` : ""}
+              </div>
             </div>
           </li>`).join("")}
         </ol>
         <div class="lab-final" hidden>
-          <div class="lab-final-titre">✓ Lab terminé !</div>
+          <div class="lab-final-scene">${scene(nomRobot)}</div>
+          ${lab.badge ? `<div class="lab-badge"><span class="lab-badge-icone">🏅</span><span><strong>Badge débloqué</strong><br>${echapper(lab.badge)}</span></div>` : ""}
           ${lab.conclusion ? `<p>${enrichir(lab.conclusion)}</p>` : ""}
           ${lab.retour ? `<p><a class="md-button md-button--primary" href="${echapper(lab.retour.lien)}">${echapper(lab.retour.texte)}</a></p>` : ""}
         </div>`;
       const items = [...guide.querySelectorAll(".lab-etape")];
+      const joue = new Set();
+
       const maj = () => {
         items.forEach((li, i) => {
           li.classList.toggle("fait", i < courant);
           li.classList.toggle("actif", i === courant);
           li.classList.toggle("ouvert", i === courant || li.classList.contains("deplie"));
         });
-        const pct = Math.round((Math.min(courant, etapes.length) / etapes.length) * 100);
-        guide.querySelector(".lab-barre span").style.width = pct + "%";
-        guide.querySelector(".lab-compte").textContent = `${Math.min(courant, etapes.length)} / ${etapes.length} étapes`;
+        const n = Math.min(courant, etapes.length);
+        guide.querySelector(".lab-barre span").style.width = Math.round((n / etapes.length) * 100) + "%";
+        guide.querySelector(".lab-compte").textContent = `${n} / ${etapes.length} étapes`;
+        guide.querySelector(".lab-xp").textContent = `${xp} XP`;
         guide.querySelector(".lab-final").hidden = courant < etapes.length;
       };
+
+      // Présentation d'une étape : le robot parle d'abord, puis les explications apparaissent.
+      const presenter = async (i, instant) => {
+        const li = items[i]; const e = etapes[i];
+        const sc = li.querySelector(".robot-scene");
+        const details = li.querySelector(".lab-details");
+        sc.classList.remove("en-attente");
+        if (joue.has(i) || instant) {
+          details.classList.add("visible");
+          if (!joue.has(i)) { joue.add(i); await dire(sc, e.robot || [e.consigne], { instant: true }); }
+          return;
+        }
+        joue.add(i);
+        details.classList.remove("visible");
+        sc.classList.add("entree");
+        await attendre(mouvementReduit() ? 0 : 450);
+        await dire(sc, e.robot || [e.consigne]);
+        details.classList.add("visible");
+      };
+
       items.forEach((li, i) => {
         const e = etapes[i];
-        li.querySelector(".lab-tete").onclick = () => { li.classList.toggle("deplie"); maj(); };
+        li.querySelector(".lab-tete").onclick = () => { li.classList.toggle("deplie"); maj(); if (li.classList.contains("ouvert")) presenter(i, true); };
         li.querySelector(".lab-inserer").onclick = () => term.dispatchEvent(new CustomEvent("ts-inserer", { detail: e.commande }));
         li.querySelector(".lab-copier").onclick = (ev) => {
           const bouton = ev.currentTarget;
@@ -951,29 +1060,62 @@ To generate this message, Docker took the following steps:
             .then(() => { bouton.textContent = "Copié ✓"; }, () => { bouton.textContent = "Sélectionne et copie"; });
           setTimeout(() => { bouton.textContent = "Copier"; }, 1600);
         };
+        const ind = li.querySelector(".lab-indice");
+        if (ind) ind.addEventListener("toggle", () => { if (ind.open) indiceUtilise.add(i); });
       });
+
       const norm = (s) => s.replace(/\s+/g, " ").trim();
-      term.addEventListener("ts-commande", (ev) => {
+      // Les deux premiers mots (« docker run », « curl http… ») : sert à distinguer une tentative ratée d'une exploration.
+      const debut = (s) => norm(s).split(" ").slice(0, 2).join(" ");
+      term.addEventListener("ts-commande", async (ev) => {
         if (courant >= etapes.length) return;
-        const e = etapes[courant];
+        const i = courant; const e = etapes[i]; const li = items[i];
+        const sc = li.querySelector(".robot-scene");
         const re = new RegExp(e.attendu || "^" + norm(e.commande).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$");
-        const li = items[courant];
         if (re.test(norm(ev.detail.cmd))) {
-          const b = li.querySelector(".lab-bravo");
-          b.hidden = false; b.innerHTML = "✓ " + enrichir(e.bravo || "Bien joué !");
-          courant++; maj();
-          const suivant = items[courant] || guide.querySelector(".lab-final");
-          setTimeout(() => suivant.scrollIntoView({ behavior: "smooth", block: "nearest" }), 250);
-        } else if (e.indice) {
-          const d = li.querySelector(".lab-indice"); if (d) d.open = true;
+          const points = indiceUtilise.has(i) ? 10 : 15;
+          xp += points; courant++;
+          sc.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          reagir(sc, "content"); popXP(sc, points);
+          li.querySelector(".lab-details").classList.add("visible");
+          await dire(sc, ["✓ " + (e.bravo || "Bien joué !")], { ajout: true, classe: "robot-bravo", instant: false });
+          maj();
+          await attendre(mouvementReduit() ? 0 : 700);
+          if (courant < etapes.length) {
+            items[courant].scrollIntoView({ behavior: "smooth", block: "start" });
+            presenter(courant);
+          } else {
+            const fin = guide.querySelector(".lab-final");
+            fin.scrollIntoView({ behavior: "smooth", block: "start" });
+            const scf = fin.querySelector(".robot-scene");
+            scf.classList.add("entree"); reagir(scf, "content");
+            dire(scf, lab.robotFin || ["Bravo, tu as terminé le lab !", `Total : **${xp} XP**.`]);
+          }
+        } else if (debut(ev.detail.cmd) === debut(e.commande)) {
+          reagir(sc, "pensif");
+          sc.querySelectorAll(".robot-indice").forEach((n) => n.remove()); // un seul indice affiché à la fois
+          sc.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          if (e.indice) {
+            indiceUtilise.add(i);
+            const d = li.querySelector(".lab-indice"); if (d) d.open = true;
+          }
+          dire(sc, ["Hmm, pas tout à fait… " + (e.indice || "Compare ta commande avec celle de la consigne, ou clique sur « Insérer dans le terminal ».")], { ajout: true, classe: "robot-indice" });
         }
       });
       term.addEventListener("ts-reset", () => {
-        courant = 0;
-        items.forEach((li) => { li.classList.remove("deplie"); li.querySelector(".lab-bravo").hidden = true; });
-        maj();
+        courant = 0; xp = 0; indiceUtilise.clear(); joue.clear();
+        items.forEach((li) => { li.classList.remove("deplie"); li.querySelector(".lab-details").classList.remove("visible"); });
+        maj(); presenter(0);
       });
+
       maj();
+      (async () => {
+        const acc = guide.querySelector(".lab-accueil .robot-scene");
+        acc.classList.add("entree");
+        await attendre(mouvementReduit() ? 0 : 300);
+        await dire(acc, lab.robotIntro || (lab.intro ? [lab.intro] : ["C'est parti !"]));
+        presenter(0);
+      })();
     }).catch(() => { guide.innerHTML = '<p class="lab-chargement">Impossible de charger le tutoriel de ce lab.</p>'; });
   }
 

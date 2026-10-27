@@ -545,3 +545,88 @@ html { scroll-behavior: smooth; }
 
 .ts-modes[hidden], .ts-mode[hidden] { display: none !important; }
 body:has(.lab-page) .md-top { display: none; }
+
+/* =====================================================================
+   Conti, le robot des labs : entrée, flottement, parole, joie, réflexion
+   ===================================================================== */
+.robot-scene {
+  position: relative; display: flex; align-items: flex-start; gap: 0.9rem;
+  margin: 0.2rem 0 1rem;
+}
+.robot-boite { flex: none; width: 74px; }
+.robot { width: 74px; height: auto; overflow: visible; }
+.robot .rb-corps { transform-box: fill-box; transform-origin: center bottom; animation: rb-flotte 3.2s ease-in-out infinite; }
+.robot .rb-oeil { transform-box: fill-box; transform-origin: center; animation: rb-cligne 4.5s infinite; }
+.robot .rb-lampe { animation: rb-lampe 1.4s ease-in-out infinite alternate; }
+.robot .rb-yeux-joie { opacity: 0; }
+.robot .rb-bouche { transform-box: fill-box; transform-origin: center; }
+.robot .rb-bras-g { transform-box: fill-box; transform-origin: right center; }
+.robot .rb-bras-d { transform-box: fill-box; transform-origin: left center; }
+.robot-scene.entree .robot-boite { animation: rb-entree 0.7s cubic-bezier(.2, .9, .3, 1.4) both; }
+.robot-scene.entree .rb-bras-d { animation: rb-salut 0.5s ease-in-out 0.5s 3 alternate; }
+.robot-scene.parle .rb-bouche { animation: rb-parle 0.18s ease-in-out infinite alternate; }
+.robot-scene.content .robot-boite { animation: rb-saut 0.7s cubic-bezier(.3, 1.6, .5, 1) 2; }
+.robot-scene.content .rb-yeux { opacity: 0; }
+.robot-scene.content .rb-yeux-joie { opacity: 1; }
+.robot-scene.content .rb-bras-g { animation: rb-bras-haut-g 0.35s ease-in-out 4 alternate; }
+.robot-scene.content .rb-bras-d { animation: rb-bras-haut-d 0.35s ease-in-out 4 alternate; }
+.robot-scene.pensif .robot-boite { animation: rb-penche 1.6s ease-in-out 2; }
+.robot-scene.pensif .rb-lampe { fill: #ff84ef; }
+@keyframes rb-flotte { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes rb-cligne { 0%, 90%, 100% { transform: scaleY(1); } 93% { transform: scaleY(0.1); } }
+@keyframes rb-lampe { from { opacity: 0.45; } to { opacity: 1; } }
+@keyframes rb-entree { 0% { opacity: 0; transform: translateX(-40px) scale(0.5) rotate(-12deg); } 70% { opacity: 1; transform: translateX(4px) scale(1.08) rotate(3deg); } 100% { transform: none; } }
+@keyframes rb-salut { from { transform: rotate(0); } to { transform: rotate(-35deg); } }
+@keyframes rb-parle { from { transform: scaleY(0.6) scaleX(1); } to { transform: scaleY(2.6) scaleX(0.8); } }
+@keyframes rb-saut { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(4deg); } }
+@keyframes rb-bras-haut-g { from { transform: rotate(0); } to { transform: rotate(40deg); } }
+@keyframes rb-bras-haut-d { from { transform: rotate(0); } to { transform: rotate(-40deg); } }
+@keyframes rb-penche { 0%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(-9deg) translateY(2px); } }
+.robot-bulle {
+  position: relative; flex: 1; min-height: 3.2rem;
+  background: #0a0006; color: #eaf0eb; border-radius: 14px; padding: 0.7rem 0.9rem 0.6rem;
+  border: 2px solid #1f9e91; box-shadow: 0 6px 18px rgba(10, 0, 6, 0.18);
+  font-size: 0.78rem; line-height: 1.55;
+}
+.robot-bulle::before {
+  content: ""; position: absolute; left: -10px; top: 22px;
+  border: 9px solid transparent; border-right-color: #1f9e91; border-left: 0;
+}
+.robot-nom { font-family: var(--ynov-titre); font-weight: 800; color: #5affb6; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.25rem; }
+.md-typeset .robot-texte p { margin: 0 0 0.45em; }
+.md-typeset .robot-bulle .robot-texte code { background: rgba(255, 255, 255, 0.12); color: #eeff57; box-shadow: none; }
+.md-typeset .robot-texte strong { color: #fff; }
+.robot-scene.parle .robot-texte p:last-child::after { content: "▋"; color: #5affb6; margin-left: 2px; animation: ts-clignote 0.8s steps(1) infinite; }
+.md-typeset .robot-texte p.robot-bravo { color: #5affb6; font-weight: 700; }
+.md-typeset .robot-texte p.robot-indice { color: #eeff57; }
+.robot-passer {
+  position: absolute; right: 0.6rem; bottom: 0.4rem; font: inherit; font-size: 0.62rem; cursor: pointer;
+  background: transparent; border: 1px solid #3a3a3a; color: #a0a4a0; border-radius: 999px; padding: 0.05rem 0.6rem;
+}
+.robot-passer:hover { color: #fff; border-color: #5affb6; }
+.xp-pop {
+  position: absolute; left: 52px; top: -6px; font-family: var(--ynov-titre); font-weight: 800; font-size: 1rem;
+  color: #0a0006; background: #5affb6; border-radius: 999px; padding: 0.1rem 0.6rem;
+  animation: xp-monte 1.6s ease-out forwards; pointer-events: none; z-index: 2;
+}
+@keyframes xp-monte { 0% { opacity: 0; transform: translateY(8px) scale(0.6); } 20% { opacity: 1; transform: translateY(0) scale(1.15); } 100% { opacity: 0; transform: translateY(-36px) scale(1); } }
+.robot-scene.en-attente { display: none; }
+.robot-scene.parle .robot-bulle { padding-bottom: 1.9rem; }
+.lab-details { display: none; }
+.lab-details.visible { display: block; animation: lab-apparait 0.5s ease both; }
+@keyframes lab-apparait { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.lab-xp {
+  font-family: var(--ynov-titre); font-weight: 800; font-size: 0.72rem; white-space: nowrap;
+  background: #0a0006; color: #5affb6; border-radius: 999px; padding: 0.15rem 0.7rem;
+}
+.lab-accueil { margin-top: 1rem; }
+.lab-badge {
+  display: flex; align-items: center; gap: 0.8rem; margin: 0.6rem 0 0.8rem; padding: 0.7rem 1rem;
+  border-radius: 12px; background: #0a0006; color: #eaf0eb; border: 2px solid #eeff57;
+  animation: lab-apparait 0.6s ease 0.4s both;
+}
+.lab-badge-icone { font-size: 2rem; animation: rb-saut 0.8s ease 0.6s 2; }
+@media (prefers-reduced-motion: reduce) {
+  .robot .rb-corps, .robot .rb-oeil, .robot .rb-lampe, .robot-scene .robot-boite, .robot-scene .rb-bras-g,
+  .robot-scene .rb-bras-d, .robot-scene .rb-bouche, .xp-pop, .lab-badge-icone { animation: none !important; }
+}

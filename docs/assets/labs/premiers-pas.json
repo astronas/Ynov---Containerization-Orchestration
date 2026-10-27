@@ -3,7 +3,10 @@
   "duree": "10 min",
   "intro": "Ton tout premier contact avec Docker, sans rien installer. Tu vas lancer un conteneur de test, puis un vrai serveur web que tu interrogeras, et apprendre à l'arrêter et à le supprimer. Pour chaque étape : clique sur « Insérer dans le terminal », appuie sur **Entrée**, et compare.",
   "conclusion": "Tu sais lancer un conteneur, le voir tourner, lui parler et faire le ménage : c'est 80 % de l'usage quotidien de Docker. Tu peux continuer à expérimenter dans le terminal : tape `help` pour voir tout ce qu'il sait faire.",
-  "retour": { "texte": "Retour à Bien démarrer", "lien": "../../Bien-demarrer/" },
+  "retour": {
+    "texte": "Retour à Bien démarrer",
+    "lien": "../../Bien-demarrer/"
+  },
   "etapes": [
     {
       "titre": "Ton premier conteneur",
@@ -11,14 +14,28 @@
       "consigne": "Lance le conteneur de test.",
       "commande": "docker run --rm hello-world",
       "options": [
-        ["docker run", "crée un conteneur à partir d'une image et le lance"],
-        ["--rm", "le supprime automatiquement dès qu'il a fini"],
-        ["hello-world", "le nom de l'image à utiliser"]
+        [
+          "docker run",
+          "crée un conteneur à partir d'une image et le lance"
+        ],
+        [
+          "--rm",
+          "le supprime automatiquement dès qu'il a fini"
+        ],
+        [
+          "hello-world",
+          "le nom de l'image à utiliser"
+        ]
       ],
       "sortie": "Unable to find image 'hello-world:latest' locally\n…\nHello from Docker!\nThis message shows that your installation appears to be working correctly.",
       "remarque": "Docker ne trouve pas l'image sur ta machine, alors il la **télécharge** depuis Docker Hub, puis lance le conteneur. Le texte affiché explique lui-même ces étapes.",
       "attendu": "^docker run .*hello-world",
-      "bravo": "Docker fonctionne."
+      "bravo": "Docker fonctionne.",
+      "robot": [
+        "On commence en douceur avec le « bonjour le monde » de Docker.",
+        "Docker va chercher une minuscule image sur **Docker Hub**, la grande bibliothèque d'images, puis la lance.",
+        "👀 Repère le moment où il dit qu'il ne la trouve pas en local, puis la télécharge."
+      ]
     },
     {
       "titre": "Lancer un vrai serveur web",
@@ -26,71 +43,149 @@
       "consigne": "Lance nginx, nommé `web`, publié sur le port 8080 de ta machine.",
       "commande": "docker run -d --name web -p 127.0.0.1:8080:80 nginx:stable",
       "options": [
-        ["-d", "en arrière-plan : le terminal te rend la main"],
-        ["--name web", "un nom facile à retenir"],
-        ["-p 127.0.0.1:8080:80", "le port 8080 de **ta** machine mène au port 80 **du** conteneur ; 127.0.0.1 : joignable depuis ta machine seulement"],
-        ["nginx:stable", "l'image du serveur web"]
+        [
+          "-d",
+          "en arrière-plan : le terminal te rend la main"
+        ],
+        [
+          "--name web",
+          "un nom facile à retenir"
+        ],
+        [
+          "-p 127.0.0.1:8080:80",
+          "le port 8080 de **ta** machine mène au port 80 **du** conteneur ; 127.0.0.1 : joignable depuis ta machine seulement"
+        ],
+        [
+          "nginx:stable",
+          "l'image du serveur web"
+        ]
       ],
       "sortie": "…: Pull complete\nStatus: Downloaded newer image for nginx:stable\n3ac27a8036c225daee0a6ed0a5d3cc6bde0709e12980fda1c48a60c727b92cf0",
       "remarque": "La longue suite de caractères est l'**identifiant** du conteneur : le tien sera différent.",
       "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]web\\b)(?=.*-p[ =]?\\S*8080:80).*nginx",
       "indice": "vérifie `-d`, `--name web` et `-p 127.0.0.1:8080:80`, puis l'image `nginx:stable` en dernier.",
-      "bravo": "Le serveur web tourne."
+      "bravo": "Le serveur web tourne.",
+      "robot": [
+        "Passons aux choses sérieuses : un **vrai serveur web**. 🌐",
+        "`-d` le fait tourner en arrière-plan, et `-p` perce une petite fenêtre entre ta machine et le conteneur.",
+        "👀 Docker te répondra par un long identifiant : c'est le numéro de série de ton conteneur."
+      ]
     },
     {
       "titre": "Le voir tourner",
       "pourquoi": "`docker ps` est la commande que tu taperas le plus : elle liste ce qui tourne.",
       "consigne": "Liste les conteneurs en cours d'exécution.",
       "commande": "docker ps",
-      "options": [["docker ps", "liste les conteneurs qui tournent (ajoute -a pour voir aussi les arrêtés)"]],
+      "options": [
+        [
+          "docker ps",
+          "liste les conteneurs qui tournent (ajoute -a pour voir aussi les arrêtés)"
+        ]
+      ],
       "sortie": "CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS                    NAMES\n3ac27a8036c2   nginx:stable   \"/docker-entrypoint.…\"   8 seconds ago   Up 8 seconds   127.0.0.1:8080->80/tcp   web",
       "remarque": "**STATUS** `Up` : il tourne. **PORTS** `127.0.0.1:8080->80/tcp` : le port 8080 de ta machine mène au port 80 du conteneur.",
       "attendu": "^docker (container )?(ps|ls)\\b",
-      "bravo": "Il tourne et son port est publié."
+      "bravo": "Il tourne et son port est publié.",
+      "robot": [
+        "Vérifions que notre serveur est bien réveillé.",
+        "`docker ps` liste tous les conteneurs qui tournent, comme un tableau de bord.",
+        "👀 Lis la colonne **PORTS** : elle montre le chemin du 8080 vers le 80."
+      ]
     },
     {
       "titre": "Lui parler",
       "pourquoi": "`curl` est un petit navigateur en ligne de commande. On demande la page d'accueil du serveur, comme le ferait ton navigateur.",
       "consigne": "Demande la page d'accueil sur le port 8080.",
       "commande": "curl http://127.0.0.1:8080",
-      "options": [["curl URL", "télécharge et affiche une page web"]],
+      "options": [
+        [
+          "curl URL",
+          "télécharge et affiche une page web"
+        ]
+      ],
       "sortie": "<!DOCTYPE html>\n<html>\n<head>\n<title>Welcome to nginx!</title>",
       "remarque": "« Welcome to nginx! » : c'est la page servie **par le conteneur**. Ta requête est entrée par le port 8080 et a atteint le port 80 du conteneur.",
       "attendu": "^curl .*8080",
-      "bravo": "Le serveur web du conteneur te répond."
+      "bravo": "Le serveur web du conteneur te répond.",
+      "robot": [
+        "Moment de vérité : on frappe à la porte du serveur ! 🚪",
+        "`curl` joue le rôle du navigateur et demande la page d'accueil.",
+        "👀 Si tu lis « Welcome to nginx! », ta requête est bien entrée dans la boîte."
+      ]
     },
     {
       "titre": "Lire ses journaux",
       "pourquoi": "Quand un conteneur se comporte mal, son journal est le premier endroit où regarder.",
       "consigne": "Affiche le journal du conteneur `web`.",
       "commande": "docker logs web",
-      "options": [["docker logs", "affiche ce que le programme du conteneur a écrit"]],
+      "options": [
+        [
+          "docker logs",
+          "affiche ce que le programme du conteneur a écrit"
+        ]
+      ],
       "sortie": "/docker-entrypoint.sh: Configuration complete; ready for start up\nstart worker processes",
       "remarque": "nginx annonce qu'il est prêt. En cas d'erreur, c'est ici qu'elle apparaîtrait.",
       "attendu": "^docker logs web",
-      "bravo": "Tu sais lire un journal."
+      "bravo": "Tu sais lire un journal.",
+      "robot": [
+        "Un conteneur, ça parle… dans ses **journaux**. 📜",
+        "Quand quelque chose ne va pas, c'est le premier endroit où regarder.",
+        "👀 nginx doit t'annoncer qu'il est prêt à travailler."
+      ]
     },
     {
       "titre": "L'arrêter",
       "pourquoi": "Arrêter un conteneur, c'est arrêter son programme. Le conteneur existe toujours : on pourrait le redémarrer.",
       "consigne": "Arrête le conteneur `web`.",
       "commande": "docker stop web",
-      "options": [["docker stop", "demande poliment au programme de s'arrêter"]],
+      "options": [
+        [
+          "docker stop",
+          "demande poliment au programme de s'arrêter"
+        ]
+      ],
       "sortie": "web",
       "remarque": "Essaie `docker ps -a` : il apparaît avec le statut `Exited (0)`. Le 0 veut dire « arrêt normal ».",
       "attendu": "^docker stop web",
-      "bravo": "Arrêté proprement."
+      "bravo": "Arrêté proprement.",
+      "robot": [
+        "Le serveur a bien bossé, on l'éteint proprement. 😴",
+        "`docker stop` lui demande poliment de s'arrêter, comme on éteint un ordinateur.",
+        "👀 Docker te répondra simplement son nom."
+      ]
     },
     {
       "titre": "Le supprimer",
       "pourquoi": "Un conteneur arrêté garde sa place. On le supprime quand on n'en a plus besoin.",
       "consigne": "Supprime le conteneur `web`.",
       "commande": "docker rm web",
-      "options": [["docker rm", "supprime un conteneur arrêté (ajoute -f pour forcer s'il tourne encore)"]],
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur arrêté (ajoute -f pour forcer s'il tourne encore)"
+        ]
+      ],
       "sortie": "web",
       "remarque": "L'**image** nginx, elle, reste sur ta machine : le prochain `docker run` sera instantané. Vérifie avec `docker images`.",
       "attendu": "^docker rm (-f )?web",
-      "bravo": "Ménage fait."
+      "bravo": "Ménage fait.",
+      "robot": [
+        "Dernier geste : on jette la boîte. 🗑️",
+        "Le conteneur disparaît, mais l'**image** reste rangée sur l'étagère pour la prochaine fois.",
+        "👀 Essaie ensuite `docker ps -a` : la liste doit être vide."
+      ]
     }
-  ]
+  ],
+  "robotIntro": [
+    "Bienvenue ! Moi c'est **Conti**, et je vais te guider pour tes tout premiers pas avec Docker. 👋",
+    "Un conteneur, c'est une boîte qui embarque une appli avec tout ce qu'il lui faut : on la lance, on l'utilise, on la jette.",
+    "Ici tout est simulé : tape ce que tu veux, rien ne casse. C'est parti !"
+  ],
+  "robotFin": [
+    "Bravo, tu viens de vivre le cycle complet d'un conteneur ! 🎉",
+    "Lancer, vérifier, interroger, lire les journaux, arrêter, supprimer : c'est le quotidien d'un admin Docker.",
+    "Voici ton badge, tu l'as mérité !"
+  ],
+  "badge": "Premier capitaine Docker"
 }

@@ -3,7 +3,10 @@
   "duree": "15 min",
   "intro": "Tu vas lancer un serveur web dans un conteneur, puis vérifier par toi-même les trois protections du cours : ce qu'il **voit** (namespaces), ce qu'il peut **consommer** (cgroups) et ce qu'il a le **droit de faire** (capabilities). À chaque étape : lis le pourquoi, clique sur « Insérer dans le terminal », appuie sur **Entrée**, puis compare avec ce que tu dois voir.",
   "conclusion": "Tu as vu de tes yeux les trois mécanismes : le conteneur se croit seul (PID 1, son propre nom de machine), il est plafonné (128 Mo, 32 programmes, et tué au-delà de 64 Mo pour le gourmand), et il garde 14 capabilities par défaut.",
-  "retour": { "texte": "Retour au cours : Isolation d'un conteneur", "lien": "../../Isolation-des-conteneurs/" },
+  "retour": {
+    "texte": "Retour au cours : Isolation d'un conteneur",
+    "lien": "../../Isolation-des-conteneurs/"
+  },
   "etapes": [
     {
       "titre": "Lancer un conteneur limité",
@@ -11,18 +14,41 @@
       "consigne": "Lance le serveur web nginx en arrière-plan, nommé `demo`, avec ces deux limites.",
       "commande": "docker run -d --name demo --memory 128m --pids-limit 32 nginx:stable",
       "options": [
-        ["docker run", "crée un conteneur à partir d'une image et le démarre"],
-        ["-d", "en arrière-plan (detached) : le terminal te rend la main tout de suite"],
-        ["--name demo", "un nom facile à retenir, au lieu d'un nom tiré au hasard"],
-        ["--memory 128m", "plafond de mémoire : 128 Mo (un cgroup)"],
-        ["--pids-limit 32", "plafond de programmes simultanés : 32 (un autre cgroup)"],
-        ["nginx:stable", "l'image : le serveur web nginx, version stable"]
+        [
+          "docker run",
+          "crée un conteneur à partir d'une image et le démarre"
+        ],
+        [
+          "-d",
+          "en arrière-plan (detached) : le terminal te rend la main tout de suite"
+        ],
+        [
+          "--name demo",
+          "un nom facile à retenir, au lieu d'un nom tiré au hasard"
+        ],
+        [
+          "--memory 128m",
+          "plafond de mémoire : 128 Mo (un cgroup)"
+        ],
+        [
+          "--pids-limit 32",
+          "plafond de programmes simultanés : 32 (un autre cgroup)"
+        ],
+        [
+          "nginx:stable",
+          "l'image : le serveur web nginx, version stable"
+        ]
       ],
       "sortie": "Unable to find image 'nginx:stable' locally\nstable: Pulling from library/nginx\n…: Pull complete\nStatus: Downloaded newer image for nginx:stable\n7cc3d572ed043bbfc77d980102c20fac35af07891f7cb492abc418d6d5af3070",
       "remarque": "La première fois, Docker **télécharge** l'image (les lignes « Pull complete »). La dernière ligne, longue de 64 caractères, est l'**identifiant** du conteneur : le tien sera différent.",
       "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]demo\\b)(?=.*(--memory|-m)[ =]128m)(?=.*--pids-limit[ =]32).*nginx",
       "indice": "il faut les quatre éléments : `-d`, `--name demo`, `--memory 128m` et `--pids-limit 32`, puis l'image `nginx:stable` en dernier.",
-      "bravo": "Le conteneur tourne en arrière-plan."
+      "bravo": "Le conteneur tourne en arrière-plan.",
+      "robot": [
+        "Première mission : on lance **nginx** dans un conteneur, mais pas en liberté !",
+        "Imagine un locataire à qui tu donnes un studio avec un compteur électrique bridé : **128 Mo** de mémoire et **32 programmes** maximum.",
+        "👀 Regarde les lignes « Pull complete » : Docker va chercher l'image avant de démarrer."
+      ]
     },
     {
       "titre": "Vérifier qu'il tourne",
@@ -30,13 +56,24 @@
       "consigne": "Affiche les conteneurs dont le nom contient `demo`.",
       "commande": "docker ps --filter name=demo",
       "options": [
-        ["docker ps", "liste les conteneurs en cours d'exécution"],
-        ["--filter name=demo", "ne garde que ceux dont le nom contient « demo »"]
+        [
+          "docker ps",
+          "liste les conteneurs en cours d'exécution"
+        ],
+        [
+          "--filter name=demo",
+          "ne garde que ceux dont le nom contient « demo »"
+        ]
       ],
       "sortie": "CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS    NAMES\n7cc3d572ed04   nginx:stable   \"/docker-entrypoint.…\"   5 seconds ago   Up 5 seconds   80/tcp   demo",
       "remarque": "La colonne **STATUS** dit `Up` : il tourne. **PORTS** indique `80/tcp` : nginx écoute sur le port 80, mais **dans** le conteneur seulement (rien n'est publié vers ta machine).",
       "attendu": "^docker (container )?(ps|ls)\\b",
-      "bravo": "Il tourne : STATUS « Up »."
+      "bravo": "Il tourne : STATUS « Up ».",
+      "robot": [
+        "Le conteneur est parti… mais est-il vraiment vivant ?",
+        "`docker ps`, c'est l'appel en classe : chaque conteneur qui tourne lève la main.",
+        "👀 Garde l'œil sur la colonne **STATUS** : on veut lire `Up`."
+      ]
     },
     {
       "titre": "Il se croit seul",
@@ -44,24 +81,45 @@
       "consigne": "Lis le nom du programme n° 1, vu de l'intérieur du conteneur.",
       "commande": "docker exec demo cat /proc/1/cmdline",
       "options": [
-        ["docker exec demo", "exécute une commande **à l'intérieur** du conteneur demo"],
-        ["cat /proc/1/cmdline", "affiche la ligne de commande du programme n° 1"]
+        [
+          "docker exec demo",
+          "exécute une commande **à l'intérieur** du conteneur demo"
+        ],
+        [
+          "cat /proc/1/cmdline",
+          "affiche la ligne de commande du programme n° 1"
+        ]
       ],
       "sortie": "nginx: master process nginx -g daemon off;",
       "remarque": "Sur ta machine, le n° 1 est `systemd` ; dans le conteneur, c'est **nginx**. Même machine, deux vues différentes.",
       "attendu": "^docker exec demo cat /proc/1/cmdline",
-      "bravo": "nginx est le programme n° 1 : il ne voit que lui-même (namespace PID)."
+      "bravo": "nginx est le programme n° 1 : il ne voit que lui-même (namespace PID).",
+      "robot": [
+        "Petite expérience de magie. 🎩",
+        "Sur ta machine, le programme n° 1 est le chef de tout le système. On va demander au conteneur qui est **son** n° 1.",
+        "👀 S'il répond **nginx**, c'est qu'il ne voit que lui-même : c'est le namespace PID."
+      ]
     },
     {
       "titre": "Son propre nom de machine",
       "pourquoi": "Le namespace UTS donne au conteneur son propre nom de machine (hostname). Pratique : chaque conteneur peut s'appeler différemment sans toucher à l'hôte.",
       "consigne": "Demande au conteneur comment s'appelle sa machine.",
       "commande": "docker exec demo hostname",
-      "options": [["hostname", "affiche le nom de la machine, vu de l'intérieur"]],
+      "options": [
+        [
+          "hostname",
+          "affiche le nom de la machine, vu de l'intérieur"
+        ]
+      ],
       "sortie": "7cc3d572ed04",
       "remarque": "Ce sont les **12 premiers caractères de l'identifiant** du conteneur. Ta machine, elle, garde son nom (`lab` ici).",
       "attendu": "^docker exec demo hostname",
-      "bravo": "Il a son propre nom de machine (namespace UTS)."
+      "bravo": "Il a son propre nom de machine (namespace UTS).",
+      "robot": [
+        "Chaque conteneur a sa propre plaque sur la porte.",
+        "On lui demande son nom de machine : ce ne sera pas celui de ton ordinateur.",
+        "👀 Compare le résultat avec le début de l'identifiant obtenu à l'étape 1."
+      ]
     },
     {
       "titre": "Ses limites, vues par le noyau",
@@ -69,13 +127,24 @@
       "consigne": "Lis la limite de mémoire, puis le nombre maximal de programmes.",
       "commande": "docker exec demo cat /sys/fs/cgroup/memory.max /sys/fs/cgroup/pids.max",
       "options": [
-        ["/sys/fs/cgroup/memory.max", "la limite de mémoire, en octets"],
-        ["/sys/fs/cgroup/pids.max", "le nombre maximal de programmes"]
+        [
+          "/sys/fs/cgroup/memory.max",
+          "la limite de mémoire, en octets"
+        ],
+        [
+          "/sys/fs/cgroup/pids.max",
+          "le nombre maximal de programmes"
+        ]
       ],
       "sortie": "134217728\n32",
       "remarque": "134 217 728 octets = 128 × 1024 × 1024 = **128 Mo**. Et **32** programmes. Exactement ce que tu as demandé à l'étape 1.",
       "attendu": "^docker exec demo cat .*memory\\.max",
-      "bravo": "Les cgroups appliquent bien tes deux limites."
+      "bravo": "Les cgroups appliquent bien tes deux limites.",
+      "robot": [
+        "Tu te souviens du compteur bridé de l'étape 1 ?",
+        "Le noyau écrit ces limites dans des petits fichiers : les **cgroups**. On va les lire depuis l'intérieur.",
+        "👀 Tu dois retrouver 128 Mo (en octets, ça fait un gros nombre) et **32**."
+      ]
     },
     {
       "titre": "Ses droits d'administrateur",
@@ -83,13 +152,24 @@
       "consigne": "Affiche ses capabilities effectives.",
       "commande": "docker exec demo grep CapEff /proc/1/status",
       "options": [
-        ["grep CapEff", "ne garde que la ligne qui contient « CapEff »"],
-        ["/proc/1/status", "la fiche d'identité du programme n° 1"]
+        [
+          "grep CapEff",
+          "ne garde que la ligne qui contient « CapEff »"
+        ],
+        [
+          "/proc/1/status",
+          "la fiche d'identité du programme n° 1"
+        ]
       ],
       "sortie": "CapEff:\t00000000a80425fb",
       "remarque": "`a80425fb` code les **14 capabilities** que Docker laisse par défaut, sur une quarantaine. Un vrai root sur l'hôte les aurait toutes.",
       "attendu": "^docker exec demo grep CapEff",
-      "bravo": "14 capabilities : une partie seulement des pouvoirs de root."
+      "bravo": "14 capabilities : une partie seulement des pouvoirs de root.",
+      "robot": [
+        "Dans le conteneur, nginx tourne en **root**… mais un root avec des menottes. 🔒",
+        "Les droits d'administrateur sont découpés en petites clés : les **capabilities**. Docker n'en laisse qu'une partie.",
+        "👀 Note la valeur hexadécimale : c'est le trousseau de clés autorisé."
+      ]
     },
     {
       "titre": "Tester le plafond de programmes",
@@ -97,13 +177,24 @@
       "consigne": "Essaie de lancer 60 programmes d'un coup dans le conteneur.",
       "commande": "docker exec demo sh -c 'for i in $(seq 1 60); do sleep 30 & done'",
       "options": [
-        ["sh -c '…'", "lance un petit script dans le conteneur"],
-        ["for i in $(seq 1 60); do sleep 30 & done", "60 fois : démarre un programme qui attend 30 s, en arrière-plan"]
+        [
+          "sh -c '…'",
+          "lance un petit script dans le conteneur"
+        ],
+        [
+          "for i in $(seq 1 60); do sleep 30 & done",
+          "60 fois : démarre un programme qui attend 30 s, en arrière-plan"
+        ]
       ],
       "sortie": "sh: can't fork: Resource temporarily unavailable",
       "remarque": "« can't fork » : le noyau **refuse** de créer un programme de plus. Le conteneur est bloqué à son plafond, le reste de la machine n'a rien senti.",
       "attendu": "^docker exec demo sh -c .*seq 1 \\d+",
-      "bravo": "Refusé au-delà du plafond : la machine est protégée."
+      "bravo": "Refusé au-delà du plafond : la machine est protégée.",
+      "robot": [
+        "On passe aux crash-tests ! 💥",
+        "On va essayer de lancer **60** programmes alors que le plafond est à 32.",
+        "👀 Guette le message « can't fork » : c'est le noyau qui dit non."
+      ]
     },
     {
       "titre": "Une fuite de mémoire",
@@ -111,15 +202,29 @@
       "consigne": "Lance un conteneur `gourmand`, limité à 64 Mo, qui remplit la mémoire.",
       "commande": "docker run --name gourmand --memory 64m alpine:3.22 sh -c 'tail /dev/zero'",
       "options": [
-        ["--memory 64m", "plafond de 64 Mo"],
-        ["alpine:3.22", "une toute petite image Linux"],
-        ["tail /dev/zero", "lit un flux de zéros infini et le garde en mémoire : la mémoire se remplit"]
+        [
+          "--memory 64m",
+          "plafond de 64 Mo"
+        ],
+        [
+          "alpine:3.22",
+          "une toute petite image Linux"
+        ],
+        [
+          "tail /dev/zero",
+          "lit un flux de zéros infini et le garde en mémoire : la mémoire se remplit"
+        ]
       ],
       "sortie": "(rien ne s'affiche : le conteneur est arrêté net)",
       "remarque": "Le terminal te rend la main sans message : le noyau a **tué** le programme dès qu'il a dépassé 64 Mo. Sans `--memory`, il aurait pu remplir la mémoire de toute la machine.",
       "attendu": "^docker run (?=.*(--memory|-m)[ =]\\d+).*tail /dev/zero",
       "indice": "sans `--memory`, rien ne l'arrêterait : ajoute `--memory 64m`.",
-      "bravo": "Le noyau l'a arrêté net."
+      "bravo": "Le noyau l'a arrêté net.",
+      "robot": [
+        "Nouveau cobaye : un conteneur **glouton** qui avale de la mémoire sans jamais s'arrêter.",
+        "On lui donne une assiette de 64 Mo. Que va-t-il se passer quand elle sera vide ?",
+        "👀 Spoiler : le terminal va te rendre la main sans prévenir. Ce silence est un indice."
+      ]
     },
     {
       "titre": "Comprendre pourquoi il s'est arrêté",
@@ -127,13 +232,24 @@
       "consigne": "Demande à Docker si c'est bien la limite de mémoire qui l'a tué.",
       "commande": "docker inspect -f '{{.State.OOMKilled}}' gourmand",
       "options": [
-        ["docker inspect", "affiche toute la fiche technique d'un conteneur"],
-        ["-f '{{.State.OOMKilled}}'", "n'en garde qu'un champ : « tué par manque de mémoire ? »"]
+        [
+          "docker inspect",
+          "affiche toute la fiche technique d'un conteneur"
+        ],
+        [
+          "-f '{{.State.OOMKilled}}'",
+          "n'en garde qu'un champ : « tué par manque de mémoire ? »"
+        ]
       ],
       "sortie": "true",
       "remarque": "**OOM** = Out Of Memory. `true` confirme que c'est la limite de 64 Mo. Essaie aussi `docker ps -a` : son statut est `Exited (137)`, le code des programmes tués.",
       "attendu": "^docker inspect .*OOMKilled",
-      "bravo": "C'est bien la limite de mémoire (OOM)."
+      "bravo": "C'est bien la limite de mémoire (OOM).",
+      "robot": [
+        "Mène l'enquête, détective ! 🕵️",
+        "On demande à Docker le rapport d'autopsie du glouton : a-t-il été arrêté pour excès de mémoire ?",
+        "👀 Un simple `true` suffira à boucler le dossier."
+      ]
     },
     {
       "titre": "Faire le ménage",
@@ -141,13 +257,35 @@
       "consigne": "Supprime les deux conteneurs.",
       "commande": "docker rm -f demo gourmand",
       "options": [
-        ["docker rm", "supprime des conteneurs"],
-        ["-f", "force : arrête d'abord ceux qui tournent encore (demo)"]
+        [
+          "docker rm",
+          "supprime des conteneurs"
+        ],
+        [
+          "-f",
+          "force : arrête d'abord ceux qui tournent encore (demo)"
+        ]
       ],
       "sortie": "demo\ngourmand",
       "remarque": "Docker répète le nom de chaque conteneur supprimé. Vérifie avec `docker ps -a` : il n'y a plus rien.",
       "attendu": "^docker rm (?=.*-f).*",
-      "bravo": "Machine propre."
+      "bravo": "Machine propre.",
+      "robot": [
+        "Dernière étape : on range le labo. 🧹",
+        "Un bon admin ne laisse pas traîner ses conteneurs de test.",
+        "👀 Docker te répondra le nom de chaque conteneur supprimé."
+      ]
     }
-  ]
+  ],
+  "robotIntro": [
+    "Salut ! Moi c'est **Conti**, ton copilote. 👋",
+    "Aujourd'hui on enferme un serveur web dans une boîte, puis on vérifie que la boîte tient : ce qu'il **voit**, ce qu'il **mange**, ce qu'il a le **droit de faire**.",
+    "Le terminal de gauche est un bac à sable : tu ne peux rien casser. On y va ?"
+  ],
+  "robotFin": [
+    "Mission accomplie ! 🎉",
+    "Tu as vu de tes yeux les trois murs d'un conteneur : **namespaces**, **cgroups** et **capabilities**.",
+    "Tu repars avec ton badge. À bientôt pour le prochain lab !"
+  ],
+  "badge": "Gardien de l'isolation"
 }
