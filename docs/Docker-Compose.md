@@ -274,6 +274,14 @@ Compose pilote **le moteur Docker visé**, en général une seule machine : il n
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/compose.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Cinq étapes, environ 10 minutes. Un mini-projet de deux services : un site nginx et un conteneur « outil » qui sert à tester le réseau.
 
 **Étape 1 · Écrire le fichier et le vérifier**

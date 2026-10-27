@@ -430,17 +430,19 @@ html { scroll-behavior: smooth; }
 .ts-ok { color: #5affb6; font-weight: 600; margin: 4px 0; }
 .ts-indice { color: #eeff57; margin: 4px 0; }
 .ts-ligne {
-  display: flex; align-items: center; gap: 8px; margin: 0;
+  display: flex; align-items: flex-start; gap: 8px; margin: 0;
   padding: 10px 16px; border-top: 1px solid #2a2027; background: #0a0006;
   font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", Menlo, monospace;
 }
+.ts-ligne .ts-invite { white-space: nowrap; line-height: 1.5; }
 .ts-saisie {
-  flex: 1; background: transparent; border: 0; outline: none;
-  color: #fff; font: inherit; caret-color: #5affb6;
+  flex: 1; background: transparent; border: 0; outline: none; resize: none; overflow: hidden;
+  color: #fff; font: inherit; line-height: 1.5; caret-color: #5affb6; padding: 0; margin: 0;
+  white-space: pre-wrap; max-height: 14rem; overflow-y: auto;
 }
 @media (max-width: 600px) { .ts-titre { display: none; } .ts-ecran { height: 18rem; } }
 .ts-ecran { overflow-x: auto; }
-.ts-sortie { white-space: pre; word-break: normal; }
+.ts-sortie { white-space: pre-wrap; word-break: normal; overflow-wrap: anywhere; }
 .ts-sortie.ts-info, .ts-sortie.ts-ok, .ts-sortie.ts-indice, .ts-sortie.ts-erreur { white-space: pre-wrap; }
 
 /* Pendant qu'une commande s'exécute : curseur clignotant, saisie en attente */
@@ -508,7 +510,7 @@ html { scroll-behavior: smooth; }
   display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem;
   background: #0a0006; border-radius: 10px; padding: 0.6rem 0.8rem; margin: 0.6rem 0 0.9rem;
 }
-.md-typeset .lab-commande code { background: none; color: #eeff57; font-size: 0.74rem; padding: 0; flex: 1 1 18rem; word-break: normal; overflow-wrap: break-word; }
+.md-typeset .lab-commande code { background: none; color: #eeff57; font-size: 0.74rem; padding: 0; flex: 1 1 18rem; word-break: normal; overflow-wrap: break-word; white-space: pre-wrap; max-height: 18rem; overflow-y: auto; }
 .lab-boutons { display: inline-flex; gap: 0.4rem; }
 .lab-boutons button {
   font: inherit; font-size: 0.66rem; cursor: pointer; border: 0; border-radius: 999px; padding: 0.3rem 0.8rem;
@@ -628,5 +630,5 @@ body:has(.lab-page) .md-top { display: none; }
 .lab-badge-icone { font-size: 2rem; animation: rb-saut 0.8s ease 0.6s 2; }
 @media (prefers-reduced-motion: reduce) {
   .robot .rb-corps, .robot .rb-oeil, .robot .rb-lampe, .robot-scene .robot-boite, .robot-scene .rb-bras-g,
-  .robot-scene .rb-bras-d, .robot-scene .rb-bouche, .xp-pop, .lab-badge-icone { animation: none !important; }
+  .robot-scene .rb-bras-d, .robot-scene .rb-bouche, .xp-pop, .lab-badge, .lab-badge-icone { animation: none !important; }
 }

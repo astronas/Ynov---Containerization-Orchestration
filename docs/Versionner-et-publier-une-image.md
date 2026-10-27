@@ -180,6 +180,14 @@ flowchart LR
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/publier.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 15 minutes. Il te faut le dossier `atelier` et l'image `atelier:1.0` de la page [Écrire un Dockerfile](Ecrire-un-Dockerfile.md) : si tu ne les as plus, refais ses étapes 1 et 2. Place-toi dans le dossier : `cd atelier`.
 
 **Étape 1 · Lancer la version 1.0, puis modifier le code**

@@ -1,0 +1,491 @@
+{
+  "titre": "Contexte de build et cache",
+  "duree": "10 min",
+  "intro": "Tu vas préparer un tout petit site avec un fichier de 50 Mo caché dans `public/`, le filtrer avec `.dockerignore`, puis regarder le cache du constructeur réutiliser ou refaire une étape.",
+  "conclusion": "Tu as vu qu'un motif `*.tmp` ne filtre que la racine (52 Mo envoyés, `gros.tmp` dans l'image), que `**/*.tmp` réduit l'envoi à quelques octets et l'en retire, et que le `COPY` passe de `CACHED` à `DONE` dès que le contenu copié change.",
+  "retour": {
+    "texte": "Retour au cours : Contexte de build, cache et .dockerignore",
+    "lien": "../../Contexte-de-build-et-cache/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer le dossier du site",
+      "pourquoi": "Pour observer le contexte, il nous faut un petit projet. On crée d'un coup le dossier `demo-ctx` et son sous-dossier `public`, puis on entre dedans.",
+      "consigne": "Crée `demo-ctx/public` et place-toi dans `demo-ctx`.",
+      "commande": "mkdir -p demo-ctx/public && cd demo-ctx",
+      "options": [
+        [
+          "mkdir -p demo-ctx/public",
+          "crée `demo-ctx` et son sous-dossier `public` en une fois"
+        ],
+        [
+          "&& cd demo-ctx",
+          "puis entre dans `demo-ctx`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : tu es maintenant dans `demo-ctx`, qui servira de contexte au build.",
+      "attendu": "^mkdir -p demo-ctx/public && cd demo-ctx$",
+      "indice": "`-p` permet de créer les deux niveaux d'un coup : `mkdir -p demo-ctx/public && cd demo-ctx`.",
+      "bravo": "Le chantier est ouvert.",
+      "robot": [
+        "On ouvre le chantier : un mini-site dans un dossier `demo-ctx`. 👷",
+        "Ce dossier sera notre **colis** : tout ce qu'il contient partira chez le constructeur.",
+        "👀 Pas de sortie : le silence veut dire que c'est fait."
+      ]
+    },
+    {
+      "titre": "Une page web",
+      "pourquoi": "Le site a besoin d'au moins une page. Une seule ligne de HTML suffit.",
+      "consigne": "Écris `<h1>ok</h1>` dans `public/index.html`.",
+      "commande": "echo '<h1>ok</h1>' > public/index.html",
+      "options": [
+        [
+          "echo '<h1>ok</h1>'",
+          "le texte de la page"
+        ],
+        [
+          "> public/index.html",
+          "l'écrit dans ce fichier (le crée ou le remplace)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : la page est créée.",
+      "attendu": "^echo .*<h1>ok</h1>.* > public/index\\.html$",
+      "bravo": "La page est prête.",
+      "robot": [
+        "Premier objet dans le colis : une petite page web.",
+        "C'est la lettre qu'on veut vraiment envoyer.",
+        "👀 Rien à l'écran : le fichier existe désormais."
+      ]
+    },
+    {
+      "titre": "Le gros fichier oublié",
+      "pourquoi": "Dans la vraie vie, un dossier contient souvent des fichiers oubliés : archives, sauvegardes, journaux. On en simule un de 50 Mo, rempli de hasard.",
+      "consigne": "Crée un fichier `public/gros.tmp` de 50 Mo.",
+      "commande": "head -c 50M /dev/urandom > public/gros.tmp",
+      "options": [
+        [
+          "head -c 50M",
+          "lit les 50 premiers mégaoctets"
+        ],
+        [
+          "/dev/urandom",
+          "une source infinie d'octets au hasard"
+        ],
+        [
+          "> public/gros.tmp",
+          "les écrit dans ce fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier de 50 Mo est créé. Il joue l'archive oubliée dans un coin du projet.",
+      "attendu": "^head -c 50M /dev/urandom > public/gros\\.tmp$",
+      "bravo": "Le piège est en place.",
+      "robot": [
+        "On glisse maintenant un **carton de 50 Mo** au fond du colis, sans faire exprès. 📦",
+        "Comme la vieille valise qu'on oublie dans le coffre avant de partir en vacances.",
+        "👀 Toujours pas de sortie : on vérifiera les tailles juste après."
+      ]
+    },
+    {
+      "titre": "Une recette de deux lignes",
+      "pourquoi": "Le Dockerfile part d'une base minuscule, `busybox`, et copie le dossier `public/` dans `/www/`. `printf` écrit tout en une ligne, `\\n` marque chaque retour à la ligne.",
+      "consigne": "Écris le `Dockerfile` avec `printf`.",
+      "commande": "printf 'FROM busybox:1.37\\nCOPY public/ /www/\\n' > Dockerfile",
+      "options": [
+        [
+          "printf '…'",
+          "écrit le texte en remplaçant chaque `\\n` par un retour à la ligne"
+        ],
+        [
+          "FROM busybox:1.37",
+          "une base de quelques Mo"
+        ],
+        [
+          "COPY public/ /www/",
+          "copie tout le dossier `public/` dans `/www/` de l'image"
+        ],
+        [
+          "> Dockerfile",
+          "écrit le résultat dans le fichier `Dockerfile`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le `Dockerfile` contient deux lignes. Attention, `COPY public/` copiera **tout** le dossier, gros fichier compris, sauf si on le filtre.",
+      "attendu": "^printf .*FROM busybox:1\\.37.*COPY public/ /www/.* > Dockerfile$",
+      "indice": "tout le texte tient entre apostrophes, avec `\\n` entre les deux lignes, puis `> Dockerfile`.",
+      "bravo": "La recette est écrite.",
+      "robot": [
+        "La recette tient en deux lignes : une base, une copie.",
+        "C'est la consigne au cuisinier : « prends tout ce qu'il y a dans le sac `public` ».",
+        "👀 Pas de sortie : retiens que `COPY public/` prend tout, sans trier."
+      ]
+    },
+    {
+      "titre": "Mesurer les fichiers",
+      "pourquoi": "On vérifie la taille de ce qu'on s'apprête à envoyer : une page de quelques octets, et un fichier énorme.",
+      "consigne": "Affiche la taille de chaque fichier de `public/`.",
+      "commande": "du -h public/*",
+      "options": [
+        [
+          "du",
+          "mesure la place prise sur le disque"
+        ],
+        [
+          "-h",
+          "en unités lisibles (K, M)"
+        ],
+        [
+          "public/*",
+          "chaque fichier du dossier `public`"
+        ]
+      ],
+      "sortie": "50M\tpublic/gros.tmp\n4.0K\tpublic/index.html",
+      "remarque": "50 Mo pour le fichier oublié contre 4 ko pour la vraie page. Sans filtre, les deux partiront au constructeur.",
+      "attendu": "^du -h public/?\\*?$",
+      "bravo": "Tu connais le poids du colis.",
+      "robot": [
+        "Pesons le colis avant de l'envoyer. ⚖️",
+        "Comme à la poste : on pose le paquet sur la balance avant de payer.",
+        "👀 Compare les deux tailles : `50M` contre `4.0K`."
+      ]
+    },
+    {
+      "titre": "Un premier filtre",
+      "pourquoi": "Le fichier `.dockerignore`, à la racine du contexte, dit ce qu'il ne faut pas envoyer. On y écrit une règle qui semble évidente : `*.tmp`.",
+      "consigne": "Crée le `.dockerignore` avec la règle `*.tmp`.",
+      "commande": "echo '*.tmp' > .dockerignore",
+      "options": [
+        [
+          "echo '*.tmp'",
+          "la règle : les fichiers qui finissent par `.tmp`"
+        ],
+        [
+          "> .dockerignore",
+          "l'écrit dans le fichier de filtre (le point au début le rend caché)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche. On va voir tout de suite si cette règle suffit.",
+      "attendu": "^echo ['\\\"]?\\*\\.tmp['\\\"]? > \\.dockerignore$",
+      "bravo": "Le filtre est posé.",
+      "robot": [
+        "On pose un premier tamis sur le colis.",
+        "C'est la liste « ne pas emballer » qu'on donne au déménageur.",
+        "👀 Pas de sortie : le test, c'est le build qui suit."
+      ]
+    },
+    {
+      "titre": "Construire et mesurer l'envoi",
+      "pourquoi": "On construit l'image en ne gardant que les lignes qui disent combien a été envoyé au constructeur : d'abord le `.dockerignore` lui-même, puis le contexte.",
+      "consigne": "Construis `demo-ctx` et affiche la taille des envois.",
+      "commande": "docker build --progress=plain -t demo-ctx . 2>&1 | grep 'transferring context: [0-9]'",
+      "options": [
+        [
+          "docker build -t demo-ctx .",
+          "construit l'image `demo-ctx` avec le dossier courant comme contexte"
+        ],
+        [
+          "--progress=plain",
+          "affiche le détail du build en texte simple"
+        ],
+        [
+          "2>&1",
+          "regroupe les messages du build (écrits sur la sortie d'erreur) avec la sortie normale"
+        ],
+        [
+          "| grep 'transferring context: [0-9]'",
+          "ne garde que les lignes qui disent combien a été envoyé"
+        ]
+      ],
+      "sortie": "#3 transferring context: 46B done\n#4 transferring context: 52.44MB 0.4s done",
+      "remarque": "52 Mo envoyés malgré la règle `*.tmp`. Les numéros `#3`, `#4` et les durées peuvent varier chez toi.",
+      "attendu": "^docker (image )?build (?=.*--progress[ =]plain)(?=.*(-t|--tag)[ =]demo-ctx\\b).* \\| grep .*transferring context",
+      "indice": "recopie la commande en entier, avec `--progress=plain`, `-t demo-ctx`, le `.` puis `2>&1 | grep …`.",
+      "bravo": "Le build a tourné, mais le colis pèse toujours 52 Mo.",
+      "robot": [
+        "On expédie le colis et on regarde le bordereau. 🚚",
+        "Le tamis est posé… mais a-t-il retenu la valise oubliée ?",
+        "👀 Regarde la deuxième ligne : si elle affiche des **MB**, le gros fichier est parti."
+      ]
+    },
+    {
+      "titre": "Regarder dans l'image",
+      "pourquoi": "Un envoi ne dit pas tout : ce qui compte, c'est ce qui est **dans** l'image. On liste le dossier `/www`.",
+      "consigne": "Liste le contenu de `/www` dans l'image `demo-ctx`.",
+      "commande": "docker run --rm demo-ctx ls /www",
+      "options": [
+        [
+          "docker run --rm demo-ctx",
+          "lance un conteneur jetable de l'image"
+        ],
+        [
+          "ls /www",
+          "liste le dossier où le site a été copié"
+        ]
+      ],
+      "sortie": "gros.tmp\nindex.html",
+      "remarque": "`gros.tmp` est bien **dans** l'image. Le motif `*.tmp` ne vise que la racine du contexte, pas le sous-dossier `public/`.",
+      "attendu": "^docker run (--rm )?demo-ctx ls /www/?$",
+      "bravo": "Le fichier oublié est dans l'image.",
+      "robot": [
+        "Ouvrons le colis à l'arrivée pour voir ce qu'il contient.",
+        "Le déménageur avait la liste « ne pas emballer »… mais il n'a regardé que dans l'entrée, pas dans les chambres.",
+        "👀 Cherche `gros.tmp` dans la liste."
+      ]
+    },
+    {
+      "titre": "Le bon motif",
+      "pourquoi": "Pour viser tous les dossiers, il faut `**/` devant le motif. `>>` ajoute la ligne à la fin du fichier au lieu de le remplacer.",
+      "consigne": "Ajoute la règle `**/*.tmp` au `.dockerignore`.",
+      "commande": "echo '**/*.tmp' >> .dockerignore",
+      "options": [
+        [
+          "'**/*.tmp'",
+          "les `.tmp` dans tous les dossiers, à toutes les profondeurs"
+        ],
+        [
+          ">>",
+          "ajoute à la fin du fichier (un seul `>` l'aurait remplacé)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le `.dockerignore` contient maintenant deux règles.",
+      "attendu": "^echo ['\\\"]?\\*\\*/\\*\\.tmp['\\\"]? >> \\.dockerignore$",
+      "indice": "deux chevrons `>>` pour ajouter, et le motif `'**/*.tmp'` entre apostrophes.",
+      "bravo": "Règle ajoutée.",
+      "robot": [
+        "On corrige le tamis : cette fois, il fouille **tous** les recoins.",
+        "C'est préciser au déménageur : « aucune valise, dans aucune pièce ».",
+        "👀 Pas de sortie : on vérifie le fichier juste après."
+      ]
+    },
+    {
+      "titre": "Relire le filtre",
+      "pourquoi": "On vérifie que les deux règles sont bien là, dans le bon ordre.",
+      "consigne": "Affiche le contenu du `.dockerignore`.",
+      "commande": "cat .dockerignore",
+      "options": [
+        [
+          "cat",
+          "affiche le contenu d'un fichier"
+        ]
+      ],
+      "sortie": "*.tmp\n**/*.tmp",
+      "remarque": "L'ancienne règle est toujours là, la nouvelle s'y ajoute. Si tu ne vois qu'une ligne, tu as tapé un seul `>`.",
+      "bravo": "Les deux règles sont en place.",
+      "robot": [
+        "Petit contrôle de la liste avant de réexpédier.",
+        "On relit la liste « ne pas emballer » avant de la donner au déménageur.",
+        "👀 Deux lignes attendues, la seconde commence par `**/`."
+      ]
+    },
+    {
+      "titre": "Reconstruire et mesurer",
+      "pourquoi": "Même build, même filtre d'affichage : la taille du contexte envoyé doit fondre.",
+      "consigne": "Reconstruis `demo-ctx` et affiche la taille des envois.",
+      "commande": "docker build --progress=plain -t demo-ctx . 2>&1 | grep 'transferring context: [0-9]'",
+      "options": [
+        [
+          "docker build -t demo-ctx .",
+          "construit l'image `demo-ctx` avec le dossier courant comme contexte"
+        ],
+        [
+          "--progress=plain",
+          "affiche le détail du build en texte simple"
+        ],
+        [
+          "2>&1",
+          "regroupe les messages du build (écrits sur la sortie d'erreur) avec la sortie normale"
+        ],
+        [
+          "| grep 'transferring context: [0-9]'",
+          "ne garde que les lignes qui disent combien a été envoyé"
+        ]
+      ],
+      "sortie": "#3 transferring context: 55B done\n#4 transferring context: 64B done",
+      "remarque": "Quelques dizaines d'octets au lieu de 52 Mo. La première ligne (55 octets) est l'envoi du `.dockerignore` lui-même, un peu plus long maintenant.",
+      "attendu": "^docker (image )?build (?=.*--progress[ =]plain)(?=.*(-t|--tag)[ =]demo-ctx\\b).* \\| grep .*transferring context",
+      "indice": "même commande qu'à l'étape 7 : `--progress=plain`, `-t demo-ctx`, le `.` puis `2>&1 | grep …`.",
+      "bravo": "Le colis ne pèse plus rien.",
+      "robot": [
+        "On réexpédie avec le nouveau tamis. 🎯",
+        "Cette fois, la valise reste à la maison et le colis tient dans une enveloppe.",
+        "👀 Cherche les **B** (octets) à la place des **MB**."
+      ]
+    },
+    {
+      "titre": "Vérifier l'image",
+      "pourquoi": "On contrôle encore le contenu de l'image : un petit envoi ne prouve rien tant qu'on n'a pas regardé dedans.",
+      "consigne": "Liste de nouveau `/www` dans l'image `demo-ctx`.",
+      "commande": "docker run --rm demo-ctx ls /www",
+      "options": [
+        [
+          "docker run --rm demo-ctx",
+          "conteneur jetable de la nouvelle image"
+        ],
+        [
+          "ls /www",
+          "liste le dossier du site"
+        ]
+      ],
+      "sortie": "index.html",
+      "remarque": "`gros.tmp` a disparu de l'image. Un fichier exclu par `.dockerignore` ne peut tout simplement pas être copié.",
+      "attendu": "^docker run (--rm )?demo-ctx ls /www/?$",
+      "bravo": "L'image ne contient que la page.",
+      "robot": [
+        "Dernière vérification à l'arrivée du colis.",
+        "On ouvre le carton : il ne reste que la lettre, la valise est restée à quai.",
+        "👀 Une seule ligne attendue : `index.html`."
+      ]
+    },
+    {
+      "titre": "Reconstruire sans rien changer",
+      "pourquoi": "Avant chaque étape, le constructeur se demande s'il a déjà fait exactement la même chose sur le même point de départ. Rien n'a changé : il doit réutiliser son résultat.",
+      "consigne": "Reconstruis `demo-ctx` et affiche le sort de l'étape `[2/2]`.",
+      "commande": "docker build --progress=plain -t demo-ctx . 2>&1 | grep -A1 '\\[2/2\\]'",
+      "options": [
+        [
+          "docker build --progress=plain -t demo-ctx .",
+          "reconstruit l'image, détail en texte simple"
+        ],
+        [
+          "2>&1 |",
+          "envoie tous les messages du build au filtre"
+        ],
+        [
+          "grep -A1 '\\[2/2\\]'",
+          "garde la ligne de l'étape 2 sur 2 (le `COPY`) et la suivante (`-A1`)"
+        ]
+      ],
+      "sortie": "#6 [2/2] COPY public/ /www/\n#6 CACHED",
+      "remarque": "`CACHED`. Le contenu à copier est identique au build précédent, le résultat est ressorti du cache sans rien refaire.",
+      "attendu": "^docker (image )?build (?=.*--progress[ =]plain)(?=.*(-t|--tag)[ =]demo-ctx\\b).* \\| grep -A ?1 .*2/2",
+      "indice": "la fin de la commande est `2>&1 | grep -A1 '\\[2/2\\]'`, avec les antislashs devant les crochets.",
+      "bravo": "L'étape vient du cache.",
+      "robot": [
+        "Et si on reconstruit sans rien toucher ? ❄️",
+        "Le cuisinier garde chaque préparation au **frigo** : si la commande est la même, il la ressort au lieu de la refaire.",
+        "👀 Lis la ligne sous `[2/2]` : on attend le mot `CACHED`."
+      ]
+    },
+    {
+      "titre": "Modifier la page",
+      "pourquoi": "Le cache se fonde sur le contenu des fichiers copiés. On réécrit la page avec la date et l'heure du moment : son contenu est forcément nouveau.",
+      "consigne": "Réécris `public/index.html` avec la date du jour.",
+      "commande": "echo \"<h1>modifié le $(date)</h1>\" > public/index.html",
+      "options": [
+        [
+          "\"…\"",
+          "guillemets doubles : le shell remplace ce qui est entre `$( )`"
+        ],
+        [
+          "$(date)",
+          "la date et l'heure du moment"
+        ],
+        [
+          "> public/index.html",
+          "remplace le contenu de la page"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : la page a un contenu neuf, que le constructeur n'a encore jamais vu.",
+      "attendu": "^echo .*\\$\\(date\\).* > public/index\\.html$",
+      "indice": "mets le texte entre guillemets doubles pour que `$(date)` soit remplacé.",
+      "bravo": "La page a changé.",
+      "robot": [
+        "On change un ingrédient, juste un peu.",
+        "C'est modifier la commande au restaurant : la préparation au frigo ne correspond plus.",
+        "👀 Pas de sortie : l'effet se verra au build suivant."
+      ]
+    },
+    {
+      "titre": "Reconstruire après modification",
+      "pourquoi": "Le contenu copié par `COPY` a changé : le constructeur ne peut plus réutiliser son résultat et doit refaire l'étape.",
+      "consigne": "Reconstruis `demo-ctx` et affiche le sort de l'étape `[2/2]`.",
+      "commande": "docker build --progress=plain -t demo-ctx . 2>&1 | grep -A1 '\\[2/2\\]'",
+      "options": [
+        [
+          "docker build --progress=plain -t demo-ctx .",
+          "reconstruit l'image, détail en texte simple"
+        ],
+        [
+          "2>&1 |",
+          "envoie tous les messages du build au filtre"
+        ],
+        [
+          "grep -A1 '\\[2/2\\]'",
+          "garde la ligne de l'étape 2 sur 2 (le `COPY`) et la suivante (`-A1`)"
+        ]
+      ],
+      "sortie": "#6 [2/2] COPY public/ /www/\n#6 DONE 0.0s",
+      "remarque": "`DONE` à la place de `CACHED`, l'étape a été refaite. Dans un vrai projet, toutes les étapes **suivantes** seraient refaites aussi : d'où l'intérêt de mettre ce qui change souvent en bas de la recette.",
+      "attendu": "^docker (image )?build (?=.*--progress[ =]plain)(?=.*(-t|--tag)[ =]demo-ctx\\b).* \\| grep -A ?1 .*2/2",
+      "indice": "même commande qu'à l'étape 13.",
+      "bravo": "L'étape a été refaite.",
+      "robot": [
+        "Le cuisinier va-t-il encore ouvrir le frigo ?",
+        "La commande a changé : la préparation gardée au frais ne sert plus, il faut recuisiner.",
+        "👀 Cette fois, la ligne sous `[2/2]` doit dire `DONE`."
+      ]
+    },
+    {
+      "titre": "Supprimer l'image",
+      "pourquoi": "L'image `demo-ctx` ne sert plus. Sans tag précisé, Docker vise `latest`.",
+      "consigne": "Supprime l'image `demo-ctx`.",
+      "commande": "docker image rm demo-ctx",
+      "options": [
+        [
+          "docker image rm demo-ctx",
+          "retire le nom `demo-ctx:latest` et supprime l'image"
+        ]
+      ],
+      "sortie": "Untagged: demo-ctx:latest\nDeleted: sha256:6f894423ee4ab463910743ad93174191bc544895175c629499802f9a1b729031",
+      "remarque": "Docker a complété le nom en `demo-ctx:latest`. Ton identifiant sera différent.",
+      "attendu": "^docker (image rm|rmi) demo-ctx(:latest)?$",
+      "bravo": "Image supprimée.",
+      "robot": [
+        "On range le chantier. 🧹",
+        "Le colis est arrivé, on jette le carton.",
+        "👀 Remarque le `:latest` ajouté tout seul au nom."
+      ]
+    },
+    {
+      "titre": "Supprimer le dossier",
+      "pourquoi": "Il reste le dossier `demo-ctx`, avec son fichier de 50 Mo. On remonte d'un niveau et on supprime tout.",
+      "consigne": "Remonte d'un dossier et supprime `demo-ctx`.",
+      "commande": "cd .. && rm -rf demo-ctx",
+      "options": [
+        [
+          "cd ..",
+          "remonte au dossier parent"
+        ],
+        [
+          "rm -rf demo-ctx",
+          "supprime le dossier et tout son contenu, sans confirmation"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : les 50 Mo sont libérés.",
+      "attendu": "^cd \\.\\. && rm -r[f]* demo-ctx/?$",
+      "bravo": "Chantier rendu propre.",
+      "robot": [
+        "Dernier coup de balai : on démonte l'échafaudage.",
+        "On rend le terrain comme on l'a trouvé, valise oubliée comprise.",
+        "👀 Pas de sortie : le dossier a disparu."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Salut ! Ici **Conti**, ton chef de chantier du jour. 👷",
+    "Mission : préparer le **colis** qu'on envoie au cuisinier de Docker sans y glisser 50 Mo par erreur, puis voir ce qu'il garde au **frigo** (le cache).",
+    "Rien de ce que tu tapes ici ne touche une vraie machine : expérimente sans crainte."
+  ],
+  "robotFin": [
+    "Chantier livré, propre et léger ! 🎉",
+    "Tu sais maintenant que le **contexte** part en entier, que le **.dockerignore** doit viser tous les dossiers (`**/`), et que le **cache** se fonde sur le contenu des fichiers.",
+    "Voici ton badge : tu construis vite et sans bagage inutile."
+  ],
+  "badge": "Maître du cache"
+}

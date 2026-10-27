@@ -1,0 +1,558 @@
+{
+  "titre": "Sécurité des images",
+  "duree": "10 min",
+  "intro": "Tu vas cacher un faux secret dans une image, croire qu'il a disparu, puis le retrouver en fouillant ses couches. Ensuite, tu feras passer le même secret proprement avec BuildKit, et tu scanneras deux images avec Trivy.",
+  "conclusion": "Tu as retrouvé `valeur-secrete` dans la couche du `COPY` malgré le `rm`, vu que le montage `--mount=type=secret` ne laisse ni fichier ni valeur dans l'historique, et que Trivy signale 0 faille grave sur `alpine:3.22` contre 54 sur `httpd:2.4`.",
+  "retour": {
+    "texte": "Retour au cours : Sécurité des images",
+    "lien": "../../Securite-des-images/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer le dossier de travail",
+      "pourquoi": "On travaille dans un dossier à part, dans ton dossier personnel (`~`), pour ne rien mélanger.",
+      "consigne": "Crée `~/lab-secret` et entre dedans.",
+      "commande": "mkdir -p ~/lab-secret && cd ~/lab-secret",
+      "options": [
+        [
+          "mkdir -p ~/lab-secret",
+          "crée le dossier dans ton dossier personnel (`~`), sans erreur s'il existe déjà"
+        ],
+        [
+          "&& cd ~/lab-secret",
+          "puis entre dedans"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : tu es dans `~/lab-secret`.",
+      "attendu": "^mkdir -p ~/lab-secret && cd ~/lab-secret$",
+      "bravo": "Le bureau d'enquête est installé.",
+      "robot": [
+        "On installe notre bureau d'enquête. 🗂️",
+        "Un dossier rien qu'à nous, comme une salle d'interrogatoire où rien ne traîne.",
+        "👀 Pas de sortie : c'est fait."
+      ]
+    },
+    {
+      "titre": "Un faux secret",
+      "pourquoi": "Il nous faut un secret à cacher. On écrit une valeur bidon dans `token.txt`, puis on l'affiche pour savoir quoi chercher plus tard.",
+      "consigne": "Écris `valeur-secrete` dans `token.txt`, puis affiche-le.",
+      "commande": "echo \"valeur-secrete\" > token.txt && cat token.txt",
+      "options": [
+        [
+          "echo \"valeur-secrete\" > token.txt",
+          "écrit le faux secret dans le fichier"
+        ],
+        [
+          "&& cat token.txt",
+          "puis affiche son contenu"
+        ]
+      ],
+      "sortie": "valeur-secrete",
+      "remarque": "Retiens bien `valeur-secrete`, c'est la pièce à conviction qu'on va chercher dans l'image.",
+      "attendu": "^echo ['\\\"]?valeur-secrete['\\\"]? > token\\.txt && cat token\\.txt$",
+      "bravo": "Le faux secret est prêt.",
+      "robot": [
+        "On fabrique la pièce à conviction : un faux mot de passe.",
+        "C'est comme marquer un billet de banque pour pouvoir le reconnaître plus tard.",
+        "👀 Note bien la valeur affichée : `valeur-secrete`."
+      ]
+    },
+    {
+      "titre": "Un Dockerfile maladroit",
+      "pourquoi": "Ce Dockerfile copie le secret dans l'image, puis le supprime à l'étape suivante. Beaucoup pensent que c'est suffisant. `printf` écrit les trois lignes d'un coup, `\\n` marque chaque retour à la ligne.",
+      "consigne": "Écris `Dockerfile.mauvais` avec `printf`.",
+      "commande": "printf 'FROM alpine:3.22\\nCOPY token.txt /tmp/\\nRUN rm /tmp/token.txt\\n' > Dockerfile.mauvais",
+      "options": [
+        [
+          "printf '…'",
+          "écrit le texte en remplaçant chaque `\\n` par un retour à la ligne"
+        ],
+        [
+          "FROM alpine:3.22",
+          "une base minuscule"
+        ],
+        [
+          "COPY token.txt /tmp/",
+          "copie le secret dans l'image : une couche"
+        ],
+        [
+          "RUN rm /tmp/token.txt",
+          "le supprime : une autre couche"
+        ],
+        [
+          "> Dockerfile.mauvais",
+          "écrit le tout dans ce fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le Dockerfile est écrit. On le relit juste après.",
+      "attendu": "^printf .*FROM alpine:3\\.22.*COPY token\\.txt /tmp/.*RUN rm /tmp/token\\.txt.* > Dockerfile\\.mauvais$",
+      "indice": "tout le texte entre apostrophes, avec `\\n` entre les lignes, puis `> Dockerfile.mauvais`.",
+      "bravo": "La recette maladroite est prête.",
+      "robot": [
+        "Place au suspect : une recette qui copie le secret… puis l'efface.",
+        "C'est comme écrire un code sur une page, puis coller un post-it par-dessus pour le cacher.",
+        "👀 Pas de sortie : on lit le fichier à l'étape suivante."
+      ]
+    },
+    {
+      "titre": "Relire la recette",
+      "pourquoi": "On vérifie que le fichier contient bien les trois lignes attendues.",
+      "consigne": "Affiche `Dockerfile.mauvais`.",
+      "commande": "cat Dockerfile.mauvais",
+      "options": [
+        [
+          "cat",
+          "affiche le contenu d'un fichier"
+        ]
+      ],
+      "sortie": "FROM alpine:3.22\nCOPY token.txt /tmp/\nRUN rm /tmp/token.txt",
+      "remarque": "`COPY` puis `RUN rm`, deux instructions, donc deux couches distinctes dans l'image.",
+      "bravo": "La recette est conforme.",
+      "robot": [
+        "Relisons la déposition du suspect.",
+        "Trois lignes : la base, la copie, puis l'effacement. Tout a l'air propre…",
+        "👀 Repère les deux lignes `COPY` et `RUN` : chacune fera sa propre couche."
+      ]
+    },
+    {
+      "titre": "Construire l'image",
+      "pourquoi": "On construit l'image à partir de cette recette. `-q` n'affiche que son identifiant.",
+      "consigne": "Construis `lab:mauvais` à partir de `Dockerfile.mauvais`.",
+      "commande": "docker build -q -f Dockerfile.mauvais -t lab:mauvais .",
+      "options": [
+        [
+          "-q",
+          "silencieux : n'affiche que l'identifiant"
+        ],
+        [
+          "-f Dockerfile.mauvais",
+          "le Dockerfile à utiliser"
+        ],
+        [
+          "-t lab:mauvais",
+          "le nom de l'image"
+        ],
+        [
+          ".",
+          "le contexte : le dossier courant, où se trouve `token.txt`"
+        ]
+      ],
+      "sortie": "sha256:4ba8fcca9f5f97e19b18203e8a554471d54d3c92a01e71b38e1200aa579a40ac",
+      "remarque": "Une seule ligne, l'identifiant de l'image (le tien sera différent).",
+      "attendu": "^docker (image )?build (?=.*(-f|--file)[ =]Dockerfile\\.mauvais\\b)(?=.*(-t|--tag)[ =]lab:mauvais\\b).* \\.$",
+      "indice": "il faut `-f Dockerfile.mauvais`, `-t lab:mauvais` et le `.` final.",
+      "bravo": "L'image est construite.",
+      "robot": [
+        "On fait cuire la recette suspecte. 🔥",
+        "Le post-it est collé sur le code : en apparence, plus rien à voir.",
+        "👀 Une ligne `sha256:…` : l'image existe."
+      ]
+    },
+    {
+      "titre": "Le secret a disparu ?",
+      "pourquoi": "On vérifie depuis un conteneur que le fichier n'est plus visible. C'est ce que verrait une personne qui lance l'image normalement.",
+      "consigne": "Cherche `/tmp/token.txt` dans un conteneur jetable de `lab:mauvais`.",
+      "commande": "docker run --rm lab:mauvais ls /tmp/token.txt",
+      "options": [
+        [
+          "--rm",
+          "conteneur jetable"
+        ],
+        [
+          "ls /tmp/token.txt",
+          "cherche le fichier"
+        ]
+      ],
+      "sortie": "ls: /tmp/token.txt: No such file or directory",
+      "remarque": "« fichier introuvable ». Vu du conteneur, le secret a disparu. Mais le conteneur ne voit que la pile finale.",
+      "attendu": "^docker run (--rm )?lab:mauvais ls /tmp/token\\.txt$",
+      "bravo": "Le fichier est invisible dans le conteneur.",
+      "robot": [
+        "Premier interrogatoire : le conteneur a-t-il encore le secret ?",
+        "On regarde la page par-dessus le post-it : le code n'est plus visible.",
+        "👀 Un message d'erreur… qui pourrait faire croire que tout va bien."
+      ]
+    },
+    {
+      "titre": "Exporter l'image",
+      "pourquoi": "Quiconque télécharge ton image reçoit toutes ses couches. `docker image save` produit exactement ce paquet, dans une archive.",
+      "consigne": "Exporte `lab:mauvais` dans `mauvais.tar`.",
+      "commande": "docker image save lab:mauvais -o mauvais.tar",
+      "options": [
+        [
+          "docker image save",
+          "exporte une image complète, toutes couches comprises"
+        ],
+        [
+          "-o mauvais.tar",
+          "le fichier d'archive à produire"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : l'archive `mauvais.tar` est créée.",
+      "attendu": "^docker (image )?save (?=.*(-o|--output)[ =]mauvais\\.tar\\b).*lab:mauvais",
+      "bravo": "L'image est exportée.",
+      "robot": [
+        "On récupère l'image comme le ferait un curieux. 🕵️",
+        "C'est photocopier le dossier complet, post-it et pages du dessous compris.",
+        "👀 Pas de sortie : l'archive est prête à être fouillée."
+      ]
+    },
+    {
+      "titre": "Ouvrir l'archive",
+      "pourquoi": "L'archive contient les couches, chacune dans son propre fichier nommé par son empreinte. On la décompresse dans un dossier `couches`.",
+      "consigne": "Crée le dossier `couches` et décompresse l'archive dedans.",
+      "commande": "mkdir -p couches && tar -xf mauvais.tar -C couches",
+      "options": [
+        [
+          "mkdir -p couches",
+          "crée le dossier de destination"
+        ],
+        [
+          "tar -xf mauvais.tar",
+          "extrait le contenu de l'archive"
+        ],
+        [
+          "-C couches",
+          "dans le dossier `couches`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : les couches sont dans `couches/blobs/sha256/`.",
+      "attendu": "^mkdir -p couches && tar -xf mauvais\\.tar -C couches$",
+      "bravo": "L'archive est ouverte.",
+      "robot": [
+        "On étale les pièces du dossier sur la table.",
+        "Chaque couche est un calque transparent qu'on peut maintenant examiner séparément.",
+        "👀 Toujours pas de sortie : la fouille commence juste après."
+      ]
+    },
+    {
+      "titre": "Chercher le fichier",
+      "pourquoi": "Pour chaque couche, on liste son contenu et on garde les lignes qui parlent de `token`. Les fichiers qui ne sont pas des couches produisent des erreurs, qu'on fait taire avec `2>/dev/null`.",
+      "consigne": "Liste, couche par couche, les fichiers dont le nom contient `token`.",
+      "commande": "for c in couches/blobs/sha256/*; do tar -tf \"$c\" 2>/dev/null | grep token; done",
+      "options": [
+        [
+          "for c in couches/blobs/sha256/*; do … done",
+          "répète la commande pour chaque fichier du dossier"
+        ],
+        [
+          "tar -tf \"$c\"",
+          "liste le contenu de la couche, sans l'extraire"
+        ],
+        [
+          "2>/dev/null",
+          "jette les messages d'erreur (fichiers qui ne sont pas des archives)"
+        ],
+        [
+          "| grep token",
+          "ne garde que les lignes qui contiennent « token »"
+        ]
+      ],
+      "sortie": "tmp/token.txt\ntmp/.wh.token.txt",
+      "remarque": "Deux couches parlent de `token`. L'une contient `tmp/token.txt`, l'autre `tmp/.wh.token.txt` : un **effaceur** (*whiteout*) qui ne fait que masquer le fichier du dessous.",
+      "attendu": "^for c in couches/blobs/sha256/\\*; do tar -tf .*\\| grep token; done$",
+      "indice": "recopie la boucle telle quelle, de `for` jusqu'à `done`.",
+      "bravo": "Le fichier est toujours dans une couche.",
+      "robot": [
+        "On soulève les calques un par un. 🔦",
+        "Sous le post-it, la page n'a pas été déchirée : le code est toujours écrit dessous.",
+        "👀 Cherche deux lignes : le fichier lui-même, et son « effaceur » `.wh.`."
+      ]
+    },
+    {
+      "titre": "Lire le secret",
+      "pourquoi": "Il reste à prouver qu'on peut lire la valeur. Pour chaque couche, on essaie d'afficher `tmp/token.txt` directement, sans rien extraire sur le disque.",
+      "consigne": "Affiche le contenu de `tmp/token.txt` depuis les couches.",
+      "commande": "for c in couches/blobs/sha256/*; do tar -xOf \"$c\" tmp/token.txt 2>/dev/null; done",
+      "options": [
+        [
+          "tar -xOf \"$c\" tmp/token.txt",
+          "extrait ce seul fichier et l'affiche à l'écran (`-O`)"
+        ],
+        [
+          "2>/dev/null",
+          "fait taire les couches qui ne le contiennent pas"
+        ]
+      ],
+      "sortie": "valeur-secrete",
+      "remarque": "Le secret en clair. N'importe qui ayant l'image peut le relire ; `RUN rm` n'a fait que le **cacher** dans une couche du dessus.",
+      "attendu": "^for c in couches/blobs/sha256/\\*; do tar -xOf .*tmp/token\\.txt.*; done$",
+      "indice": "recopie la boucle telle quelle, de `for` jusqu'à `done`.",
+      "bravo": "Secret retrouvé en clair.",
+      "robot": [
+        "Moment de vérité : peut-on lire le secret ? 😱",
+        "On décolle le post-it… et le code apparaît, intact.",
+        "👀 Si tu lis `valeur-secrete`, l'affaire est entendue."
+      ]
+    },
+    {
+      "titre": "Le bon geste",
+      "pourquoi": "BuildKit, le moteur de construction de Docker, sait prêter un fichier à **une seule** instruction `RUN`, sans l'écrire dans l'image : c'est le montage de secret. Ce `RUN` se contente de compter les caractères du secret.",
+      "consigne": "Écris `Dockerfile.bon` avec `printf`.",
+      "commande": "printf 'FROM alpine:3.22\\nRUN --mount=type=secret,id=t wc -c /run/secrets/t\\n' > Dockerfile.bon",
+      "options": [
+        [
+          "RUN --mount=type=secret,id=t",
+          "pendant ce `RUN` seulement, le secret `t` est monté dans `/run/secrets/t`"
+        ],
+        [
+          "wc -c /run/secrets/t",
+          "compte ses caractères, comme le ferait une vraie étape qui en a besoin"
+        ],
+        [
+          "> Dockerfile.bon",
+          "écrit la recette dans ce fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : la bonne recette est écrite. Remarque qu'elle ne contient ni `COPY` du secret, ni `rm`.",
+      "attendu": "^printf .*FROM alpine:3\\.22.*RUN --mount=type=secret,id=t .* > Dockerfile\\.bon$",
+      "indice": "tout le texte entre apostrophes, avec `\\n` entre les lignes, puis `> Dockerfile.bon`.",
+      "bravo": "La bonne recette est prête.",
+      "robot": [
+        "Maintenant, la méthode propre. ✨",
+        "Au lieu d'écrire le code sur la page, on le **chuchote** au cuisinier pendant une seule étape.",
+        "👀 Pas de sortie : on construit juste après."
+      ]
+    },
+    {
+      "titre": "Construire avec le secret",
+      "pourquoi": "Au build, on indique d'où vient le secret `t` : du fichier `token.txt`. Il est prêté au `RUN`, puis retiré.",
+      "consigne": "Construis `lab:bon` en prêtant `token.txt` comme secret `t`.",
+      "commande": "docker build -q -f Dockerfile.bon --secret id=t,src=token.txt -t lab:bon .",
+      "options": [
+        [
+          "-f Dockerfile.bon",
+          "la bonne recette"
+        ],
+        [
+          "--secret id=t,src=token.txt",
+          "le secret nommé `t` vient du fichier `token.txt`"
+        ],
+        [
+          "-t lab:bon",
+          "le nom de l'image"
+        ]
+      ],
+      "sortie": "sha256:cb08ddd861eef262ffada8bb16dfa5669a3652e22514fabd513c61b33e035cb2",
+      "remarque": "L'identifiant de la nouvelle image (différent chez toi). Le `RUN` a bien reçu le secret pendant le build.",
+      "attendu": "^docker (image )?build (?=.*(-f|--file)[ =]Dockerfile\\.bon\\b)(?=.*--secret[ =]id=t,src=token\\.txt\\b)(?=.*(-t|--tag)[ =]lab:bon\\b).* \\.$",
+      "indice": "il faut `-f Dockerfile.bon`, `--secret id=t,src=token.txt`, `-t lab:bon` et le `.` final.",
+      "bravo": "L'image est construite proprement.",
+      "robot": [
+        "On cuisine avec le secret chuchoté. 🤫",
+        "Le cuisinier entend le code, s'en sert, et l'oublie aussitôt : rien n'est noté sur la fiche.",
+        "👀 Une ligne `sha256:…` : la construction a réussi."
+      ]
+    },
+    {
+      "titre": "Le secret est-il resté ?",
+      "pourquoi": "On cherche le fichier du secret dans un conteneur de la nouvelle image.",
+      "consigne": "Essaie de lire `/run/secrets/t` dans un conteneur jetable de `lab:bon`.",
+      "commande": "docker run --rm lab:bon cat /run/secrets/t",
+      "options": [
+        [
+          "--rm",
+          "conteneur jetable"
+        ],
+        [
+          "cat /run/secrets/t",
+          "essaie d'afficher le secret"
+        ]
+      ],
+      "sortie": "cat: can't open '/run/secrets/t': No such file or directory",
+      "remarque": "Le fichier n'existe pas dans l'image finale. Le montage n'a duré que le temps du `RUN`.",
+      "attendu": "^docker run (--rm )?lab:bon cat /run/secrets/t$",
+      "bravo": "Aucun fichier secret dans l'image.",
+      "robot": [
+        "Interrogatoire de la nouvelle image.",
+        "On cherche le code sur la fiche de cuisine : il n'a jamais été écrit.",
+        "👀 Une erreur « can't open » : cette fois, c'est vraiment une bonne nouvelle."
+      ]
+    },
+    {
+      "titre": "Fouiller l'historique",
+      "pourquoi": "L'historique de l'image garde le texte de chaque instruction. On regarde celui de la dernière étape, en entier.",
+      "consigne": "Affiche l'instruction complète de la dernière étape de `lab:bon`.",
+      "commande": "docker image history --no-trunc --format '{{.CreatedBy}}' lab:bon | head -1",
+      "options": [
+        [
+          "docker image history",
+          "liste les étapes de fabrication"
+        ],
+        [
+          "--no-trunc",
+          "sans couper les lignes trop longues"
+        ],
+        [
+          "--format '{{.CreatedBy}}'",
+          "seulement l'instruction"
+        ],
+        [
+          "| head -1",
+          "seulement la première ligne, la plus récente"
+        ]
+      ],
+      "sortie": "RUN /bin/sh -c wc -c /run/secrets/t # buildkit",
+      "remarque": "La commande est gardée, mais **aucune valeur**. Ni `valeur-secrete`, ni fichier : le montage de secret ne laisse pas de trace.",
+      "attendu": "^docker (image )?history (?=.*--no-trunc)(?=.*--format).*lab:bon \\| head -(n ?)?1$",
+      "indice": "`--no-trunc` et `--format '{{.CreatedBy}}'`, puis `lab:bon | head -1`.",
+      "bravo": "L'historique est propre.",
+      "robot": [
+        "Dernière vérification : le carnet de bord de l'image.",
+        "Le carnet note « le cuisinier a utilisé un code », mais jamais le code lui-même.",
+        "👀 Cherche `valeur-secrete` dans la ligne : tu ne le trouveras pas."
+      ]
+    },
+    {
+      "titre": "Scanner une petite image",
+      "pourquoi": "Trivy compare la liste des paquets d'une image à la base publique des failles connues (les CVE). Il tourne lui-même dans un conteneur jetable : rien à installer.",
+      "consigne": "Scanne `alpine:3.22` avec Trivy, failles graves seulement, et garde le bilan.",
+      "commande": "docker run --rm -v trivy-cache:/root/.cache aquasec/trivy:0.58.1 image -q --severity HIGH,CRITICAL alpine:3.22 | grep Total",
+      "options": [
+        [
+          "docker run --rm",
+          "Trivy tourne dans un conteneur jetable"
+        ],
+        [
+          "-v trivy-cache:/root/.cache",
+          "garde sa base de failles dans un volume, pour ne la télécharger qu'une fois"
+        ],
+        [
+          "aquasec/trivy:0.58.1",
+          "l'image officielle de Trivy, version figée"
+        ],
+        [
+          "image -q",
+          "analyse une image, sans bavardage"
+        ],
+        [
+          "--severity HIGH,CRITICAL",
+          "seulement les failles graves"
+        ],
+        [
+          "| grep Total",
+          "ne garde que la ligne de bilan"
+        ]
+      ],
+      "sortie": "Total: 0 (HIGH: 0, CRITICAL: 0)",
+      "remarque": "Aucune faille grave **connue** dans `alpine:3.22`. Le premier lancement télécharge la base de failles (une minute environ), et tes chiffres peuvent différer : la base change chaque jour.",
+      "attendu": "^docker run (?=.*--rm\\b)(?=.*-v[ =]trivy-cache:/root/\\.cache\\b).*aquasec/trivy:0\\.58\\.1 image (?=.*--severity[ =]HIGH,CRITICAL\\b).*alpine:3\\.22( 2>&1)? \\| grep Total$",
+      "indice": "recopie la commande en entier : `-v trivy-cache:/root/.cache`, l'image `aquasec/trivy:0.58.1`, puis `image -q --severity HIGH,CRITICAL alpine:3.22 | grep Total`.",
+      "bravo": "Bilan obtenu pour Alpine.",
+      "robot": [
+        "On passe au contrôle sanitaire : le **scan**. 🔬",
+        "Trivy lit la liste des ingrédients de l'image et la compare aux **avis de rappel** publics.",
+        "👀 Lis la ligne `Total` : combien de failles graves ?"
+      ]
+    },
+    {
+      "titre": "Scanner une image plus grosse",
+      "pourquoi": "Même scan sur `httpd:2.4`, le serveur web Apache, construit sur une Debian complète.",
+      "consigne": "Scanne `httpd:2.4` de la même façon.",
+      "commande": "docker run --rm -v trivy-cache:/root/.cache aquasec/trivy:0.58.1 image -q --severity HIGH,CRITICAL httpd:2.4 | grep Total",
+      "options": [
+        [
+          "httpd:2.4",
+          "l'image du serveur web Apache, sur base Debian"
+        ],
+        [
+          "(le reste)",
+          "mêmes options qu'à l'étape précédente"
+        ]
+      ],
+      "sortie": "Total: 54 (HIGH: 53, CRITICAL: 1)",
+      "remarque": "54 failles graves connues, dont une critique, héritées de la base. Ce bilan n'est qu'un point de départ : pour chaque ligne, on décide de **corriger**, **mitiger** ou **accepter**. Et zéro alerte ne voudrait pas dire image sûre.",
+      "attendu": "^docker run (?=.*--rm\\b)(?=.*-v[ =]trivy-cache:/root/\\.cache\\b).*aquasec/trivy:0\\.58\\.1 image (?=.*--severity[ =]HIGH,CRITICAL\\b).*httpd:2\\.4( 2>&1)? \\| grep Total$",
+      "indice": "même commande qu'à l'étape précédente, avec `httpd:2.4` à la place de `alpine:3.22`.",
+      "bravo": "Bilan obtenu pour Apache.",
+      "robot": [
+        "Même contrôle, sur un plat beaucoup plus copieux.",
+        "Plus il y a d'ingrédients, plus il y a de chances qu'un avis de rappel en concerne un.",
+        "👀 Compare ce `Total` avec celui d'Alpine."
+      ]
+    },
+    {
+      "titre": "Supprimer les images",
+      "pourquoi": "Les deux images du lab ne servent plus.",
+      "consigne": "Supprime `lab:mauvais` et `lab:bon`.",
+      "commande": "docker image rm lab:mauvais lab:bon",
+      "options": [
+        [
+          "docker image rm",
+          "retire les noms et supprime les images"
+        ]
+      ],
+      "sortie": "Untagged: lab:mauvais\nDeleted: sha256:4ba8fcca9f5f97e19b18203e8a554471d54d3c92a01e71b38e1200aa579a40ac\nUntagged: lab:bon\nDeleted: sha256:cb08ddd861eef262ffada8bb16dfa5669a3652e22514fabd513c61b33e035cb2",
+      "remarque": "Un `Untagged` et un `Deleted` par image. Tes identifiants seront différents.",
+      "attendu": "^docker (image rm|rmi) (?=.*\\blab:mauvais\\b)(?=.*\\blab:bon\\b)",
+      "bravo": "Images supprimées.",
+      "robot": [
+        "On classe l'affaire. 🧹",
+        "Les pièces à conviction partent à la broyeuse.",
+        "👀 Deux `Deleted` attendus."
+      ]
+    },
+    {
+      "titre": "Supprimer la base de failles",
+      "pourquoi": "Le volume `trivy-cache` contient la base téléchargée par Trivy. On le supprime aussi.",
+      "consigne": "Supprime le volume `trivy-cache`.",
+      "commande": "docker volume rm trivy-cache",
+      "options": [
+        [
+          "docker volume rm",
+          "supprime un volume"
+        ]
+      ],
+      "sortie": "trivy-cache",
+      "remarque": "Docker répète le nom du volume supprimé. Tu peux aussi retirer Trivy lui-même avec `docker image rm aquasec/trivy:0.58.1`.",
+      "attendu": "^docker volume rm trivy-cache$",
+      "bravo": "Volume supprimé.",
+      "robot": [
+        "On vide aussi le classeur des avis de rappel.",
+        "Il se retéléchargera tout seul la prochaine fois qu'on en aura besoin.",
+        "👀 Le nom du volume en retour."
+      ]
+    },
+    {
+      "titre": "Supprimer le dossier",
+      "pourquoi": "Dernier rangement : on revient dans le dossier personnel et on supprime le dossier de travail, faux secret compris.",
+      "consigne": "Reviens dans `~` et supprime `~/lab-secret`.",
+      "commande": "cd ~ && rm -rf ~/lab-secret",
+      "options": [
+        [
+          "cd ~",
+          "revient dans ton dossier personnel"
+        ],
+        [
+          "rm -rf ~/lab-secret",
+          "supprime le dossier et tout son contenu"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier, l'archive et le faux secret ont disparu.",
+      "attendu": "^cd ~ && rm -r[f]* ~/lab-secret/?$",
+      "bravo": "Bureau d'enquête rangé.",
+      "robot": [
+        "On éteint la lumière du bureau d'enquête.",
+        "Plus aucune trace du faux code, ni sur la table ni dans les tiroirs.",
+        "👀 Pas de sortie : tout est rangé."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Bonjour, détective ! C'est **Conti**, loupe à la main. 🕵️",
+    "L'affaire du jour : un mot de passe « effacé » dans une image. On va soulever les **calques** un par un pour voir s'il a vraiment disparu.",
+    "Le secret est faux et le terminal est un bac à sable : enquête sans risque."
+  ],
+  "robotFin": [
+    "Affaire résolue ! 🎉",
+    "Tu sais qu'un fichier supprimé reste dans sa **couche**, que le **montage de secret** BuildKit ne laisse aucune trace, et qu'un **scan** ne liste que les failles déjà connues.",
+    "Voici ton badge. Plus aucun secret ne se cachera dans tes images !"
+  ],
+  "badge": "Chasseur de secrets cachés"
+}

@@ -289,6 +289,14 @@ gantt
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine simulée avec Minikube et kubectl** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/k8s-deployment.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 15 minutes. Tu vas faire vivre le Deployment `web-deploy` : le créer, casser un pod, le multiplier, changer sa version puis revenir en arrière. Il te faut le cluster Minikube installé à la [page précédente](Kubernetes-etat-desire.md).
 
 **Étape 1 · Créer le Deployment**

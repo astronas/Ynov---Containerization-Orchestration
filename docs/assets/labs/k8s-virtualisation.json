@@ -1,0 +1,277 @@
+{
+  "titre": "Virtualisation et orchestration",
+  "duree": "10 min",
+  "intro": "Tu vas descendre les couches de ton propre cluster Minikube, du poste jusqu'aux pods : la VM, le nœud qui est un conteneur, son noyau, son containerd, puis sa capacité. Ces commandes ne font que **lire**. À chaque étape : clique sur « Insérer dans le terminal », appuie sur **Entrée**, et compare.",
+  "conclusion": "Ton Linux est une VM (noyau `microsoft-standard-WSL2`), le nœud Kubernetes est un conteneur Docker qui annonce Debian mais partage ce même noyau, et dedans containerd exécute les pods. Toute la capacité du cluster est celle de ton poste.",
+  "retour": {
+    "texte": "Retour au cours : Virtualisation et orchestration",
+    "lien": "../../Virtualisation-et-orchestration/"
+  },
+  "preparation": [
+    "minikube start --driver=docker"
+  ],
+  "etapes": [
+    {
+      "titre": "La couche virtualisation",
+      "pourquoi": "On commence tout en bas de la pile : quel système fait tourner ton Linux, et quel noyau ? Le nom du noyau trahit une éventuelle machine virtuelle.",
+      "consigne": "Affiche les deux premières lignes de la description du système, puis la version du noyau.",
+      "commande": "cat /etc/os-release | head -2; uname -r",
+      "options": [
+        [
+          "cat /etc/os-release",
+          "le fichier qui décrit le système installé"
+        ],
+        [
+          "| head -2",
+          "n'en garde que les deux premières lignes"
+        ],
+        [
+          ";",
+          "enchaîne la commande suivante, quoi qu'il arrive"
+        ],
+        [
+          "uname -r",
+          "la version du noyau Linux"
+        ]
+      ],
+      "sortie": "PRETTY_NAME=\"Ubuntu 26.04 LTS\"\nNAME=\"Ubuntu\"\n6.18.33.2-microsoft-standard-WSL2",
+      "remarque": "Le noyau se termine par `microsoft-standard-WSL2` : ce Linux tourne dans la **VM légère de WSL2**, sous Hyper-V. C'est la couche virtualisation. Garde ce nom de noyau en tête.",
+      "attendu": "^cat /etc/os-release \\| head -(n )?2 ?; ?uname -r$",
+      "indice": "deux commandes séparées par `;` : `cat /etc/os-release | head -2` puis `uname -r`.",
+      "bravo": "Ton Linux est une VM.",
+      "robot": [
+        "On part en expédition : de la cave au grenier de ton cluster ! 🔦",
+        "Sur un **terrain**, on regarde d'abord le bâtiment et ses fondations : ici, le système et son noyau.",
+        "👀 Lis la fin de la dernière ligne : `microsoft-standard-WSL2` signale une VM."
+      ]
+    },
+    {
+      "titre": "Le nœud est un conteneur",
+      "pourquoi": "Avec le driver `docker`, Minikube ne crée pas de VM pour son nœud : il lance un **conteneur** Docker nommé `minikube`. On le cherche dans la liste des conteneurs.",
+      "consigne": "Affiche le conteneur dont le nom est exactement `minikube`, avec son image et son état.",
+      "commande": "docker ps --filter name=^minikube$ --format \"table {{.Names}}\\t{{.Image}}\\t{{.Status}}\"",
+      "options": [
+        [
+          "--filter name=^minikube$",
+          "le conteneur dont le nom est exactement minikube (^ : début, $ : fin)"
+        ],
+        [
+          "--format \"table ...\"",
+          "un tableau avec seulement les colonnes choisies"
+        ],
+        [
+          "{{.Names}} {{.Image}} {{.Status}}",
+          "le nom, l'image et l'état"
+        ]
+      ],
+      "sortie": "NAMES      IMAGE                                 STATUS\nminikube   gcr.io/k8s-minikube/kicbase:v0.0.51   Up 18 minutes",
+      "remarque": "Le nœud Kubernetes est un simple conteneur, lancé à partir de l'image `kicbase` de Minikube. La durée sera différente chez toi.",
+      "attendu": "^docker (container )?(ps|ls) (?=.*--filter[ =]name=\\^?minikube\\$?)",
+      "indice": "il faut `--filter name=^minikube$`.",
+      "bravo": "Le nœud est bien un conteneur.",
+      "robot": [
+        "Premier étage : on cherche le nœud Kubernetes. 🏢",
+        "Surprise : le nœud n'est pas un bâtiment à part, c'est un **appartement** dans le bâtiment WSL2.",
+        "👀 Une seule ligne : le conteneur `minikube`, avec l'image `kicbase`."
+      ]
+    },
+    {
+      "titre": "Le profil du cluster",
+      "pourquoi": "Minikube peut gérer plusieurs clusters, appelés **profils**. La liste montre, pour chacun, le **driver** (comment le nœud est fabriqué) et le **runtime** (le moteur qui exécute les pods).",
+      "consigne": "Liste les clusters Minikube de ton poste.",
+      "commande": "minikube profile list",
+      "options": [
+        [
+          "minikube profile list",
+          "les clusters Minikube, avec driver, moteur de conteneurs, adresse, version et état"
+        ]
+      ],
+      "sortie": "┌──────────┬────────┬────────────┬──────────────┬─────────┬────────┬───────┬────────────────┬────────────────────┐\n│ PROFILE  │ DRIVER │  RUNTIME   │      IP      │ VERSION │ STATUS │ NODES │ ACTIVE PROFILE │ ACTIVE KUBECONTEXT │\n├──────────┼────────┼────────────┼──────────────┼─────────┼────────┼───────┼────────────────┼────────────────────┤\n│ minikube │ docker │ containerd │ 192.168.49.2 │ v1.37.0 │ OK     │ 1     │ *              │ *                  │\n└──────────┴────────┴────────────┴──────────────┴─────────┴────────┴───────┴────────────────┴────────────────────┘",
+      "remarque": "Driver `docker` (le nœud est un conteneur), runtime `containerd` (le moteur des pods), un seul nœud (`NODES 1`).",
+      "attendu": "^minikube profile (list|ls)$",
+      "bravo": "Driver docker, runtime containerd.",
+      "robot": [
+        "Consultons le registre de copropriété. 📜",
+        "Il dit **comment** chaque immeuble a été construit (le driver) et **qui** fait tourner les appartements (le runtime).",
+        "👀 Lis les colonnes **DRIVER** et **RUNTIME** : `docker` et `containerd`."
+      ]
+    },
+    {
+      "titre": "Le nœud vu par Kubernetes",
+      "pourquoi": "On demande maintenant à Kubernetes comment il voit son nœud : son adresse, le système qu'il annonce, son noyau et son moteur de conteneurs. Un tableau sur mesure évite les colonnes inutiles.",
+      "consigne": "Affiche le nom, l'adresse, le système, le noyau et le moteur de conteneurs du nœud.",
+      "commande": "kubectl get nodes -o custom-columns=NOM:.metadata.name,IP:.status.addresses[0].address,OS:.status.nodeInfo.osImage,NOYAU:.status.nodeInfo.kernelVersion,RUNTIME:.status.nodeInfo.containerRuntimeVersion",
+      "options": [
+        [
+          "kubectl get nodes",
+          "liste les nœuds du cluster"
+        ],
+        [
+          "-o custom-columns=...",
+          "un tableau sur mesure : chaque colonne est un TITRE:chemin vers un champ"
+        ],
+        [
+          "NOM:.metadata.name",
+          "le nom du nœud"
+        ],
+        [
+          "IP:.status.addresses[0].address",
+          "sa première adresse"
+        ],
+        [
+          "OS:.status.nodeInfo.osImage",
+          "le système qu'il annonce"
+        ],
+        [
+          "NOYAU:.status.nodeInfo.kernelVersion",
+          "le noyau sur lequel il tourne"
+        ],
+        [
+          "RUNTIME:.status.nodeInfo.containerRuntimeVersion",
+          "son moteur de conteneurs"
+        ]
+      ],
+      "sortie": "NOM        IP             OS                               NOYAU                               RUNTIME\nminikube   192.168.49.2   Debian GNU/Linux 12 (bookworm)   6.18.33.2-microsoft-standard-WSL2   containerd://2.3.4",
+      "remarque": "Le nœud annonce **Debian 12** (le système de fichiers de son image), mais la colonne `NOYAU` est **la même** qu'à l'étape 1. Comme tout conteneur, il n'a pas de noyau à lui.",
+      "attendu": "^kubectl get (nodes|node|no) (?=.*-o[ =]?custom-columns=).*kernelVersion",
+      "indice": "il faut `-o custom-columns=` avec au moins la colonne `NOYAU:.status.nodeInfo.kernelVersion`.",
+      "bravo": "Debian dehors, noyau WSL2 dedans.",
+      "robot": [
+        "Changeons de point de vue : comment Kubernetes voit-il son nœud ? 🔭",
+        "Un appartement peut avoir sa **déco** à lui (Debian), mais il repose sur les **fondations** de l'immeuble (le noyau WSL2).",
+        "👀 Compare la colonne **NOYAU** avec la dernière ligne de l'étape 1 : c'est la même."
+      ]
+    },
+    {
+      "titre": "Interroger le moteur du nœud",
+      "pourquoi": "On entre dans le nœud pour parler à son moteur de conteneurs, avec `crictl`, l'outil qui parle la **CRI** (Container Runtime Interface), la même langue que le kubelet.",
+      "consigne": "Dans le nœud, demande sa version au moteur de conteneurs avec `crictl`.",
+      "commande": "minikube ssh -- \"sudo crictl version\"",
+      "options": [
+        [
+          "minikube ssh --",
+          "lance la commande qui suit **dans** le nœud"
+        ],
+        [
+          "sudo crictl version",
+          "interroge le moteur de conteneurs par la CRI, comme le kubelet"
+        ]
+      ],
+      "sortie": "Version:  0.1.0\nRuntimeName:  containerd\nRuntimeVersion:  v2.3.4\nRuntimeApiVersion:  v1",
+      "remarque": "`RuntimeName: containerd`. Ce n'est pas le Docker de ton poste qui exécute les pods, c'est le **containerd du nœud**.",
+      "attendu": "^minikube ssh -- \"?sudo crictl version\"?$",
+      "indice": "`minikube ssh --`, puis `\"sudo crictl version\"`.",
+      "bravo": "containerd répond par la CRI.",
+      "robot": [
+        "On descend dans l'appartement : direction la chaufferie. 🔧",
+        "Le **gardien** de l'immeuble (le kubelet) donne ses ordres à la chaudière (containerd) par un interphone standard : la CRI.",
+        "👀 Repère la ligne `RuntimeName: containerd`."
+      ]
+    },
+    {
+      "titre": "Les espaces de containerd",
+      "pourquoi": "`ctr` est l'outil de base de containerd. Il range ses conteneurs dans des **espaces** séparés. On les liste.",
+      "consigne": "Dans le nœud, liste les espaces de containerd.",
+      "commande": "minikube ssh -- sudo ctr namespace ls",
+      "options": [
+        [
+          "minikube ssh --",
+          "lance la commande dans le nœud"
+        ],
+        [
+          "sudo ctr namespace ls",
+          "liste les espaces de rangement de containerd"
+        ]
+      ],
+      "sortie": "NAME   LABELS\nk8s.io\nmoby",
+      "remarque": "`k8s.io` contient les conteneurs des pods. Ces espaces de containerd n'ont **rien à voir** avec les namespaces Kubernetes.",
+      "attendu": "^minikube ssh -- \"?sudo ctr (namespace|namespaces|ns) (ls|list)\"?$",
+      "indice": "`minikube ssh -- sudo ctr namespace ls`.",
+      "bravo": "Les pods sont rangés dans k8s.io.",
+      "robot": [
+        "Toujours dans la chaufferie, on ouvre les placards. 🗄️",
+        "containerd range ses affaires dans des **placards étiquetés**, un par client : Kubernetes a le sien.",
+        "👀 Cherche le placard `k8s.io` : c'est celui des pods."
+      ]
+    },
+    {
+      "titre": "Activer les mesures",
+      "pourquoi": "Pour mesurer la consommation du nœud, Kubernetes a besoin d'un collecteur de mesures : le module `metrics-server`. On l'active (s'il l'est déjà, Minikube le confirme simplement).",
+      "consigne": "Active le module `metrics-server` de Minikube.",
+      "commande": "minikube addons enable metrics-server",
+      "options": [
+        [
+          "minikube addons",
+          "gère les modules complémentaires de Minikube"
+        ],
+        [
+          "enable metrics-server",
+          "active le collecteur de mesures (processeur, mémoire)"
+        ]
+      ],
+      "sortie": "* metrics-server is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.\nYou can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS\n  - Using image registry.k8s.io/metrics-server/metrics-server:v0.9.0\n* The 'metrics-server' addon is enabled",
+      "remarque": "`The 'metrics-server' addon is enabled`. Sur un vrai cluster, attends une minute avant l'étape suivante, le temps des premières mesures.",
+      "attendu": "^minikube addons enable metrics-server$",
+      "bravo": "Le collecteur de mesures est actif.",
+      "robot": [
+        "On installe les compteurs avant de relever les consommations. 📟",
+        "Comme poser un **compteur d'eau** : sans lui, impossible de savoir combien on consomme.",
+        "👀 La dernière ligne doit dire que l'addon est `enabled`."
+      ]
+    },
+    {
+      "titre": "Mesurer la capacité",
+      "pourquoi": "On lit la consommation actuelle du nœud. Comme il n'y a qu'un nœud, c'est tout le cluster, et sa capacité, c'est celle de ton poste.",
+      "consigne": "Affiche la consommation des nœuds.",
+      "commande": "kubectl top nodes",
+      "options": [
+        [
+          "kubectl top nodes",
+          "la consommation actuelle de chaque nœud : processeur en millièmes de cœur (m), mémoire"
+        ]
+      ],
+      "sortie": "NAME       CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)\nminikube   1127m        9%       1947Mi          25%",
+      "remarque": "`1127m` = un peu plus d'un cœur utilisé. Tes chiffres seront différents. Aucun HPA ne pourra aller au-delà de la capacité de ton poste : pour plus, il faudrait **d'autres machines**.",
+      "attendu": "^kubectl top (nodes|node|no)$",
+      "indice": "`kubectl top nodes`. Si le message `Metrics API not available` s'affiche, attends une minute et recommence.",
+      "bravo": "Tu as mesuré la capacité du cluster.",
+      "robot": [
+        "Relevé des compteurs ! 📊",
+        "Le **syndic** peut ouvrir des appartements tant qu'il reste de la place dans l'immeuble, mais il ne construit pas de nouveaux bâtiments.",
+        "👀 Lis les colonnes **CPU(%)** et **MEMORY(%)** : c'est la part de ton poste déjà occupée."
+      ]
+    },
+    {
+      "titre": "Libérer la mémoire",
+      "pourquoi": "Tu n'as rien créé : il n'y a rien à supprimer. Pour rendre la mémoire à ton poste, on arrête le conteneur du nœud, sans rien effacer.",
+      "consigne": "Arrête le cluster Minikube.",
+      "commande": "minikube stop",
+      "options": [
+        [
+          "minikube stop",
+          "arrête le conteneur du nœud sans rien effacer ; `minikube start` le relancera tel quel"
+        ]
+      ],
+      "sortie": "(Minikube annonce l'arrêt du nœud « minikube »)",
+      "remarque": "Après l'arrêt, `docker ps --filter name=^minikube$` n'affiche plus aucune ligne : le conteneur du nœud est arrêté, mais pas supprimé.",
+      "attendu": "^minikube stop$",
+      "bravo": "Le nœud est arrêté.",
+      "robot": [
+        "Fin de la visite : on éteint en partant. 💤",
+        "On ferme l'appartement à clé **sans le vider** : tout sera là au prochain `minikube start`.",
+        "👀 Minikube va t'annoncer l'arrêt du nœud `minikube`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Salut ! **Conti** ici, casque de spéléologue vissé sur la tête. ⛑️",
+    "Aujourd'hui, on descend toutes les couches de ton cluster comme les étages d'un immeuble : la **VM**, le **nœud** qui est un conteneur, son **noyau**, sa **chaufferie** containerd.",
+    "Ces commandes ne font que lire, et le terminal est un bac à sable : aucun risque. On descend ?"
+  ],
+  "robotFin": [
+    "Retour à la surface, bravo ! 🎉",
+    "Tu as vu la **virtualisation** (le noyau WSL2), le **nœud conteneur** qui annonce Debian mais partage ce **noyau**, **containerd** et la **CRI** dans le nœud, et une **capacité** limitée à celle de ton poste.",
+    "Voici ton badge d'explorateur. Tu as fait tout le parcours !"
+  ],
+  "badge": "Spéléologue des couches"
+}

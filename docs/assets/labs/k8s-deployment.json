@@ -1,0 +1,625 @@
+{
+  "titre": "Pod, Deployment, ReplicaSet",
+  "duree": "15 min",
+  "intro": "Tu vas faire vivre le Deployment `web-deploy` : le créer, remonter la chaîne Deployment, ReplicaSet, Pod, casser un pod, le multiplier, changer sa version puis **revenir en arrière**. À chaque étape : lis le pourquoi, clique sur « Insérer dans le terminal », appuie sur **Entrée**, puis compare.",
+  "conclusion": "Tu as vu qu'un pod supprimé est remplacé par le ReplicaSet, que changer le nombre de copies ne crée pas de révision, alors que changer l'image en crée une (nouveau ReplicaSet, l'ancien gardé à 0), et qu'un `rollout undo` crée un nouveau numéro avec l'ancien modèle.",
+  "retour": {
+    "texte": "Retour au cours : Pod, Deployment, ReplicaSet",
+    "lien": "../../Pod-Deployment-ReplicaSet/"
+  },
+  "etapes": [
+    {
+      "titre": "Écrire le Deployment",
+      "pourquoi": "Tout commence par un fichier : le manifeste du Deployment `web-deploy`. Il demande 3 copies de nginx 1.25 et fixe la manière de changer de version, un pod à la fois.",
+      "consigne": "Crée le fichier `web-deploy.yaml` avec le manifeste du cours.",
+      "commande": "cat > web-deploy.yaml <<'EOF'\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-deploy\n  labels:\n    app: web\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: web\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxUnavailable: 1\n      maxSurge: 1\n  template:\n    metadata:\n      labels:\n        app: web\n    spec:\n      containers:\n        - name: web\n          image: nginx:1.25\n          ports:\n            - containerPort: 80\nEOF",
+      "options": [
+        [
+          "cat > web-deploy.yaml",
+          "écrit dans le fichier `web-deploy.yaml` tout ce qui suit"
+        ],
+        [
+          "<<'EOF' … EOF",
+          "le texte entre ces deux repères devient le contenu du fichier"
+        ],
+        [
+          "name: web-deploy",
+          "le nom du Deployment ; ses ReplicaSets et ses pods en découleront"
+        ],
+        [
+          "replicas: 3",
+          "trois copies voulues"
+        ],
+        [
+          "selector.matchLabels app: web",
+          "le Deployment considère comme siens les pods étiquetés `app: web`"
+        ],
+        [
+          "strategy: RollingUpdate",
+          "changer de version petit à petit"
+        ],
+        [
+          "maxUnavailable: 1 / maxSurge: 1",
+          "pendant une mise à jour : au plus 1 pod en moins, au plus 1 pod en plus"
+        ],
+        [
+          "template",
+          "le modèle de pod : toute modification ici crée une nouvelle révision"
+        ],
+        [
+          "name: web / image: nginx:1.25",
+          "le conteneur `web` et son image ; c'est ce nom qu'on citera dans `set image`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est écrit. Relis-le avec `cat web-deploy.yaml` si tu veux : deux espaces par niveau, jamais de tabulation.",
+      "attendu": "^cat > web-deploy\\.yaml <<",
+      "bravo": "Le manifeste est prêt.",
+      "robot": [
+        "On prépare la **fiche de poste** de notre chef de rayon. 📋",
+        "Dans un supermarché, le chef de rayon reçoit une consigne écrite : « **3 produits** de ce modèle en rayon, et on les remplace un par un quand le modèle change ».",
+        "👀 Pas de réponse attendue : le fichier se remplit en silence."
+      ]
+    },
+    {
+      "titre": "Réveiller le cluster",
+      "pourquoi": "Le cluster Minikube a été arrêté à la fin du lab précédent. On le relance ; s'il tourne déjà, la commande est sans danger.",
+      "consigne": "Démarre Minikube.",
+      "commande": "minikube start",
+      "options": [
+        [
+          "minikube start",
+          "redémarre le cluster existant (ou le crée s'il n'existe pas)"
+        ]
+      ],
+      "sortie": "😄  minikube v1.39.0 on Ubuntu 26.04 (kvm/amd64)\n✨  Using the docker driver based on existing profile\n👍  Starting \"minikube\" primary control-plane node in \"minikube\" cluster\n🚜  Pulling base image v0.0.51 ...\n🔄  Restarting existing docker container for \"minikube\" ...\n📦  Preparing Kubernetes v1.37.0 on containerd 2.3.4 ...\n🔎  Verifying Kubernetes components...\n    ▪ Using image docker.io/kubernetesui/metrics-scraper:v1.0.8\n    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5\n    ▪ Using image docker.io/kubernetesui/dashboard:v2.7.0\n    ▪ Using image registry.k8s.io/metrics-server/metrics-server:v0.9.0\n💡  Some dashboard features require the metrics-server addon. To enable all features please run:\n\n\tminikube addons enable metrics-server\n\n🌟  Enabled addons: metrics-server, storage-provisioner, dashboard, default-storageclass\n🏄  Done! kubectl is now configured to use \"minikube\" cluster and \"default\" namespace by default",
+      "remarque": "« **based on existing profile** » : Minikube reprend ton cluster tel que tu l'avais laissé. La ligne **Done!** confirme que kubectl est branché dessus.",
+      "attendu": "^minikube start\\b",
+      "bravo": "Le cluster est réveillé.",
+      "robot": [
+        "On rallume la lumière dans le **magasin**. 💡",
+        "Le cluster était en veille, comme un ordinateur au repos : on le réveille et tout est là où on l'avait laissé.",
+        "👀 Attends la dernière ligne : **Done!**"
+      ]
+    },
+    {
+      "titre": "Recréer le dossier demo",
+      "pourquoi": "Le namespace `demo` a été supprimé au lab précédent. On le recrée pour y ranger tout ce que l'on va fabriquer.",
+      "consigne": "Crée le namespace `demo`.",
+      "commande": "kubectl create namespace demo",
+      "options": [
+        [
+          "kubectl create namespace",
+          "crée un namespace"
+        ],
+        [
+          "demo",
+          "son nom"
+        ]
+      ],
+      "sortie": "namespace/demo created",
+      "remarque": "Si tu vois `already exists`, le namespace existait encore : continue, la suite fonctionne quand même.",
+      "attendu": "^kubectl create (namespace|ns) demo$",
+      "bravo": "Le dossier de travail est prêt.",
+      "robot": [
+        "On ouvre un **rayon vide** pour notre expérience. 🛒",
+        "Un namespace, c'est un rayon réservé dans le magasin : tout ce qu'on y pose s'enlève d'un coup à la fermeture.",
+        "👀 Une ligne qui finit par `created`."
+      ]
+    },
+    {
+      "titre": "Déclarer le Deployment",
+      "pourquoi": "On envoie le manifeste au cluster : il enregistre l'état désiré, 3 copies de nginx 1.25, puis fabrique tout seul ce qu'il faut.",
+      "consigne": "Applique `web-deploy.yaml` dans le namespace `demo`.",
+      "commande": "kubectl apply -n demo -f web-deploy.yaml",
+      "options": [
+        [
+          "kubectl apply",
+          "enregistre l'état désiré décrit dans un fichier"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ],
+        [
+          "-f web-deploy.yaml",
+          "le fichier à appliquer"
+        ]
+      ],
+      "sortie": "deployment.apps/web-deploy created",
+      "remarque": "Seul le **Deployment** est annoncé : c'est le seul objet que tu as écrit. Le ReplicaSet et les pods vont être **générés** pour toi.",
+      "attendu": "^kubectl apply (?=.*(-n|--namespace)[ =]demo\\b)(?=.*-f[ =]web-deploy\\.yaml)",
+      "indice": "il faut `-n demo` et `-f web-deploy.yaml`.",
+      "bravo": "Le Deployment est déclaré.",
+      "robot": [
+        "On remet la fiche de poste au **chef de rayon**. 🤝",
+        "Tu donnes la consigne au chef : c'est lui qui embauchera un magasinier (le ReplicaSet), qui remplira le rayon.",
+        "👀 Une seule ligne `created`, pour le Deployment seulement."
+      ]
+    },
+    {
+      "titre": "Suivre le remplissage",
+      "pourquoi": "On suit la progression jusqu'à ce que les 3 copies soient prêtes.",
+      "consigne": "Suis le déploiement `web-deploy` dans le namespace `demo`.",
+      "commande": "kubectl rollout status deployment/web-deploy -n demo",
+      "options": [
+        [
+          "kubectl rollout status",
+          "attend et raconte la progression d'un déploiement"
+        ],
+        [
+          "deployment/web-deploy",
+          "le Deployment suivi"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ]
+      ],
+      "sortie": "Waiting for deployment \"web-deploy\" rollout to finish: 0 of 3 updated replicas are available...\nWaiting for deployment \"web-deploy\" rollout to finish: 1 of 3 updated replicas are available...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 of 3 updated replicas are available...\ndeployment \"web-deploy\" successfully rolled out",
+      "remarque": "Les copies deviennent disponibles une à une, jusqu'à **successfully rolled out**. Certaines lignes peuvent manquer si tout va vite.",
+      "attendu": "^kubectl rollout status (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b)",
+      "indice": "écris `deployment/web-deploy` et n'oublie pas `-n demo`.",
+      "bravo": "Les 3 copies sont prêtes.",
+      "robot": [
+        "Le rayon se remplit sous nos yeux. 📦",
+        "Comme un réassort : le magasinier pose les produits un par un, jusqu'au nombre demandé.",
+        "👀 Guette **successfully rolled out**."
+      ]
+    },
+    {
+      "titre": "L'arbre des objets",
+      "pourquoi": "Un Deployment crée un ReplicaSet, qui crée les pods. On affiche les trois d'un coup, avec leurs étiquettes, pour voir ce qui les relie.",
+      "consigne": "Liste le Deployment, les ReplicaSets et les pods `app=web` du namespace `demo`, avec leurs étiquettes.",
+      "commande": "kubectl get deploy,rs,pods -n demo -l app=web --show-labels",
+      "options": [
+        [
+          "kubectl get deploy,rs,pods",
+          "trois types d'objets d'un coup : Deployments, ReplicaSets (`rs`) et pods"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ],
+        [
+          "-l app=web",
+          "seulement les objets étiquetés `app=web`"
+        ],
+        [
+          "--show-labels",
+          "ajoute une colonne avec toutes les étiquettes"
+        ]
+      ],
+      "sortie": "NAME                         READY   UP-TO-DATE   AVAILABLE   AGE   LABELS\ndeployment.apps/web-deploy   3/3     3            3           7s    app=web\n\nNAME                                    DESIRED   CURRENT   READY   AGE   LABELS\nreplicaset.apps/web-deploy-749df4ccc5   3         3         3       7s    app=web,pod-template-hash=749df4ccc5\n\nNAME                              READY   STATUS    RESTARTS   AGE   LABELS\npod/web-deploy-749df4ccc5-bh4lh   1/1     Running   0          7s    app=web,pod-template-hash=749df4ccc5\npod/web-deploy-749df4ccc5-jgwbc   1/1     Running   0          7s    app=web,pod-template-hash=749df4ccc5\npod/web-deploy-749df4ccc5-q7hds   1/1     Running   0          7s    app=web,pod-template-hash=749df4ccc5",
+      "remarque": "Un Deployment `3/3`, **un seul** ReplicaSet `web-deploy-<empreinte>` à 3, et trois pods `web-deploy-<empreinte>-<5 caractères>`. L'empreinte `pod-template-hash` est la **même partout** : c'est elle qui relie le ReplicaSet à ses pods.",
+      "attendu": "^kubectl get (deploy|deployments?),(rs|replicasets?),(pods?|po) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b)(?=.*--show-labels)",
+      "indice": "les trois types s'écrivent collés, séparés par des virgules : `deploy,rs,pods`, puis `-n demo -l app=web --show-labels`.",
+      "bravo": "Tu vois toute la chaîne.",
+      "robot": [
+        "On ouvre l'**organigramme** du rayon. 🗂️",
+        "Le chef de rayon (Deployment) a embauché un magasinier (ReplicaSet), qui a posé trois produits (pods). Chacun porte un **badge** avec le même numéro d'équipe.",
+        "👀 Compare la valeur de `pod-template-hash` sur le ReplicaSet et sur chaque pod."
+      ]
+    },
+    {
+      "titre": "Qui est mon chef ?",
+      "pourquoi": "Chaque pod sait qui l'a créé. La fiche détaillée (`describe`) l'indique dans la ligne `Controlled By` ; `grep` ne garde que cette ligne.",
+      "consigne": "Affiche le propriétaire de chaque pod `app=web` du namespace `demo`.",
+      "commande": "kubectl describe pods -n demo -l app=web | grep \"Controlled By\"",
+      "options": [
+        [
+          "kubectl describe pods",
+          "la fiche détaillée de chaque pod"
+        ],
+        [
+          "-n demo -l app=web",
+          "les pods étiquetés `app=web` du namespace `demo`"
+        ],
+        [
+          "| grep \"Controlled By\"",
+          "ne garde que la ligne qui nomme le propriétaire"
+        ]
+      ],
+      "sortie": "Controlled By:  ReplicaSet/web-deploy-749df4ccc5\nControlled By:  ReplicaSet/web-deploy-749df4ccc5\nControlled By:  ReplicaSet/web-deploy-749df4ccc5",
+      "remarque": "Trois lignes identiques : les trois pods appartiennent au **même ReplicaSet**. La chaîne de propriété est complète : Deployment, puis ReplicaSet, puis Pod.",
+      "attendu": "^kubectl describe (pods?|po) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b).*\\| grep ['\"]?Controlled By",
+      "indice": "termine par `| grep \"Controlled By\"`, avec les guillemets : le texte cherché contient un espace.",
+      "bravo": "Chaque pod connaît son propriétaire.",
+      "robot": [
+        "On demande à chaque produit : « **qui t'a mis là** ? » 🔎",
+        "C'est l'étiquette « mis en rayon par » collée au dos de chaque article.",
+        "👀 Les trois lignes doivent nommer le **même** ReplicaSet."
+      ]
+    },
+    {
+      "titre": "Casser un pod",
+      "pourquoi": "On supprime un pod à la main. Le ReplicaSet compte ses pods, en trouve 2 pour 3 désirés, et en crée un neuf.",
+      "consigne": "Supprime le premier pod `app=web` du namespace `demo`.",
+      "commande": "kubectl delete -n demo $(kubectl get pods -n demo -l app=web -o name | head -1)",
+      "options": [
+        [
+          "$( … )",
+          "la commande entre parenthèses s'exécute d'abord, et son résultat prend sa place"
+        ],
+        [
+          "kubectl get pods … -o name",
+          "liste les pods sous la forme `pod/<nom>`"
+        ],
+        [
+          "| head -1",
+          "ne garde que le premier"
+        ],
+        [
+          "kubectl delete -n demo",
+          "supprime l'objet obtenu"
+        ]
+      ],
+      "sortie": "pod \"web-deploy-749df4ccc5-bh4lh\" deleted from demo namespace",
+      "remarque": "Le pod est supprimé. Pas besoin d'écrire `pod` devant : le nom fabriqué contient déjà son type (`pod/…`).",
+      "attendu": "^kubectl delete (?=.*(-n|--namespace)[ =]demo\\b).*\\$\\(kubectl get (pods?|po) .*-o[ =]?name.*\\| head -1\\)",
+      "indice": "la commande intérieure s'écrit entre `$(` et `)` : `kubectl get pods -n demo -l app=web -o name | head -1`.",
+      "bravo": "Un pod de moins… pour l'instant.",
+      "robot": [
+        "On fait tomber un produit du rayon. 💥",
+        "Un yaourt abîmé ? Le magasinier ne le **répare** pas : il le jette et en pose un neuf.",
+        "👀 Une ligne `deleted` avec le nom du pod supprimé."
+      ]
+    },
+    {
+      "titre": "Le remplaçant",
+      "pourquoi": "On vérifie que le ReplicaSet a bien comblé le trou.",
+      "consigne": "Liste les pods `app=web` du namespace `demo`.",
+      "commande": "kubectl get pods -n demo -l app=web",
+      "options": [
+        [
+          "kubectl get pods",
+          "liste les pods"
+        ],
+        [
+          "-n demo -l app=web",
+          "namespace `demo`, étiquette `app=web`"
+        ]
+      ],
+      "sortie": "NAME                          READY   STATUS    RESTARTS   AGE\nweb-deploy-749df4ccc5-jgwbc   1/1     Running   0          10s\nweb-deploy-749df4ccc5-q7hds   1/1     Running   0          10s\nweb-deploy-749df4ccc5-wssg4   1/1     Running   0          2s",
+      "remarque": "Toujours **3 pods**, dont un avec un `AGE` de quelques secondes : le **remplaçant**, avec un nom neuf mais la même empreinte. Le pod supprimé n'est pas revenu.",
+      "attendu": "^kubectl get (pods?|po) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b)",
+      "indice": "`kubectl get pods -n demo -l app=web`.",
+      "bravo": "Le rayon est de nouveau plein.",
+      "robot": [
+        "Le rayon a-t-il été réassorti ? 🔁",
+        "Le magasinier passe, compte « 2 au lieu de 3 » et en remet un : sans qu'on le lui demande.",
+        "👀 Repère le pod le plus **jeune** dans la colonne AGE."
+      ]
+    },
+    {
+      "titre": "Passer à 5 copies",
+      "pourquoi": "On demande 5 copies directement au cluster. C'est une action **impérative** : elle sera écrasée au prochain `apply` du fichier, qui dit toujours 3.",
+      "consigne": "Passe le Deployment `web-deploy` du namespace `demo` à 5 copies.",
+      "commande": "kubectl scale deployment/web-deploy -n demo --replicas=5",
+      "options": [
+        [
+          "kubectl scale",
+          "change le nombre de copies d'un Deployment"
+        ],
+        [
+          "deployment/web-deploy",
+          "le Deployment visé"
+        ],
+        [
+          "--replicas=5",
+          "le nouveau nombre voulu"
+        ]
+      ],
+      "sortie": "deployment.apps/web-deploy scaled",
+      "remarque": "**scaled** : la consigne est passée à 5. Le fichier `web-deploy.yaml`, lui, dit toujours 3.",
+      "attendu": "^kubectl scale (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b)(?=.*--replicas[ =]5\\b)",
+      "indice": "il faut `deployment/web-deploy`, `-n demo` et `--replicas=5`.",
+      "bravo": "5 copies demandées.",
+      "robot": [
+        "Grosse affluence : on veut **5 produits** en rayon ! 📈",
+        "Le chef de rayon dit au magasinier « mets-en deux de plus ». Même modèle, juste plus nombreux.",
+        "👀 Une ligne qui finit par `scaled`."
+      ]
+    },
+    {
+      "titre": "Toujours un seul ReplicaSet",
+      "pourquoi": "Changer le nombre de copies ne touche pas au **modèle de pod**. On vérifie qu'aucun nouveau ReplicaSet n'est apparu.",
+      "consigne": "Liste les ReplicaSets `app=web` du namespace `demo`.",
+      "commande": "kubectl get rs -n demo -l app=web",
+      "options": [
+        [
+          "kubectl get rs",
+          "liste les ReplicaSets"
+        ],
+        [
+          "-n demo -l app=web",
+          "namespace `demo`, étiquette `app=web`"
+        ]
+      ],
+      "sortie": "NAME                    DESIRED   CURRENT   READY   AGE\nweb-deploy-749df4ccc5   5         5         5       13s",
+      "remarque": "**Un seul** ReplicaSet, passé à 5 : changer le nombre de copies ne crée **pas** de révision. Si `READY` est encore à 3 ou 4, les deux derniers pods démarrent.",
+      "attendu": "^kubectl get (rs|replicasets?) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b)",
+      "indice": "`rs` est l'abréviation de ReplicaSet : `kubectl get rs -n demo -l app=web`.",
+      "bravo": "Même ReplicaSet, juste plus de pods.",
+      "robot": [
+        "Combien de **magasiniers** pour ce rayon ? 🧑‍🔧",
+        "Le même magasinier pose simplement deux produits de plus : on n'a pas changé de modèle, donc pas besoin d'un nouveau.",
+        "👀 Une seule ligne, avec `5` dans **DESIRED**."
+      ]
+    },
+    {
+      "titre": "Changer de version",
+      "pourquoi": "On remplace l'image du conteneur `web` par `nginx:1.27`. Cela modifie le **modèle de pod** : le Deployment crée une nouvelle révision, donc un nouveau ReplicaSet.",
+      "consigne": "Passe le conteneur `web` du Deployment `web-deploy` à l'image `nginx:1.27`.",
+      "commande": "kubectl set image deployment/web-deploy -n demo web=nginx:1.27",
+      "options": [
+        [
+          "kubectl set image",
+          "change l'image d'un conteneur dans le modèle de pod"
+        ],
+        [
+          "deployment/web-deploy",
+          "le Deployment visé"
+        ],
+        [
+          "web=nginx:1.27",
+          "nom du conteneur (le `name:` sous `containers:`), puis la nouvelle image"
+        ]
+      ],
+      "sortie": "deployment.apps/web-deploy image updated",
+      "remarque": "**image updated** : le modèle a changé. Le remplacement des pods commence aussitôt, un par un.",
+      "attendu": "^kubectl set image (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b)(?=.*\\bweb=nginx:1\\.27\\b)",
+      "indice": "la forme est `web=nginx:1.27` : le nom du conteneur, `=`, puis l'image. Le conteneur s'appelle `web`.",
+      "bravo": "La nouvelle version est demandée.",
+      "robot": [
+        "Nouveau modèle de produit en magasin ! 🆕",
+        "C'est changer les ampoules d'un long couloir **une par une** : il reste toujours assez de lumière pour passer.",
+        "👀 Une ligne qui finit par `image updated`."
+      ]
+    },
+    {
+      "titre": "Suivre le remplacement",
+      "pourquoi": "Le Deployment remplit le nouveau ReplicaSet et vide l'ancien pas à pas, sans jamais dépasser 1 pod en plus ni descendre de plus d'1 pod sous 5.",
+      "consigne": "Suis le déploiement `web-deploy` dans le namespace `demo`.",
+      "commande": "kubectl rollout status deployment/web-deploy -n demo",
+      "options": [
+        [
+          "kubectl rollout status",
+          "raconte la mise à jour jusqu'à la fin"
+        ],
+        [
+          "deployment/web-deploy -n demo",
+          "le Deployment et son namespace"
+        ]
+      ],
+      "sortie": "Waiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 1 old replicas are pending termination...\n…\nWaiting for deployment \"web-deploy\" rollout to finish: 4 of 5 updated replicas are available...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 of 5 updated replicas are available...\ndeployment \"web-deploy\" successfully rolled out",
+      "remarque": "Plusieurs lignes **Waiting** : les nouveaux pods arrivent, les anciens partent. À la fin, **successfully rolled out** : les 5 pods sont en nginx 1.27.",
+      "attendu": "^kubectl rollout status (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b)",
+      "indice": "`kubectl rollout status deployment/web-deploy -n demo`.",
+      "bravo": "Version changée sans coupure.",
+      "robot": [
+        "On regarde les ampoules changer. 🔄",
+        "Une nouvelle ampoule s'allume, une ancienne s'éteint, et ainsi de suite : le couloir n'est **jamais** dans le noir.",
+        "👀 Suis les compteurs « new replicas » jusqu'à **successfully rolled out**."
+      ]
+    },
+    {
+      "titre": "Deux ReplicaSets",
+      "pourquoi": "Le changement d'image a créé un nouveau ReplicaSet. L'ancien n'est pas détruit : il est vidé et gardé en réserve.",
+      "consigne": "Liste à nouveau les ReplicaSets `app=web` du namespace `demo`.",
+      "commande": "kubectl get rs -n demo -l app=web",
+      "options": [
+        [
+          "kubectl get rs",
+          "liste les ReplicaSets"
+        ],
+        [
+          "-n demo -l app=web",
+          "namespace `demo`, étiquette `app=web`"
+        ]
+      ],
+      "sortie": "NAME                    DESIRED   CURRENT   READY   AGE\nweb-deploy-749df4ccc5   0         0         0       17s\nweb-deploy-8c96c8dfc    5         5         5       4s",
+      "remarque": "**Deux** ReplicaSets : le nouveau à `5`, l'ancien à `0`, **conservé**. C'est cette réserve qui permettra de revenir en arrière.",
+      "attendu": "^kubectl get (rs|replicasets?) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b)",
+      "indice": "même commande qu'avant : `kubectl get rs -n demo -l app=web`.",
+      "bravo": "L'ancienne version attend en réserve.",
+      "robot": [
+        "Et maintenant, combien de magasiniers ? 🧑‍🔧",
+        "L'ancien magasinier n'est pas licencié : il attend dans la **réserve**, rayon vide, prêt à reprendre du service.",
+        "👀 Une ligne à `5`, une autre à `0`."
+      ]
+    },
+    {
+      "titre": "L'historique",
+      "pourquoi": "Chaque changement du modèle de pod est une **révision**. Le Deployment en garde la liste.",
+      "consigne": "Affiche l'historique des révisions de `web-deploy`.",
+      "commande": "kubectl rollout history deployment/web-deploy -n demo",
+      "options": [
+        [
+          "kubectl rollout history",
+          "liste les révisions d'un Deployment"
+        ],
+        [
+          "deployment/web-deploy -n demo",
+          "le Deployment et son namespace"
+        ]
+      ],
+      "sortie": "deployment.apps/web-deploy \nREVISION  CHANGE-CAUSE\n1         <none>\n2         <none>",
+      "remarque": "Deux révisions : 1 (nginx 1.25) et 2 (nginx 1.27). La colonne **CHANGE-CAUSE** reste vide tant que personne ne pose l'annotation `kubernetes.io/change-cause`.",
+      "attendu": "^kubectl rollout history (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b)",
+      "indice": "`kubectl rollout history deployment/web-deploy -n demo`.",
+      "bravo": "Deux révisions au compteur.",
+      "robot": [
+        "On feuillette le **carnet de bord** du chef de rayon. 📖",
+        "Chaque changement de modèle y est noté sur une nouvelle page, comme les versions successives d'un document.",
+        "👀 Compte les lignes sous **REVISION** : 1 et 2."
+      ]
+    },
+    {
+      "titre": "Revenir en arrière",
+      "pourquoi": "On revient à la révision précédente : le Deployment remplit de nouveau l'ancien ReplicaSet et vide le nouveau, pod par pod.",
+      "consigne": "Annule la dernière mise à jour de `web-deploy`, puis suis le remplacement.",
+      "commande": "kubectl rollout undo deployment/web-deploy -n demo && kubectl rollout status deployment/web-deploy -n demo",
+      "options": [
+        [
+          "kubectl rollout undo",
+          "revient à la révision précédente (`--to-revision=N` pour en viser une précise)"
+        ],
+        [
+          "&&",
+          "si l'annulation est acceptée, enchaîne sur le suivi"
+        ],
+        [
+          "kubectl rollout status …",
+          "suit le remplacement jusqu'au bout"
+        ]
+      ],
+      "sortie": "Warning: resource deployments/web-deploy was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.\ndeployment.apps/web-deploy rolled back\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 2 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 3 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 out of 5 new replicas have been updated...\n…\nWaiting for deployment \"web-deploy\" rollout to finish: 4 of 5 updated replicas are available...\nWaiting for deployment \"web-deploy\" rollout to finish: 4 of 5 updated replicas are available...\ndeployment \"web-deploy\" successfully rolled out",
+      "remarque": "**rolled back**, puis le même remplacement progressif qu'à l'aller, jusqu'à **successfully rolled out**.",
+      "attendu": "^kubectl rollout undo (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b).*&& kubectl rollout status",
+      "indice": "`kubectl rollout undo deployment/web-deploy -n demo`, puis `&&` et le `rollout status`.",
+      "bravo": "Retour à la version précédente.",
+      "robot": [
+        "Le nouveau modèle ne plaît pas ? On **ressort l'ancien** ! ⏪",
+        "Le magasinier de la réserve reprend son rayon : il suffit de **remplir à nouveau** l'ancien ReplicaSet.",
+        "👀 D'abord `rolled back`, puis la phrase finale **successfully rolled out**."
+      ]
+    },
+    {
+      "titre": "Quelle image ?",
+      "pourquoi": "On vérifie l'image du modèle de pod. `-o jsonpath` extrait un seul champ de l'objet, au lieu de tout afficher.",
+      "consigne": "Affiche l'image du premier conteneur du modèle de pod de `web-deploy`.",
+      "commande": "kubectl get deployment web-deploy -n demo -o jsonpath='{.spec.template.spec.containers[0].image}{\"\\n\"}'",
+      "options": [
+        [
+          "kubectl get deployment web-deploy",
+          "lit un seul Deployment"
+        ],
+        [
+          "-o jsonpath='…'",
+          "n'affiche qu'un champ, désigné par son chemin dans l'objet"
+        ],
+        [
+          "{.spec.template.spec.containers[0].image}",
+          "spec, puis modèle de pod, puis premier conteneur (`[0]`), puis son image"
+        ],
+        [
+          "{\"\\n\"}",
+          "ajoute un retour à la ligne à la fin"
+        ]
+      ],
+      "sortie": "nginx:1.25",
+      "remarque": "L'image est revenue à **`nginx:1.25`** : le modèle de la révision 1 est de nouveau en service.",
+      "attendu": "^kubectl get (deployments?|deploy)[ /]web-deploy\\b(?=.*(-n|--namespace)[ =]demo\\b)(?=.*jsonpath.*containers\\[0\\]\\.image)",
+      "indice": "le chemin s'écrit `{.spec.template.spec.containers[0].image}`, entre apostrophes après `-o jsonpath=`.",
+      "bravo": "nginx 1.25 est de retour.",
+      "robot": [
+        "Vérifions l'**étiquette** du produit en rayon. 🏷️",
+        "Plutôt que de lire toute la fiche technique, on va droit à la ligne qui nous intéresse, comme le prix sur l'étiquette.",
+        "👀 Une seule ligne : le nom de l'image."
+      ]
+    },
+    {
+      "titre": "Un nouveau numéro",
+      "pourquoi": "Revenir en arrière n'efface pas l'histoire : on relit l'historique pour voir comment le retour a été noté.",
+      "consigne": "Affiche de nouveau l'historique de `web-deploy`.",
+      "commande": "kubectl rollout history deployment/web-deploy -n demo",
+      "options": [
+        [
+          "kubectl rollout history",
+          "liste les révisions"
+        ],
+        [
+          "deployment/web-deploy -n demo",
+          "le Deployment et son namespace"
+        ]
+      ],
+      "sortie": "deployment.apps/web-deploy \nREVISION  CHANGE-CAUSE\n2         <none>\n3         <none>",
+      "remarque": "La révision `1` a disparu au profit d'une révision **`3`** : revenir en arrière crée un **nouveau numéro**, avec l'ancien modèle.",
+      "attendu": "^kubectl rollout history (deployments?[ /]web-deploy|deploy[ /]web-deploy)\\b(?=.*(-n|--namespace)[ =]demo\\b)",
+      "indice": "la même commande qu'à l'étape de l'historique.",
+      "bravo": "L'histoire continue, elle ne recule pas.",
+      "robot": [
+        "Dernière page du carnet de bord. 📖",
+        "Ressortir un ancien modèle, c'est l'**inscrire de nouveau** dans le carnet, à la date du jour, pas arracher les pages.",
+        "👀 Les numéros sont maintenant **2** et **3**."
+      ]
+    },
+    {
+      "titre": "Vider le rayon",
+      "pourquoi": "Supprimer le namespace efface tout ce qu'il contient : Deployment, ReplicaSets et pods.",
+      "consigne": "Supprime le namespace `demo`.",
+      "commande": "kubectl delete namespace demo",
+      "options": [
+        [
+          "kubectl delete namespace",
+          "supprime un namespace et tout son contenu"
+        ],
+        [
+          "demo",
+          "le namespace visé"
+        ]
+      ],
+      "sortie": "namespace \"demo\" deleted",
+      "remarque": "Une ligne, et tout l'arbre Deployment, ReplicaSets, pods est parti. Compte quelques secondes.",
+      "attendu": "^kubectl delete (namespace|ns) demo$",
+      "bravo": "Le cluster est propre.",
+      "robot": [
+        "Fermeture du magasin : on **vide le rayon**. 🧹",
+        "On démonte tout le rayon d'un coup plutôt que de reprendre chaque produit un par un.",
+        "👀 Une ligne qui finit par `deleted`."
+      ]
+    },
+    {
+      "titre": "Supprimer le manifeste",
+      "pourquoi": "Le fichier a servi : on le supprime de ton dossier.",
+      "consigne": "Supprime le fichier `web-deploy.yaml`.",
+      "commande": "rm web-deploy.yaml",
+      "options": [
+        [
+          "rm",
+          "supprime un fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier a disparu. Vérifie avec `ls` si tu veux.",
+      "bravo": "Fichier supprimé.",
+      "robot": [
+        "On range aussi la **fiche de poste**. 🗑️",
+        "Le chef de rayon a fini sa journée : sa consigne écrite part au panier.",
+        "👀 Aucun message : `rm` travaille en silence."
+      ]
+    },
+    {
+      "titre": "Éteindre le magasin",
+      "pourquoi": "On arrête le cluster sans l'effacer, pour le retrouver au prochain lab.",
+      "consigne": "Arrête Minikube.",
+      "commande": "minikube stop",
+      "options": [
+        [
+          "minikube stop",
+          "arrête le nœud du cluster sans rien effacer"
+        ]
+      ],
+      "sortie": "✋  Stopping node \"minikube\"  ...\n🛑  Powering off \"minikube\" via SSH ...\n🛑  1 node stopped.",
+      "remarque": "Le nœud est **arrêté**, pas effacé : `minikube start` le relancera.",
+      "bravo": "Le cluster est en veille.",
+      "robot": [
+        "Dernier geste : on **baisse le rideau**. 🌙",
+        "Le magasin ferme pour la nuit, mais rien n'est démonté : demain, on rouvre.",
+        "👀 Minikube annonce `1 node stopped.`"
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Re-bonjour ! C'est **Conti**, ton coéquipier en salopette de magasinier. 👋",
+    "Aujourd'hui, on gère un **rayon de supermarché** : trois produits identiques à garder en place, un modèle à changer sans jamais laisser le rayon vide, et un retour en arrière si le nouveau modèle déçoit.",
+    "Tout se passe dans un terminal simulé : vas-y franchement, rien ne peut casser."
+  ],
+  "robotFin": [
+    "Rayon impeccable, bravo ! 🎉",
+    "Tu maîtrises la chaîne **Deployment**, **ReplicaSet**, **Pod**, le **rolling update** pod par pod et le **rollback** en une commande.",
+    "Tu repars avec le badge **Chef de rayon des pods**. À très vite !"
+  ],
+  "badge": "Chef de rayon des pods"
+}

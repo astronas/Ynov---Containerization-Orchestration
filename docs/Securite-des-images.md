@@ -245,6 +245,14 @@ Un analyseur comme Trivy ou Docker Scout produit un rapport. Ce rapport n'est qu
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/securite-images.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 10 minutes. Tu vas cacher un faux secret dans une image, le retrouver, puis faire la même chose proprement. Tape les commandes une par une.
 
 **Étape 1 · Préparer un faux secret et un Dockerfile maladroit**

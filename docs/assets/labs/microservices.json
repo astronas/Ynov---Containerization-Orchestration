@@ -1,0 +1,314 @@
+{
+  "titre": "La boutique en services",
+  "duree": "10 min",
+  "intro": "Tu vas monter une mini-boutique à deux services : un serveur Apache dans le rôle du **paiement**, un serveur nginx dans le rôle du **catalogue**, sur un réseau commun où ils se trouvent par leur nom. Puis tu provoques une panne pour voir ce qui tient debout.",
+  "conclusion": "Les deux services se sont joints par leur nom sur le réseau `boutique`. Quand le paiement s'est arrêté, le catalogue a continué de répondre (`Welcome to nginx!`) : la panne était isolée, mais le paiement, lui, était injoignable (`bad address`).",
+  "retour": {
+    "texte": "Retour au cours : Du monolithe aux microservices",
+    "lien": "../../Du-monolithe-aux-microservices/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer le réseau",
+      "pourquoi": "Des services séparés doivent pouvoir se parler. Un réseau Docker privé relie les conteneurs qu'on branche dessus, et leur permet de se trouver **par leur nom**.",
+      "consigne": "Crée un réseau nommé `boutique`.",
+      "commande": "docker network create boutique",
+      "options": [
+        [
+          "docker network create",
+          "crée un réseau privé pour des conteneurs"
+        ],
+        [
+          "boutique",
+          "le nom du réseau"
+        ]
+      ],
+      "sortie": "f66d64380e91ec9d426591bc744f94ceb5e611f7999c398d361aed704499808d",
+      "remarque": "Docker répond par l'**identifiant** du réseau (le tien sera différent). Pour l'instant, personne n'est branché dessus.",
+      "bravo": "Le réseau `boutique` est prêt.",
+      "robot": [
+        "On ouvre notre boutique ! D'abord, il faut que les équipes puissent se parler. 🏬",
+        "Un réseau Docker, c'est le **réseau de talkies-walkies** du grand magasin : chaque équipe s'y appelle par son nom.",
+        "👀 Docker va te répondre par un long identifiant : celui du réseau tout neuf."
+      ]
+    },
+    {
+      "titre": "Lancer le paiement",
+      "pourquoi": "Premier service : un serveur web Apache joue le rôle du paiement. On le branche sur le réseau `boutique` ; son nom de conteneur devient aussi son nom sur ce réseau.",
+      "consigne": "Lance `httpd:2.4` en arrière-plan, nommé `paiement`, sur le réseau `boutique`.",
+      "commande": "docker run -d --name paiement --network boutique httpd:2.4",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan : le terminal te rend la main"
+        ],
+        [
+          "--name paiement",
+          "le nom du conteneur, qui sert aussi de nom sur le réseau"
+        ],
+        [
+          "--network boutique",
+          "le brancher sur le réseau de l'étape précédente"
+        ],
+        [
+          "httpd:2.4",
+          "l'image du serveur web Apache"
+        ]
+      ],
+      "sortie": "6b370628dfcc70e6343e4b11569c9591facc73a376f800bf398018f450d8c3cd",
+      "remarque": "Un long identifiant : le service paiement tourne (le tien sera différent). Si l'image n'est pas encore là, des lignes « Pull complete » s'affichent d'abord.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]paiement\\b)(?=.*(--network|--net)[ =]boutique\\b).*httpd",
+      "indice": "il faut `-d`, `--name paiement` et `--network boutique`, puis l'image `httpd:2.4` en dernier.",
+      "bravo": "Le paiement est en service.",
+      "robot": [
+        "On installe la première équipe : celle des **caisses**. 💳",
+        "Chaque service a son propre stand, avec son badge nominatif : ici, le badge dit `paiement`.",
+        "👀 Un long identifiant doit s'afficher : le stand est ouvert."
+      ]
+    },
+    {
+      "titre": "Lancer le catalogue",
+      "pourquoi": "Deuxième service : un serveur nginx joue le rôle du catalogue, sur le même réseau. Chaque service tourne dans **son propre conteneur**.",
+      "consigne": "Lance `nginx:stable` en arrière-plan, nommé `catalogue`, sur le réseau `boutique`.",
+      "commande": "docker run -d --name catalogue --network boutique nginx:stable",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan"
+        ],
+        [
+          "--name catalogue",
+          "le nom du conteneur, et son nom sur le réseau"
+        ],
+        [
+          "--network boutique",
+          "le même réseau que le paiement"
+        ],
+        [
+          "nginx:stable",
+          "l'image du serveur web nginx"
+        ]
+      ],
+      "sortie": "1639b41c4dd228f107dbc528575af23d3aba2535087b07ebdd9e5f6f89e80e7d",
+      "remarque": "Un autre identifiant : deux services, deux conteneurs séparés, mais branchés sur le même réseau.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]catalogue\\b)(?=.*(--network|--net)[ =]boutique\\b).*nginx",
+      "indice": "il faut `-d`, `--name catalogue` et `--network boutique`, puis l'image `nginx:stable`.",
+      "bravo": "Le catalogue est en service.",
+      "robot": [
+        "Deuxième équipe : les **rayons** du catalogue. 📚",
+        "Un rayon et une caisse sont deux stands séparés : si l'un ferme, l'autre peut rester ouvert.",
+        "👀 Encore un identifiant, différent du précédent : c'est bien un deuxième conteneur."
+      ]
+    },
+    {
+      "titre": "Voir la boutique",
+      "pourquoi": "On vérifie que les deux services tournent, en ne listant que les conteneurs branchés sur notre réseau.",
+      "consigne": "Liste les conteneurs du réseau `boutique`, avec leur nom, leur image et leur état.",
+      "commande": "docker ps --filter network=boutique --format 'table {{.Names}}\\t{{.Image}}\\t{{.Status}}'",
+      "options": [
+        [
+          "docker ps",
+          "liste les conteneurs en marche"
+        ],
+        [
+          "--filter network=boutique",
+          "seulement ceux branchés sur notre réseau"
+        ],
+        [
+          "--format 'table …'",
+          "un tableau à trois colonnes : nom, image, état (`\\t` sépare les colonnes)"
+        ]
+      ],
+      "sortie": "NAMES       IMAGE          STATUS\ncatalogue   nginx:stable   Up Less than a second\npaiement    httpd:2.4      Up Less than a second",
+      "remarque": "Deux services, deux images différentes, tous les deux à l'état `Up` (la durée variera chez toi).",
+      "attendu": "^docker (container )?(ps|ls) (?=.*network=boutique\\b).*",
+      "indice": "il faut `--filter network=boutique` ; le `--format` sert seulement à choisir les colonnes.",
+      "bravo": "Les deux services tournent.",
+      "robot": [
+        "Petit tour du propriétaire avant l'ouverture des portes. 👔",
+        "C'est le **plan du magasin** affiché à l'entrée : chaque stand, son équipe, et s'il est ouvert.",
+        "👀 Vérifie la colonne **STATUS** : les deux lignes doivent commencer par `Up`."
+      ]
+    },
+    {
+      "titre": "Appeler le paiement par son nom",
+      "pourquoi": "Un petit conteneur Alpine jetable joue le client, sur le même réseau. Il vise le service **par son nom**, `paiement`, sans connaître son adresse : c'est le réseau Docker qui fait la traduction.",
+      "consigne": "Depuis un conteneur jetable `alpine:3.22` sur le réseau `boutique`, télécharge la page `http://paiement/`.",
+      "commande": "docker run --rm --network boutique alpine:3.22 wget -qO- http://paiement/",
+      "options": [
+        [
+          "--rm",
+          "le conteneur client est supprimé dès qu'il a fini"
+        ],
+        [
+          "--network boutique",
+          "le client est sur le même réseau que les services"
+        ],
+        [
+          "wget -qO-",
+          "télécharge une page et l'affiche à l'écran (`-q` : sans bavardage, `-O-` : vers l'écran)"
+        ],
+        [
+          "http://paiement/",
+          "on vise le service par son nom"
+        ]
+      ],
+      "sortie": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n<html>\n<head>\n<title>It works! Apache httpd</title>\n</head>\n<body>\n<p>It works!</p>\n</body>\n</html>",
+      "remarque": "« It works! Apache httpd », la page d'accueil d'Apache. Le nom `paiement` a suffi : pas besoin de connaître l'adresse du conteneur.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(--network|--net)[ =]boutique\\b).*alpine.*wget .*paiement",
+      "indice": "le client doit être sur le réseau : `--network boutique`. Sans lui, le nom `paiement` est inconnu.",
+      "bravo": "Le paiement répond à son nom.",
+      "robot": [
+        "Premier client de la journée : il veut passer en caisse !",
+        "Il prend son talkie-walkie et appelle « **paiement** » : pas besoin de connaître le numéro de la caisse, le nom suffit. 📻",
+        "👀 Cherche « It works! » dans la page : c'est Apache qui décroche."
+      ]
+    },
+    {
+      "titre": "Provoquer une panne",
+      "pourquoi": "On arrête le conteneur du paiement pour simuler une panne. On va voir ce que ça change pour le reste de la boutique.",
+      "consigne": "Arrête le conteneur `paiement`.",
+      "commande": "docker stop paiement",
+      "options": [
+        [
+          "docker stop",
+          "arrête le programme principal du conteneur"
+        ],
+        [
+          "paiement",
+          "le service qu'on fait tomber en panne"
+        ]
+      ],
+      "sortie": "paiement",
+      "remarque": "Docker répète le nom du conteneur arrêté. Un conteneur arrêté **disparaît du réseau** : son nom n'y répond plus.",
+      "attendu": "^docker (container )?stop (-t \\d+ )?paiement",
+      "bravo": "Le paiement est en panne.",
+      "robot": [
+        "Coup dur : les caisses tombent en panne ! ⚠️",
+        "On débranche le stand du paiement, comme une caisse qui ne s'allume plus le samedi matin.",
+        "👀 Docker te répondra juste `paiement`. Le vrai test, c'est la suite."
+      ]
+    },
+    {
+      "titre": "Le catalogue tient bon",
+      "pourquoi": "Le catalogue tourne dans son propre conteneur : la panne du paiement ne devrait pas l'atteindre. On le vérifie depuis un client jetable, en ne gardant que le titre de la page.",
+      "consigne": "Depuis un conteneur jetable sur `boutique`, demande `http://catalogue/` et ne garde que la ligne du titre.",
+      "commande": "docker run --rm --network boutique alpine:3.22 wget -qO- http://catalogue/ | grep title",
+      "options": [
+        [
+          "--rm --network boutique",
+          "un client jetable sur le réseau de la boutique"
+        ],
+        [
+          "wget -qO- http://catalogue/",
+          "télécharge la page du catalogue et l'affiche"
+        ],
+        [
+          "| grep title",
+          "ne garde que la ligne qui contient « title »"
+        ]
+      ],
+      "sortie": "<title>Welcome to nginx!</title>",
+      "remarque": "Le catalogue répond toujours. **La panne est isolée** : seul le conteneur du paiement est touché.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(--network|--net)[ =]boutique\\b).*wget .*catalogue.*\\| ?grep title",
+      "indice": "même commande que tout à l'heure avec `http://catalogue/`, suivie de `| grep title`.",
+      "bravo": "Le catalogue répond malgré la panne.",
+      "robot": [
+        "Les caisses sont en panne… mais peut-on encore flâner dans les rayons ?",
+        "Dans un grand magasin, une caisse en rade n'éteint pas la lumière des **rayons**. 💡",
+        "👀 Si tu lis « Welcome to nginx! », le catalogue est toujours ouvert."
+      ]
+    },
+    {
+      "titre": "Et le paiement ?",
+      "pourquoi": "On essaie de joindre le paiement, en abandonnant au bout de 2 secondes. C'est la dépendance qui demeure : sans paiement, aucune commande ne pourrait passer.",
+      "consigne": "Depuis un conteneur jetable sur `boutique`, demande `http://paiement/` avec un délai de 2 secondes.",
+      "commande": "docker run --rm --network boutique alpine:3.22 wget -T 2 -qO- http://paiement/",
+      "options": [
+        [
+          "--rm --network boutique",
+          "un client jetable sur le réseau de la boutique"
+        ],
+        [
+          "-T 2",
+          "abandonner au bout de 2 secondes"
+        ],
+        [
+          "http://paiement/",
+          "le service arrêté"
+        ]
+      ],
+      "sortie": "wget: bad address 'paiement'",
+      "remarque": "« bad address », le nom `paiement` n'existe plus sur le réseau. Découper **isole la panne mais ne supprime pas la dépendance** : dans une vraie boutique, toute commande échouerait.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(--network|--net)[ =]boutique\\b)(?=.*-T ?\\d+).*wget .*paiement",
+      "indice": "n'oublie pas `-T 2` pour ne pas attendre trop longtemps, et `--network boutique`.",
+      "bravo": "Paiement injoignable : la dépendance est bien là.",
+      "robot": [
+        "Et maintenant, on tente de payer quand même. 🛒",
+        "Le client appelle « paiement » au talkie-walkie… et personne ne répond sur la fréquence.",
+        "👀 Le message « bad address » veut dire que le nom n'existe plus sur le réseau."
+      ]
+    },
+    {
+      "titre": "Supprimer les services",
+      "pourquoi": "On ferme la boutique : on supprime les deux conteneurs, même celui qui tourne encore.",
+      "consigne": "Supprime les conteneurs `paiement` et `catalogue`.",
+      "commande": "docker rm -f paiement catalogue",
+      "options": [
+        [
+          "docker rm",
+          "supprime des conteneurs"
+        ],
+        [
+          "-f",
+          "arrête d'abord ceux qui tournent encore (le catalogue)"
+        ]
+      ],
+      "sortie": "paiement\ncatalogue",
+      "remarque": "Docker répète le nom de chaque conteneur supprimé.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b)(?=.*\\bpaiement\\b)(?=.*\\bcatalogue\\b)",
+      "indice": "les deux noms, avec `-f` car le catalogue tourne encore.",
+      "bravo": "Les deux services sont supprimés.",
+      "robot": [
+        "Fin de journée, on ferme boutique. 🔑",
+        "On démonte les deux stands : celui en panne et celui qui tournait encore.",
+        "👀 Docker te répondra les deux noms, l'un sous l'autre."
+      ]
+    },
+    {
+      "titre": "Supprimer le réseau",
+      "pourquoi": "Le réseau survit aux conteneurs : on le supprime à son tour. Il faut le faire **après** les conteneurs, car on ne retire pas un réseau encore utilisé.",
+      "consigne": "Supprime le réseau `boutique`.",
+      "commande": "docker network rm boutique",
+      "options": [
+        [
+          "docker network rm",
+          "supprime un réseau qui n'est plus utilisé"
+        ],
+        [
+          "boutique",
+          "le réseau à supprimer"
+        ]
+      ],
+      "sortie": "boutique",
+      "remarque": "Docker répète le nom du réseau supprimé. S'il restait un conteneur branché dessus, il refuserait (`has active endpoints`).",
+      "bravo": "La boutique est rangée.",
+      "robot": [
+        "Dernier geste : on range les talkies-walkies. 📦",
+        "Le réseau, c'est l'installation radio du magasin : on la démonte une fois que toutes les équipes sont parties.",
+        "👀 Docker te répondra `boutique`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Bonjour ! **Conti** à ton service, robot guide et gérant de magasin à mes heures. 👋",
+    "On va ouvrir une mini-boutique en **deux services** séparés, les faire se parler par leur nom, puis faire tomber les caisses en panne pour voir ce qui résiste.",
+    "Ici, c'est un terminal d'entraînement : les pannes sont pour de faux, tu ne casses rien."
+  ],
+  "robotFin": [
+    "Bravo, ta boutique a survécu à sa première panne ! 🎉",
+    "Tu as vu des **services séparés** sur un **réseau** commun, qui se trouvent **par leur nom**, une **panne isolée** au seul paiement, et une **dépendance** qui demeure.",
+    "Voici ton badge de gérant, bien mérité !"
+  ],
+  "badge": "Architecte de la boutique"
+}

@@ -235,6 +235,14 @@ AppArmor et SELinux sont des contrôles d'accès **obligatoires** (MAC) : la rè
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/identites.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Cinq étapes, environ 8 minutes. Tu vas regarder qui tourne dans Apache, tomber dans le piège du « tout retirer », puis trouver le bon réglage.
 
 **Étape 1 · Lancer Apache tel quel et regarder qui tourne**

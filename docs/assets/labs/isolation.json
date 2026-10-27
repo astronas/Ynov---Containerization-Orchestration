@@ -186,14 +186,14 @@
           "60 fois : démarre un programme qui attend 30 s, en arrière-plan"
         ]
       ],
-      "sortie": "sh: can't fork: Resource temporarily unavailable",
-      "remarque": "« can't fork » : le noyau **refuse** de créer un programme de plus. Le conteneur est bloqué à son plafond, le reste de la machine n'a rien senti.",
+      "sortie": "sh: 0: Cannot fork",
+      "remarque": "« Cannot fork » : le noyau **refuse** de créer un programme de plus. Le conteneur est bloqué à son plafond, le reste de la machine n'a rien senti. (Dans une image Alpine, le même refus s'écrit « can't fork: Resource temporarily unavailable ».)",
       "attendu": "^docker exec demo sh -c .*seq 1 \\d+",
       "bravo": "Refusé au-delà du plafond : la machine est protégée.",
       "robot": [
         "On passe aux crash-tests ! 💥",
         "On va essayer de lancer **60** programmes alors que le plafond est à 32.",
-        "👀 Guette le message « can't fork » : c'est le noyau qui dit non."
+        "👀 Guette le message « Cannot fork » : c'est le noyau qui dit non."
       ]
     },
     {

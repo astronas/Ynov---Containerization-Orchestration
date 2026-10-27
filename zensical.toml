@@ -20,7 +20,17 @@ docs_dir = "build_docs"
 site_dir = "site"
 
 extra_css = ["stylesheets/extra.css"]
-extra_javascript = ["javascripts/dockersim.js"]
+# Simulateur des labs : js-yaml (Compose, kubectl), puis le noyau, les modules et l'interface, dans cet ordre.
+extra_javascript = [
+  "https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js",
+  "javascripts/sim-noyau.js",
+  "javascripts/sim-docker.js",
+  "javascripts/sim-images.js",
+  "javascripts/sim-compose.js",
+  "javascripts/sim-k8s.js",
+  "javascripts/sim-hote.js",
+  "javascripts/dockersim.js",
+]
 # Pages de lab interactif : ouvertes depuis les pages du cours, hors du menu.
 not_in_nav = """
 /labs/
@@ -29,6 +39,7 @@ not_in_nav = """
 nav = [
   { "Accueil" = "index.md" },
   { "Bien démarrer" = "Bien-demarrer.md" },
+  { "Labs interactifs" = "Labs.md" },
   { "Comprendre" = [
     { "Du monolithe aux microservices" = "Du-monolithe-aux-microservices.md" },
     { "Machine virtuelle ou conteneur" = "Machine-virtuelle-ou-conteneur.md" },

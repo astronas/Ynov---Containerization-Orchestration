@@ -1,0 +1,514 @@
+{
+  "titre": "Écrire un Dockerfile",
+  "duree": "15 min",
+  "intro": "Tu vas écrire ta première recette d'image : un petit serveur web Python, construit sous le nom `atelier:1.0`, lancé, interrogé, puis comparé à une variante sans ligne `USER`. Garde l'image et le dossier à la fin : le lab suivant s'en resservira.",
+  "conclusion": "Tu as construit `atelier:1.0` en 4 étapes de fichiers, vu ton serveur répondre sur le port 8080 sous l'utilisateur `app` (UID 10001), changé `PORT` sans reconstruire, et constaté qu'une recette sans `USER` tourne en root.",
+  "retour": {
+    "texte": "Retour au cours : Écrire un Dockerfile",
+    "lien": "../../Ecrire-un-Dockerfile/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer le dossier de travail",
+      "pourquoi": "Une image se construit à partir d'un dossier, le contexte. On en crée un, vide, pour y ranger la recette et le programme.",
+      "consigne": "Crée le dossier `atelier` et entre dedans.",
+      "commande": "mkdir atelier && cd atelier",
+      "options": [
+        [
+          "mkdir atelier",
+          "crée le dossier `atelier`"
+        ],
+        [
+          "&&",
+          "lance la commande suivante seulement si la première a réussi"
+        ],
+        [
+          "cd atelier",
+          "entre dans le dossier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : en ligne de commande, le silence veut dire que tout s'est bien passé. Tout le reste du lab se passe dans ce dossier.",
+      "attendu": "^mkdir (-p )?atelier && cd atelier$",
+      "indice": "les deux commandes sont reliées par `&&` : `mkdir atelier && cd atelier`.",
+      "bravo": "Tu es dans le dossier `atelier`.",
+      "robot": [
+        "On installe la cuisine : un dossier `atelier` pour la recette et ses ingrédients. 🍳",
+        "Comme un plan de travail dégagé avant de cuisiner : tout ce qui sert à la recette sera posé là.",
+        "👀 Pas de message en retour : c'est bon signe."
+      ]
+    },
+    {
+      "titre": "Écrire le programme",
+      "pourquoi": "Il nous faut une application à mettre en image : un petit serveur web en Python qui répond « Bonjour depuis Docker ! ». Pas besoin de lire le Python, retiens seulement qu'il écoute sur le port donné par la variable `PORT`.",
+      "consigne": "Crée le fichier `app.py` en collant le bloc entier, jusqu'à `EOF`.",
+      "commande": "cat > app.py <<'EOF'\nfrom http.server import BaseHTTPRequestHandler, HTTPServer\nfrom os import getenv\n\n\nclass App(BaseHTTPRequestHandler):\n    def do_GET(self):\n        body = b\"Bonjour depuis Docker !\\n\"\n        self.send_response(200)\n        self.send_header(\"Content-Type\", \"text/plain; charset=utf-8\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\nHTTPServer((\"0.0.0.0\", int(getenv(\"PORT\", \"8080\"))), App).serve_forever()\nEOF",
+      "options": [
+        [
+          "cat > app.py",
+          "écrit ce qui suit dans le fichier `app.py`"
+        ],
+        [
+          "<<'EOF'",
+          "le texte va jusqu'à la ligne `EOF`, recopié tel quel"
+        ],
+        [
+          "do_GET",
+          "à chaque requête, répond « Bonjour depuis Docker ! » avec le code 200"
+        ],
+        [
+          "getenv(\"PORT\", \"8080\")",
+          "le port vient de la variable `PORT`, 8080 par défaut"
+        ],
+        [
+          "\"0.0.0.0\"",
+          "écoute sur toutes les adresses du conteneur, pas seulement en interne"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est créé. Le `0.0.0.0` compte : sur `127.0.0.1`, le serveur ne serait joignable que depuis l'intérieur du conteneur.",
+      "attendu": "^cat > app\\.py <<",
+      "indice": "colle tout le bloc d'un coup, de `cat > app.py <<'EOF'` jusqu'à la ligne `EOF`.",
+      "bravo": "Le programme est prêt.",
+      "robot": [
+        "Premier ingrédient : le petit serveur web. Pas besoin de comprendre le Python !",
+        "C'est la garniture qu'on va mettre en bocal : un serveur qui dit bonjour à chaque visite.",
+        "👀 Retiens juste `getenv(\"PORT\", \"8080\")` : le port viendra d'une variable, on s'en servira plus tard."
+      ]
+    },
+    {
+      "titre": "Écrire la recette",
+      "pourquoi": "Le Dockerfile est la recette de l'image : chaque ligne ajoute des fichiers (`RUN`, `COPY`) ou fixe un réglage par défaut (`ENV`, `USER`, `EXPOSE`, `CMD`).",
+      "consigne": "Crée le fichier `Dockerfile` en collant le bloc entier, jusqu'à `EOF`.",
+      "commande": "cat > Dockerfile <<'EOF'\nFROM python:3.12-alpine\nWORKDIR /app\nRUN adduser -D -u 10001 app\nCOPY --chown=app:app app.py .\nENV PORT=8080\nENV PYTHONUNBUFFERED=1\nUSER app\nEXPOSE 8080\nCMD [\"python\", \"app.py\"]\nEOF",
+      "options": [
+        [
+          "cat > Dockerfile",
+          "écrit ce qui suit dans le fichier `Dockerfile` (avec un D majuscule)"
+        ],
+        [
+          "FROM python:3.12-alpine",
+          "la base : Alpine Linux et Python 3.12, version précise"
+        ],
+        [
+          "WORKDIR /app",
+          "crée le dossier `/app` et s'y place"
+        ],
+        [
+          "RUN adduser -D -u 10001 app",
+          "pendant la construction, crée un compte `app`, UID 10001, sans mot de passe"
+        ],
+        [
+          "COPY --chown=app:app app.py .",
+          "copie `app.py` dans `/app` et le donne à `app` ; doit venir après le `RUN adduser`"
+        ],
+        [
+          "ENV PORT=8080",
+          "une variable par défaut, remplaçable au lancement avec `-e`"
+        ],
+        [
+          "ENV PYTHONUNBUFFERED=1",
+          "Python écrit ses messages tout de suite dans les journaux"
+        ],
+        [
+          "USER app",
+          "à partir d'ici, et au démarrage, le programme ne tourne plus en root"
+        ],
+        [
+          "EXPOSE 8080",
+          "documente le port ; n'ouvre rien"
+        ],
+        [
+          "CMD [\"python\", \"app.py\"]",
+          "la commande de démarrage, en forme exec (entre crochets)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche. Les lignes `FROM`, `WORKDIR`, `RUN` et `COPY` produiront des fichiers ; les cinq dernières ne remplissent que la fiche de réglages.",
+      "attendu": "^cat > Dockerfile <<",
+      "indice": "colle tout le bloc d'un coup, de `cat > Dockerfile <<'EOF'` jusqu'à la ligne `EOF`.",
+      "bravo": "La recette est écrite.",
+      "robot": [
+        "Maintenant, la **recette** elle-même : neuf lignes, pas une de plus.",
+        "Comme une fiche de cuisine : la base, les ingrédients ajoutés, puis les consignes de service collées sur l'étiquette.",
+        "👀 Repère la ligne `USER app` : on verra à l'étape 14 ce qui se passe sans elle."
+      ]
+    },
+    {
+      "titre": "Vérifier les deux fichiers",
+      "pourquoi": "Avant de construire, on vérifie que les deux fichiers sont bien là, avec les bons noms : une faute de frappe dans `Dockerfile` et le build échoue.",
+      "consigne": "Liste le contenu du dossier.",
+      "commande": "ls",
+      "options": [
+        [
+          "ls",
+          "liste les fichiers du dossier courant"
+        ]
+      ],
+      "sortie": "Dockerfile  app.py",
+      "remarque": "Exactement `Dockerfile` (D majuscule) et `app.py`. C'est tout ce dont le build a besoin.",
+      "attendu": "^ls\\b",
+      "bravo": "Les deux fichiers sont prêts.",
+      "robot": [
+        "Petit contrôle avant d'allumer le four.",
+        "Comme vérifier qu'on a bien tous les ingrédients sur le plan de travail avant de commencer.",
+        "👀 Tu dois lire deux noms, et seulement deux."
+      ]
+    },
+    {
+      "titre": "Construire l'image",
+      "pourquoi": "`docker build` suit la recette et produit l'image. Aucun conteneur n'est créé à ce stade : on obtient seulement un modèle, prêt à être lancé ou publié.",
+      "consigne": "Construis l'image `atelier:1.0` à partir du dossier courant.",
+      "commande": "docker build -t atelier:1.0 .",
+      "options": [
+        [
+          "docker build",
+          "suit la recette du `Dockerfile` et fabrique une image"
+        ],
+        [
+          "-t atelier:1.0",
+          "le nom `atelier` et le tag `1.0`"
+        ],
+        [
+          ".",
+          "le contexte : le dossier courant, où Docker trouve le `Dockerfile` et `app.py`"
+        ]
+      ],
+      "sortie": "#1 [internal] load build definition from Dockerfile\n#1 transferring dockerfile: 217B done\n#1 DONE 0.0s\n…\n#5 [1/4] FROM docker.io/library/python:3.12-alpine@sha256:5789aa194f757888f41fa3d48e14b6feaa1b57c0af0b56fcb1372d6474d3bff0\n…\n#6 [2/4] WORKDIR /app\n…\n#7 [3/4] RUN adduser -D -u 10001 app\n…\n#8 [4/4] COPY --chown=app:app app.py .\n…\n#9 exporting to image\n…\n#9 naming to docker.io/library/atelier:1.0 done\n#9 DONE 0.2s",
+      "remarque": "Seulement 4 étapes, `[1/4]` à `[4/4]` : `FROM`, `WORKDIR`, `RUN` et `COPY`, les seules qui produisent des fichiers. La ligne `naming to …atelier:1.0` confirme le nom. Si tu as déjà construit cette recette, les étapes affichent `CACHED`.",
+      "attendu": "^docker (image )?build (?=.*(-t|--tag)[ =]atelier:1\\.0\\b).* \\.$",
+      "indice": "n'oublie pas le `.` final, séparé par une espace : c'est le dossier courant.",
+      "bravo": "L'image `atelier:1.0` est construite.",
+      "robot": [
+        "Au four ! On transforme la recette en **bocal scellé** : l'image. 🔥",
+        "La recette ne se cuisine qu'une fois ; ensuite, on servira autant d'assiettes qu'on veut depuis le bocal.",
+        "👀 Compte les étapes numérotées `[1/4]` à `[4/4]`, puis cherche la ligne `naming to`."
+      ]
+    },
+    {
+      "titre": "Retrouver son image",
+      "pourquoi": "On vérifie que l'image est bien rangée sur la machine, avec son nom et son tag.",
+      "consigne": "Liste les images qui s'appellent `atelier`.",
+      "commande": "docker image ls atelier",
+      "options": [
+        [
+          "docker image ls atelier",
+          "liste les images du dépôt `atelier`"
+        ]
+      ],
+      "sortie": "IMAGE         ID             DISK USAGE   CONTENT SIZE   EXTRA\natelier:1.0   547a15591fd6       74.2MB         18.1MB",
+      "remarque": "74,2 Mo sur le disque, presque tout hérité de `python:3.12-alpine` ; tes couches à toi ne pèsent que quelques ko. Ton identifiant sera différent.",
+      "attendu": "^docker (image ls|images) atelier\\b",
+      "bravo": "Ton image est rangée.",
+      "robot": [
+        "Le bocal est sorti du four : on le pose sur l'étagère.",
+        "Comme une étiquette sur un pot de confiture : un nom, un numéro de lot, un poids.",
+        "👀 Repère la colonne **DISK USAGE** : compare-la au poids de la base vu dans le lab précédent."
+      ]
+    },
+    {
+      "titre": "Lancer un conteneur",
+      "pourquoi": "L'image ne fait rien tant qu'on ne la lance pas. `docker run` crée le conteneur et décide de ce qui n'est pas dans la recette : ici, le port publié sur ta machine.",
+      "consigne": "Lance `atelier:1.0` en arrière-plan, nommé `web`, publié sur le port 8080 local.",
+      "commande": "docker run -d --name web -p 127.0.0.1:8080:8080 atelier:1.0",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan : le terminal te rend la main"
+        ],
+        [
+          "--name web",
+          "un nom facile à retenir"
+        ],
+        [
+          "-p 127.0.0.1:8080:8080",
+          "le port 8080 de ta machine, en local seulement, mène au port 8080 du conteneur"
+        ],
+        [
+          "atelier:1.0",
+          "ton image"
+        ]
+      ],
+      "sortie": "740e3ab0b37079f264510c0e7be7e7c79d82770e3f5a23133edc93326dca61e4",
+      "remarque": "La longue suite de caractères est l'identifiant du conteneur, le tien sera différent. C'est `-p`, et non `EXPOSE`, qui rend le port joignable.",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]web\\b)(?=.*-p[ =]?\\S*8080:8080).*atelier:1\\.0$",
+      "indice": "vérifie `-d`, `--name web` et `-p 127.0.0.1:8080:8080`, puis l'image `atelier:1.0` en dernier.",
+      "bravo": "Le conteneur `web` tourne.",
+      "robot": [
+        "On sert la première assiette depuis le bocal ! 🍽️",
+        "`EXPOSE` disait juste « je travaille au 8080 » ; `-p` perce vraiment la fenêtre entre ta machine et le conteneur.",
+        "👀 Docker te répond par un long identifiant : ton conteneur est né."
+      ]
+    },
+    {
+      "titre": "Lui parler",
+      "pourquoi": "`curl` envoie une requête web, comme un navigateur, et affiche la réponse. On vérifie ainsi que le serveur du conteneur répond bien sur le port publié.",
+      "consigne": "Demande la page d'accueil sur le port 8080.",
+      "commande": "curl http://127.0.0.1:8080",
+      "options": [
+        [
+          "curl URL",
+          "envoie une requête web et affiche la réponse"
+        ]
+      ],
+      "sortie": "Bonjour depuis Docker !",
+      "remarque": "C'est le texte écrit dans `app.py`, servi **par le conteneur**. Ta requête est entrée par le port 8080 de ta machine.",
+      "attendu": "^curl .*8080",
+      "indice": "l'adresse est `http://127.0.0.1:8080`.",
+      "bravo": "Ton serveur te répond.",
+      "robot": [
+        "Moment de vérité : on goûte l'assiette !",
+        "`curl` joue le client du restaurant : il commande la page et lit ce qu'on lui sert.",
+        "👀 Tu dois lire exactement la phrase du programme."
+      ]
+    },
+    {
+      "titre": "Lire ses journaux",
+      "pourquoi": "Tout ce que le programme écrit est recueilli par Docker. Le journal montre ici la trace de ta requête.",
+      "consigne": "Affiche le journal du conteneur `web`.",
+      "commande": "docker logs web",
+      "options": [
+        [
+          "docker logs",
+          "affiche ce que le programme du conteneur a écrit depuis son démarrage"
+        ]
+      ],
+      "sortie": "172.17.0.1 - - [27/Oct/2026 15:46:37] \"GET / HTTP/1.1\" 200 -",
+      "remarque": "La date, la requête `GET /` et le code `200` (OK). `172.17.0.1` est l'adresse par laquelle ta machine joint le conteneur. La ligne apparaît tout de suite grâce à `ENV PYTHONUNBUFFERED=1`.",
+      "attendu": "^docker (container )?logs web$",
+      "bravo": "Tu sais lire le journal.",
+      "robot": [
+        "Le serveur a pris des notes : allons les lire. 📜",
+        "C'est le carnet de commandes du serveur : chaque client y laisse une ligne.",
+        "👀 Cherche le code `200` en fin de ligne : la requête a réussi."
+      ]
+    },
+    {
+      "titre": "Qui fait tourner le programme ?",
+      "pourquoi": "La recette demande `USER app`. On le vérifie sur le programme qui tourne vraiment, en lançant la commande `id` dans le conteneur.",
+      "consigne": "Demande au conteneur `web` sous quel utilisateur il tourne.",
+      "commande": "docker exec web id",
+      "options": [
+        [
+          "docker exec web",
+          "lance une commande dans le conteneur `web` qui tourne"
+        ],
+        [
+          "id",
+          "affiche l'utilisateur et ses groupes"
+        ]
+      ],
+      "sortie": "uid=10001(app) gid=10001(app) groups=10001(app)",
+      "remarque": "UID **10001**, l'utilisateur `app` créé par la recette, pas root. Si quelqu'un prend la main sur ce serveur, il n'est pas administrateur du conteneur.",
+      "attendu": "^docker (container )?exec web id$",
+      "bravo": "Le programme tourne en `app`.",
+      "robot": [
+        "On vérifie qui est aux fourneaux. 🧐",
+        "La recette disait « c'est le commis `app` qui cuisine, pas le patron » : on contrôle sur place.",
+        "👀 Regarde le nombre après `uid=` : 0 serait root, on attend 10001."
+      ]
+    },
+    {
+      "titre": "Changer un réglage sans reconstruire",
+      "pourquoi": "`ENV PORT=8080` n'est qu'une valeur par défaut. `-e` la remplace au lancement : la même image peut servir en test et en production avec des réglages différents.",
+      "consigne": "Lance un conteneur jetable avec `PORT=9090` et affiche sa variable `PORT`.",
+      "commande": "docker run --rm -e PORT=9090 atelier:1.0 env | grep PORT",
+      "options": [
+        [
+          "--rm",
+          "conteneur jetable, supprimé dès qu'il a fini"
+        ],
+        [
+          "-e PORT=9090",
+          "remplace la variable `PORT` pour ce conteneur seulement"
+        ],
+        [
+          "env",
+          "liste les variables ; remplace le `CMD` de l'image"
+        ],
+        [
+          "| grep PORT",
+          "ne garde que la ligne qui contient `PORT`"
+        ]
+      ],
+      "sortie": "PORT=9090",
+      "remarque": "La nouvelle valeur, obtenue **sans reconstruire** l'image. La recette fixe les défauts, le lancement décide du reste.",
+      "attendu": "^docker run (?=.*--rm\\b)(?=.*(-e|--env)[ =]PORT=9090).*atelier:1\\.0 env \\| grep PORT$",
+      "indice": "`--rm` et `-e PORT=9090` avant l'image, puis `env | grep PORT` après.",
+      "bravo": "Réglage changé au lancement.",
+      "robot": [
+        "Et si on veut servir sur un autre port ? Pas besoin de refaire la recette.",
+        "C'est comme demander la sauce à part au serveur : le plat est le même, seul le service change.",
+        "👀 Tu dois lire `9090`, pas `8080`."
+      ]
+    },
+    {
+      "titre": "Une recette sans USER",
+      "pourquoi": "Pour mesurer l'effet de `USER app`, on fabrique une copie de la recette sans cette ligne. `sed` la retire automatiquement.",
+      "consigne": "Écris dans `Dockerfile.root` une copie du `Dockerfile` sans la ligne `USER`.",
+      "commande": "sed '/^USER/d' Dockerfile > Dockerfile.root",
+      "options": [
+        [
+          "sed '/^USER/d'",
+          "supprime les lignes qui commencent par `USER`"
+        ],
+        [
+          "Dockerfile",
+          "le fichier lu (il n'est pas modifié)"
+        ],
+        [
+          "> Dockerfile.root",
+          "écrit le résultat dans un nouveau fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : `Dockerfile.root` est créé, identique au premier moins la ligne `USER app`.",
+      "attendu": "^sed .*USER.* Dockerfile > Dockerfile\\.root$",
+      "indice": "l'expression `'/^USER/d'` entre apostrophes, puis `Dockerfile > Dockerfile.root`.",
+      "bravo": "La variante est écrite.",
+      "robot": [
+        "Petite expérience : on retire une seule ligne de la recette.",
+        "Comme refaire un gâteau sans le sucre pour comprendre à quoi il sert.",
+        "👀 Pas de sortie : la copie est prête dans `Dockerfile.root`."
+      ]
+    },
+    {
+      "titre": "Construire la variante",
+      "pourquoi": "On construit cette variante sous un autre tag. `-f` désigne le Dockerfile à utiliser, `-q` n'affiche que l'identifiant final.",
+      "consigne": "Construis `atelier:root` à partir de `Dockerfile.root`, en mode silencieux.",
+      "commande": "docker build -q -f Dockerfile.root -t atelier:root .",
+      "options": [
+        [
+          "-q",
+          "silencieux : n'affiche que l'identifiant de l'image"
+        ],
+        [
+          "-f Dockerfile.root",
+          "utilise ce fichier au lieu de `Dockerfile`"
+        ],
+        [
+          "-t atelier:root",
+          "le nom de la variante"
+        ],
+        [
+          ".",
+          "le même contexte : le dossier courant"
+        ]
+      ],
+      "sortie": "sha256:ab87260e5391d353bf6f2b1e07f2a15c28ebc9969e34bdea9361398a24717784",
+      "remarque": "Une seule ligne, l'identifiant de la nouvelle image (le tien sera différent). Les premières étapes viennent du cache, seule la configuration change.",
+      "attendu": "^docker (image )?build (?=.*(-f|--file)[ =]Dockerfile\\.root\\b)(?=.*(-t|--tag)[ =]atelier:root\\b).* \\.$",
+      "indice": "il faut `-f Dockerfile.root`, `-t atelier:root` et le `.` final.",
+      "bravo": "La variante est construite.",
+      "robot": [
+        "On fait cuire la recette sans sucre, en silence cette fois.",
+        "Même cuisine, même ingrédients, une consigne en moins sur l'étiquette.",
+        "👀 Une seule ligne `sha256:…` : c'est l'effet de `-q`."
+      ]
+    },
+    {
+      "titre": "Sous quel utilisateur ?",
+      "pourquoi": "Sans `USER`, le programme hérite de l'utilisateur de la base. On le vérifie avec `id` dans un conteneur jetable.",
+      "consigne": "Lance `id` dans un conteneur jetable de `atelier:root`.",
+      "commande": "docker run --rm atelier:root id",
+      "options": [
+        [
+          "--rm",
+          "conteneur jetable"
+        ],
+        [
+          "id",
+          "remplace le `CMD` : affiche l'utilisateur"
+        ]
+      ],
+      "sortie": "uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)",
+      "remarque": "Uid=0**, root, avec une longue liste de groupes. Une seule ligne oubliée, et ton serveur tourne en administrateur.",
+      "attendu": "^docker run (--rm )?atelier:root id$",
+      "bravo": "Sans `USER`, c'est root.",
+      "robot": [
+        "Verdict de la recette sans sucre…",
+        "Sans consigne, c'est le patron qui cuisine : il a les clés de toute la cuisine.",
+        "👀 Compare avec l'étape 10 : `uid=0` au lieu de `uid=10001`."
+      ]
+    },
+    {
+      "titre": "Supprimer le conteneur",
+      "pourquoi": "Le conteneur `web` tourne toujours. `-f` l'arrête et le supprime d'un coup.",
+      "consigne": "Supprime le conteneur `web`, même s'il tourne.",
+      "commande": "docker rm -f web",
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur"
+        ],
+        [
+          "-f",
+          "force : l'arrête d'abord s'il tourne"
+        ]
+      ],
+      "sortie": "web",
+      "remarque": "Docker répète le nom du conteneur supprimé. L'image `atelier:1.0` reste : on la garde pour la suite.",
+      "attendu": "^docker (container )?rm (?=(.*\\s)?-[a-z]*f).*\\bweb$",
+      "indice": "il faut `-f` pour supprimer un conteneur qui tourne encore.",
+      "bravo": "Conteneur supprimé.",
+      "robot": [
+        "On fait la vaisselle. 🧽",
+        "On débarrasse l'assiette ; le bocal, lui, retourne sur l'étagère.",
+        "👀 Docker te répond simplement `web`."
+      ]
+    },
+    {
+      "titre": "Supprimer la variante",
+      "pourquoi": "L'image `atelier:root` ne servait qu'à la démonstration. Comme c'est son seul nom, la retirer supprime aussi l'image.",
+      "consigne": "Supprime l'image `atelier:root`.",
+      "commande": "docker image rm atelier:root",
+      "options": [
+        [
+          "docker image rm",
+          "retire un nom ; supprime l'image si c'était le dernier"
+        ]
+      ],
+      "sortie": "Untagged: atelier:root\nDeleted: sha256:ab87260e5391d353bf6f2b1e07f2a15c28ebc9969e34bdea9361398a24717784",
+      "remarque": "`Untagged` puis `Deleted` : c'était le seul nom de cette image, elle est supprimée.",
+      "attendu": "^docker (image rm|rmi) atelier:root$",
+      "bravo": "Variante supprimée.",
+      "robot": [
+        "On jette le gâteau raté, il a rempli son rôle.",
+        "Quand un bocal n'a plus qu'une étiquette, la retirer, c'est jeter le bocal.",
+        "👀 Cette fois, tu dois voir `Deleted` en plus de `Untagged`."
+      ]
+    },
+    {
+      "titre": "Supprimer sa recette",
+      "pourquoi": "Il reste le fichier `Dockerfile.root`. On le supprime, et on garde le dossier `atelier` avec `Dockerfile` et `app.py` pour le lab suivant.",
+      "consigne": "Supprime le fichier `Dockerfile.root`.",
+      "commande": "rm Dockerfile.root",
+      "options": [
+        [
+          "rm",
+          "supprime un fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche. Garde le dossier `atelier` et l'image `atelier:1.0` : le lab « Versionner et publier une image » s'en resservira.",
+      "attendu": "^rm (-f )?Dockerfile\\.root$",
+      "bravo": "Plan de travail propre.",
+      "robot": [
+        "Dernier coup d'éponge sur le plan de travail.",
+        "On range la fiche ratée ; la bonne recette reste dans le classeur.",
+        "👀 Pas de sortie : le fichier a disparu. Un `ls` te le confirmerait."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Bonjour, chef ! Ici **Conti**, tablier noué et prêt à cuisiner. 🍳",
+    "Au menu : écrire une **recette** (le Dockerfile), en tirer un **bocal scellé** (l'image), puis servir des assiettes (les conteneurs).",
+    "Ce terminal est une cuisine d'essai : tu peux tout renverser, rien ne tache."
+  ],
+  "robotFin": [
+    "Service terminé, et quel service ! 🎉",
+    "Tu as vu qu'un Dockerfile mêle des **couches** (`RUN`, `COPY`) et des **réglages** (`ENV`, `USER`, `CMD`), que `EXPOSE` n'ouvre rien sans `-p`, et que sans **USER** on tourne en root.",
+    "Voici ton badge de chef. Garde ton bocal `atelier:1.0`, on le publiera bientôt !"
+  ],
+  "badge": "Chef de la recette Docker"
+}

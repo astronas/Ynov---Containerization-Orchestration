@@ -1,0 +1,502 @@
+{
+  "titre": "Stockage et volumes",
+  "duree": "15 min",
+  "intro": "Tu vas comparer trois façons de stocker des fichiers pour un conteneur : sa propre couche (qui disparaît avec lui), un **volume** géré par Docker (qui survit), un **bind mount** (un dossier de ton poste vu dans le conteneur), et enfin un **tmpfs** en mémoire.",
+  "conclusion": "Le fichier écrit dans la couche est parti avec `docker rm`, la note rangée dans le volume `labo` a été relue par un conteneur tout neuf, la page du dossier `site` a changé dans nginx sans le redémarrer, et `:ro` a bloqué toute écriture depuis le conteneur.",
+  "retour": {
+    "texte": "Retour au cours : Stockage et volumes",
+    "lien": "../../Stockage-et-volumes/"
+  },
+  "etapes": [
+    {
+      "titre": "Écrire sans volume",
+      "pourquoi": "Un conteneur écrit un fichier dans sa propre couche inscriptible, puis s'arrête. On ne met pas `--rm` : on veut le garder pour l'examiner.",
+      "consigne": "Lance un conteneur `ephemere` qui écrit « perdu » dans `/fichier.txt`.",
+      "commande": "docker run --name ephemere alpine:3.22 sh -c 'echo perdu > /fichier.txt'",
+      "options": [
+        [
+          "docker run",
+          "crée et lance un conteneur"
+        ],
+        [
+          "--name ephemere",
+          "un nom pour le retrouver ensuite"
+        ],
+        [
+          "alpine:3.22",
+          "une toute petite image Linux"
+        ],
+        [
+          "sh -c 'echo perdu > /fichier.txt'",
+          "écrit le mot « perdu » dans le fichier `/fichier.txt`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le conteneur a écrit son fichier, puis s'est arrêté, son travail étant fini. Il existe toujours, à l'état `Exited`.",
+      "attendu": "^docker (container )?run (?=.*--name[ =]ephemere\\b).*alpine.*echo perdu > ?/fichier\\.txt",
+      "indice": "pas de `--rm` ici : il faut `--name ephemere`, l'image, puis `sh -c '…'` entre apostrophes.",
+      "bravo": "Le fichier est écrit dans la couche du conteneur.",
+      "robot": [
+        "On commence par une expérience sans filet : un fichier écrit **sans volume**.",
+        "Le conteneur, c'est une **chambre d'hôtel** : on y laisse un mot sur la table de nuit.",
+        "👀 Aucun message en retour : le conteneur a écrit puis s'est arrêté tout seul."
+      ]
+    },
+    {
+      "titre": "Voir la couche",
+      "pourquoi": "`docker diff` liste ce qui a changé dans la couche inscriptible du conteneur par rapport à son image. Notre fichier doit y être.",
+      "consigne": "Affiche les différences du conteneur `ephemere` par rapport à son image.",
+      "commande": "docker diff ephemere",
+      "options": [
+        [
+          "docker diff",
+          "liste les fichiers ajoutés (A), modifiés (C) ou supprimés (D)"
+        ],
+        [
+          "ephemere",
+          "le conteneur à examiner, même arrêté"
+        ]
+      ],
+      "sortie": "A /fichier.txt",
+      "remarque": "`A /fichier.txt`. Le fichier vit dans la couche **du conteneur**, pas dans l'image.",
+      "bravo": "Le fichier est bien dans la couche.",
+      "robot": [
+        "Vérifions que notre mot est bien sur la table de nuit. 🔍",
+        "La couche inscriptible, c'est la chambre elle-même : tout ce qu'on y pose lui appartient.",
+        "👀 Repère la lettre **A** (ajouté) devant le nom du fichier."
+      ]
+    },
+    {
+      "titre": "Rendre la clé",
+      "pourquoi": "Supprimer le conteneur supprime aussi sa couche inscriptible, et donc le fichier qu'il y a écrit.",
+      "consigne": "Supprime le conteneur `ephemere`.",
+      "commande": "docker rm ephemere",
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur arrêté, avec sa couche"
+        ],
+        [
+          "ephemere",
+          "le conteneur à supprimer"
+        ]
+      ],
+      "sortie": "ephemere",
+      "remarque": "Docker répète le nom du conteneur supprimé. Pas besoin de `-f` : il était déjà arrêté.",
+      "attendu": "^docker (container )?rm (-f )?ephemere",
+      "bravo": "Conteneur et couche supprimés.",
+      "robot": [
+        "On rend la clé de la chambre. 🗝️",
+        "Dès que tu rends la clé, le service de ménage passe et **efface tout** ce que tu as laissé.",
+        "👀 Docker te répondra juste `ephemere`."
+      ]
+    },
+    {
+      "titre": "Le fichier a disparu",
+      "pourquoi": "Un **nouveau** conteneur, tiré de la même image, cherche le fichier. Il part d'une couche vide : le fichier ne peut pas y être.",
+      "consigne": "Lance un conteneur jetable `alpine:3.22` qui affiche `/fichier.txt`.",
+      "commande": "docker run --rm alpine:3.22 cat /fichier.txt",
+      "options": [
+        [
+          "--rm",
+          "le conteneur est supprimé dès qu'il a fini"
+        ],
+        [
+          "cat /fichier.txt",
+          "essaie d'afficher le fichier"
+        ]
+      ],
+      "sortie": "cat: can't open '/fichier.txt': No such file or directory",
+      "remarque": "« No such file or directory ». **Tout ce qui est écrit hors d'un montage disparaît avec `docker rm`.**",
+      "attendu": "^docker (container )?run (?=.*--rm\\b).*alpine.*cat /fichier\\.txt",
+      "bravo": "Preuve faite : sans volume, le fichier est perdu.",
+      "robot": [
+        "Un nouveau client arrive dans une chambre identique. Trouvera-t-il notre mot ?",
+        "Même modèle de chambre, mais elle sort tout juste du **ménage** : rien sur la table de nuit.",
+        "👀 Le message d'erreur est ici la bonne réponse : le fichier n'existe plus."
+      ]
+    },
+    {
+      "titre": "Créer un volume",
+      "pourquoi": "Un volume est un espace de stockage géré par Docker, indépendant des conteneurs. Ce qu'on y range survit à leur suppression.",
+      "consigne": "Crée un volume nommé `labo`.",
+      "commande": "docker volume create labo",
+      "options": [
+        [
+          "docker volume create",
+          "crée un volume nommé"
+        ],
+        [
+          "labo",
+          "le nom du volume"
+        ]
+      ],
+      "sortie": "labo",
+      "remarque": "Docker répond par le nom du volume, vide pour l'instant.",
+      "bravo": "Le volume `labo` est prêt.",
+      "robot": [
+        "Place à la solution : un **volume** ! 🗄️",
+        "C'est un **casier à la consigne** de l'hôtel : il reste à toi même quand tu changes de chambre.",
+        "👀 Docker te répondra `labo`, le numéro de ton casier."
+      ]
+    },
+    {
+      "titre": "Le conteneur A écrit",
+      "pourquoi": "Un conteneur jetable branche le volume sur son dossier `/data`, y écrit une note, puis est supprimé. La note, elle, reste dans le volume.",
+      "consigne": "Lance un conteneur jetable qui branche `labo` sur `/data` et y écrit une note.",
+      "commande": "docker run --rm -v labo:/data alpine:3.22 sh -c 'echo bonjour du conteneur A > /data/note.txt'",
+      "options": [
+        [
+          "--rm",
+          "supprimé dès qu'il a fini"
+        ],
+        [
+          "-v labo:/data",
+          "branche le volume `labo` sur le dossier `/data` ; à gauche du `:` un **nom**, c'est donc un volume"
+        ],
+        [
+          "sh -c '…'",
+          "écrit « bonjour du conteneur A » dans `/data/note.txt`, donc dans le volume"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le conteneur A a écrit puis disparu grâce à `--rm`.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(-v|--volume)[ =]?labo:/data\\b).*echo bonjour du conteneur A",
+      "indice": "il faut `--rm` et `-v labo:/data`, puis l'image et le `sh -c '…'` entre apostrophes.",
+      "bravo": "La note est rangée dans le volume.",
+      "robot": [
+        "Le conteneur A dépose sa note dans le casier. ✍️",
+        "Il range ses affaires à la **consigne**, puis rend la clé de sa chambre.",
+        "👀 Pas de message : A a disparu, mais la note est restée au casier."
+      ]
+    },
+    {
+      "titre": "Le conteneur B relit",
+      "pourquoi": "Un conteneur B, tout neuf, branche le même volume, mais en **lecture seule** (`:ro`), et relit la note écrite par A.",
+      "consigne": "Lance un conteneur jetable qui branche `labo` sur `/data` en lecture seule et affiche `/data/note.txt`.",
+      "commande": "docker run --rm -v labo:/data:ro alpine:3.22 cat /data/note.txt",
+      "options": [
+        [
+          "-v labo:/data:ro",
+          "branche le même volume, en lecture seule (`ro` = read only)"
+        ],
+        [
+          "cat /data/note.txt",
+          "affiche la note écrite par le conteneur A"
+        ]
+      ],
+      "sortie": "bonjour du conteneur A",
+      "remarque": "B lit la note de A, alors que A n'existe plus. **On remplace le conteneur, on garde le volume.**",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(-v|--volume)[ =]?labo:/data:ro\\b).*cat /data/note\\.txt",
+      "indice": "branche le volume avec `-v labo:/data:ro`.",
+      "bravo": "La note a survécu au conteneur A.",
+      "robot": [
+        "Nouveau client, nouvelle chambre… mais il a la clé du **même casier**.",
+        "C'est comme récupérer ses valises à la consigne après avoir changé d'hôtel… enfin, de chambre. 🧳",
+        "👀 Si tu lis la phrase du conteneur A, le volume a tenu sa promesse."
+      ]
+    },
+    {
+      "titre": "Écrire en lecture seule",
+      "pourquoi": "Le même conteneur B essaie maintenant d'**écrire** dans le volume. Avec `:ro`, le noyau doit refuser.",
+      "consigne": "Lance un conteneur jetable qui branche `labo` en lecture seule et essaie d'y écrire `/data/autre.txt`.",
+      "commande": "docker run --rm -v labo:/data:ro alpine:3.22 sh -c 'echo x > /data/autre.txt'",
+      "options": [
+        [
+          "-v labo:/data:ro",
+          "le volume, en lecture seule"
+        ],
+        [
+          "sh -c 'echo x > /data/autre.txt'",
+          "tente de créer un fichier dans le volume"
+        ]
+      ],
+      "sortie": "sh: can't create /data/autre.txt: Read-only file system",
+      "remarque": "« Read-only file system ». `:ro` protège les données : ce conteneur peut lire, jamais modifier.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(-v|--volume)[ =]?labo:/data:ro\\b).*autre\\.txt",
+      "indice": "garde bien `:ro` à la fin de `-v labo:/data:ro` : c'est lui qu'on teste.",
+      "bravo": "Écriture refusée : `:ro` fait son travail.",
+      "robot": [
+        "Petit test de sécurité : B essaie de glisser un papier dans le casier. 🔒",
+        "Avec `:ro`, il a seulement le droit de **regarder à travers la vitre** du casier.",
+        "👀 Guette « Read-only file system » : c'est le refus attendu."
+      ]
+    },
+    {
+      "titre": "Préparer un dossier",
+      "pourquoi": "Pour le bind mount, il faut un dossier sur ton poste. On crée `site` avec une petite page web dedans.",
+      "consigne": "Crée un dossier `site` et écris une page `site/index.html` contenant `<h1>Bonjour</h1>`.",
+      "commande": "mkdir site && echo '<h1>Bonjour</h1>' > site/index.html",
+      "options": [
+        [
+          "mkdir site",
+          "crée le dossier `site` sur ton poste"
+        ],
+        [
+          "&&",
+          "enchaîne la commande suivante si la première a réussi"
+        ],
+        [
+          "echo '<h1>Bonjour</h1>' > site/index.html",
+          "écrit une page web dans le dossier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier et la page sont créés **sur ton poste**, pas dans un conteneur.",
+      "attendu": "^mkdir site && echo .*Bonjour.*> ?site/index\\.html",
+      "indice": "les deux commandes sur une ligne, reliées par `&&`.",
+      "bravo": "Le dossier `site` est prêt.",
+      "robot": [
+        "Changement de décor : on prépare **ton propre classeur**. 📁",
+        "Cette fois, on ne loue pas de casier : on apporte un dossier de la maison.",
+        "👀 Pas de message : la page attend sagement dans `site`."
+      ]
+    },
+    {
+      "titre": "Brancher le dossier",
+      "pourquoi": "On lance nginx en branchant le dossier `site` là où il cherche ses pages, en lecture seule. Le chemin commence par `/` (`$PWD` est le dossier où tu es) : c'est un **bind mount**, pas un volume.",
+      "consigne": "Lance nginx en arrière-plan, nommé `vitrine`, publié sur `127.0.0.1:8080`, avec le dossier `site` monté en lecture seule sur `/usr/share/nginx/html`.",
+      "commande": "docker run -d --name vitrine -p 127.0.0.1:8080:80 -v \"$PWD/site\":/usr/share/nginx/html:ro nginx:stable",
+      "options": [
+        [
+          "-d --name vitrine",
+          "en arrière-plan, nommé `vitrine`"
+        ],
+        [
+          "-p 127.0.0.1:8080:80",
+          "le port 8080 de ton poste mène au port 80 du conteneur"
+        ],
+        [
+          "-v \"$PWD/site\":/usr/share/nginx/html:ro",
+          "branche ton dossier `site` là où nginx cherche ses pages, en lecture seule"
+        ],
+        [
+          "$PWD",
+          "le chemin complet du dossier où tu es : il commence par `/`, donc c'est un bind mount"
+        ],
+        [
+          "nginx:stable",
+          "l'image du serveur web"
+        ]
+      ],
+      "sortie": "5bbd06e9095087e296343f5207afa36eea6bc0b4b70ce4b19658f3e90fdf9a60",
+      "remarque": "L'identifiant du conteneur (le tien sera différent). Attention : sans `$PWD/`, Docker aurait créé un **volume** nommé `site`, et nginx servirait sa page « Welcome to nginx! ».",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]vitrine\\b)(?=.*-p[ =]?\\S*\\d+:80\\b)(?=.*(-v|--volume)[ =]?\"?(\\$PWD|\\$\\{PWD\\}|\\$\\(pwd\\))/site\"?:/usr/share/nginx/html:ro).*nginx",
+      "indice": "vérifie `-p 127.0.0.1:8080:80` et surtout `-v \"$PWD/site\":/usr/share/nginx/html:ro` : sans `$PWD/`, ce serait un volume.",
+      "bravo": "nginx sert ton dossier.",
+      "robot": [
+        "On installe une **vitrine** qui affiche le contenu de ton classeur. 🪟",
+        "Le bind mount, c'est ton classeur **posé dans la chambre** : le conteneur lit directement tes feuilles.",
+        "👀 Un long identifiant doit s'afficher : la vitrine est allumée."
+      ]
+    },
+    {
+      "titre": "Voir la page",
+      "pourquoi": "On demande la page d'accueil à nginx : il doit servir le fichier de **ton** dossier, pas celui de son image.",
+      "consigne": "Demande la page servie sur `http://127.0.0.1:8080/`.",
+      "commande": "curl -s http://127.0.0.1:8080/",
+      "options": [
+        [
+          "curl",
+          "un petit navigateur en ligne de commande"
+        ],
+        [
+          "-s",
+          "silencieux : n'affiche que la page"
+        ]
+      ],
+      "sortie": "<h1>Bonjour</h1>",
+      "remarque": "C'est **ta** page, celle du dossier `site`. Le montage cache la page d'accueil que l'image contenait au même endroit.",
+      "attendu": "^curl .*127\\.0\\.0\\.1:\\d+",
+      "bravo": "nginx sert bien ta page.",
+      "robot": [
+        "On passe devant la vitrine pour voir ce qu'elle affiche.",
+        "nginx lit la feuille posée sur le dessus de **ton** classeur.",
+        "👀 Tu dois lire `<h1>Bonjour</h1>`, ta page à toi."
+      ]
+    },
+    {
+      "titre": "Modifier sur ton poste",
+      "pourquoi": "On change la page **sur ton poste**, sans toucher au conteneur. Avec un bind mount, le conteneur voit le même fichier.",
+      "consigne": "Remplace le contenu de `site/index.html` par `<h1>Modifié sur mon poste</h1>`.",
+      "commande": "echo '<h1>Modifié sur mon poste</h1>' > site/index.html",
+      "options": [
+        [
+          "echo '…'",
+          "le nouveau texte de la page"
+        ],
+        [
+          "> site/index.html",
+          "remplace le contenu du fichier sur ton poste"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : seul le fichier de ton poste a changé. Aucun redémarrage, aucune nouvelle image.",
+      "attendu": "^echo .*Modifi.*> ?site/index\\.html",
+      "bravo": "Page modifiée sur ton poste.",
+      "robot": [
+        "On change l'affiche… depuis la maison ! 🏠",
+        "Tu réécris une feuille de ton classeur : comme il est posé dans la chambre, c'est la **même feuille**.",
+        "👀 Pas de message ici : la preuve viendra à l'étape suivante."
+      ]
+    },
+    {
+      "titre": "Le changement est visible",
+      "pourquoi": "On redemande la page : si le bind mount fonctionne, nginx sert la nouvelle version tout de suite.",
+      "consigne": "Redemande la page sur `http://127.0.0.1:8080/`.",
+      "commande": "curl -s http://127.0.0.1:8080/",
+      "options": [
+        [
+          "curl -s",
+          "affiche la page, sans bavardage"
+        ]
+      ],
+      "sortie": "<h1>Modifié sur mon poste</h1>",
+      "remarque": "La modification est visible **aussitôt**, sans redémarrer nginx. Pratique pour du code ou de la configuration.",
+      "attendu": "^curl .*127\\.0\\.0\\.1:\\d+",
+      "bravo": "Modifié à chaud, sans redémarrage.",
+      "robot": [
+        "Retour devant la vitrine : l'affiche a-t-elle changé ?",
+        "Pas besoin de reconstruire la vitrine : c'est ta feuille qu'elle montre, **en direct**. ⚡",
+        "👀 Tu dois lire la nouvelle phrase, « Modifié sur mon poste »."
+      ]
+    },
+    {
+      "titre": "Écrire depuis le conteneur",
+      "pourquoi": "Le dossier est monté en `:ro`. On essaie de modifier la page **depuis** le conteneur : le noyau doit refuser.",
+      "consigne": "Depuis le conteneur `vitrine`, essaie d'écrire « pirate » dans `/usr/share/nginx/html/index.html`.",
+      "commande": "docker exec vitrine sh -c 'echo pirate > /usr/share/nginx/html/index.html'",
+      "options": [
+        [
+          "docker exec vitrine",
+          "exécute une commande dans le conteneur en marche"
+        ],
+        [
+          "sh -c 'echo pirate > …'",
+          "tente de remplacer la page"
+        ]
+      ],
+      "sortie": "sh: 1: cannot create /usr/share/nginx/html/index.html: Read-only file system",
+      "remarque": "« Read-only file system ». Ton poste peut modifier la page, le conteneur non : c'est le rôle de `:ro`.",
+      "attendu": "^docker exec vitrine sh -c .*pirate",
+      "bravo": "Le conteneur ne peut pas toucher à tes fichiers.",
+      "robot": [
+        "Et si un pirate s'introduisait dans la vitrine ? 🏴‍☠️",
+        "Il voit bien ton classeur, mais il est **sous verre** : impossible d'écrire dessus.",
+        "👀 Cherche « Read-only file system » à la fin du message."
+      ]
+    },
+    {
+      "titre": "Un /tmp en mémoire",
+      "pourquoi": "Troisième type de stockage : le **tmpfs**, un dossier en mémoire vive, jamais écrit sur disque et perdu à l'arrêt. On en fixe la taille.",
+      "consigne": "Lance un conteneur jetable avec un tmpfs de 16 Mo sur `/tmp`, et affiche son type et sa taille.",
+      "commande": "docker run --rm --tmpfs /tmp:size=16m alpine:3.22 df -h /tmp",
+      "options": [
+        [
+          "--tmpfs /tmp:size=16m",
+          "un dossier `/tmp` en mémoire, limité à 16 Mo"
+        ],
+        [
+          "df -h /tmp",
+          "affiche le type et la taille de ce qui est monté sur `/tmp`"
+        ]
+      ],
+      "sortie": "Filesystem                Size      Used Available Use% Mounted on\ntmpfs                    16.0M         0     16.0M   0% /tmp",
+      "remarque": "Le type est `tmpfs`, la taille **16.0M**. Rapide et jamais écrit sur disque, mais tout disparaît à l'arrêt du conteneur.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*--tmpfs[ =]/tmp).*df -h /tmp",
+      "indice": "il faut `--tmpfs /tmp:size=16m`, puis l'image et `df -h /tmp`.",
+      "bravo": "Un `/tmp` de 16 Mo, en mémoire.",
+      "robot": [
+        "Dernier type de rangement : le **tableau blanc** ! 🧽",
+        "Le tmpfs, c'est un tableau blanc dans la chambre : on y écrit vite, et il est **effacé** à chaque départ.",
+        "👀 Lis la première colonne : `tmpfs`, et la taille : 16 Mo."
+      ]
+    },
+    {
+      "titre": "Supprimer la vitrine",
+      "pourquoi": "On commence le ménage par le conteneur : il faut le faire **avant** le volume, sinon Docker refuserait de supprimer un volume utilisé.",
+      "consigne": "Supprime le conteneur `vitrine`.",
+      "commande": "docker rm -f vitrine",
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur"
+        ],
+        [
+          "-f",
+          "l'arrête d'abord, puisqu'il tourne"
+        ]
+      ],
+      "sortie": "vitrine",
+      "remarque": "Docker répète le nom du conteneur supprimé. Ton dossier `site`, lui, est toujours sur ton poste : un bind mount ne lui appartient pas.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b).*vitrine",
+      "indice": "il tourne encore : ajoute `-f`.",
+      "bravo": "Vitrine démontée.",
+      "robot": [
+        "C'est l'heure du rangement. 🧹",
+        "On démonte la vitrine, mais ton classeur reste à toi : il rentre à la maison.",
+        "👀 Docker te répondra `vitrine`."
+      ]
+    },
+    {
+      "titre": "Vider le casier",
+      "pourquoi": "Le volume survit aux conteneurs : il faut le supprimer lui-même. Cette fois, la note est vraiment perdue.",
+      "consigne": "Supprime le volume `labo`.",
+      "commande": "docker volume rm labo",
+      "options": [
+        [
+          "docker volume rm",
+          "supprime un volume et son contenu, pour de bon"
+        ],
+        [
+          "labo",
+          "le volume à supprimer"
+        ]
+      ],
+      "sortie": "labo",
+      "remarque": "Docker répète le nom du volume. S'il était encore utilisé par un conteneur, même arrêté, il refuserait avec `volume is in use`.",
+      "bravo": "Volume supprimé.",
+      "robot": [
+        "On rend aussi le casier de la consigne. 🗄️",
+        "Un volume ne se vide jamais tout seul : c'est à toi de **résilier** le casier.",
+        "👀 Docker te répondra `labo` : la note est partie avec lui."
+      ]
+    },
+    {
+      "titre": "Ranger ton dossier",
+      "pourquoi": "Le dossier `site` est sur ton poste, pas chez Docker : on le supprime avec une commande ordinaire.",
+      "consigne": "Supprime le dossier `site` et son contenu.",
+      "commande": "rm -r site",
+      "options": [
+        [
+          "rm -r",
+          "supprime un dossier et tout ce qu'il contient"
+        ],
+        [
+          "site",
+          "le dossier créé pour le bind mount"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier est supprimé. Le labo est propre.",
+      "attendu": "^rm (-r|-rf|-fr|-R) site",
+      "bravo": "Labo rangé.",
+      "robot": [
+        "Dernier geste : on range ton classeur. 📂",
+        "C'était ton dossier à toi, pas celui de l'hôtel : c'est donc à toi de le jeter.",
+        "👀 Aucun message : le dossier a disparu sans bruit."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Salut, c'est **Conti** ! Aujourd'hui je suis concierge d'hôtel pour conteneurs. 🛎️",
+    "On va comparer où ranger ses affaires : dans la chambre (qu'on efface au départ), dans un **casier à la consigne**, dans **ton propre classeur** ou sur un **tableau blanc**.",
+    "C'est un terminal d'entraînement : tu peux tout supprimer, rien n'est perdu pour de vrai."
+  ],
+  "robotFin": [
+    "Bravo, tu sais maintenant où ranger chaque chose ! 🎉",
+    "Tu as vu la **couche inscriptible** effacée par `docker rm`, le **volume** qui survit, le **bind mount** modifié à chaud, la protection `:ro` et le **tmpfs** en mémoire.",
+    "Retiens bien : persister n'est pas sauvegarder. Voici ton badge !"
+  ],
+  "badge": "Concierge des données"
+}

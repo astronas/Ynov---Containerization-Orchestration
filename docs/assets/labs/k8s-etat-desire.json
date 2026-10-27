@@ -1,0 +1,701 @@
+{
+  "titre": "Kubernetes : état désiré et réconciliation",
+  "duree": "20 min",
+  "intro": "Tu vas installer kubectl et Minikube, démarrer ton propre cluster, lui **déclarer** une application, puis la casser et le regarder la **réparer** tout seul. À chaque étape : lis le pourquoi, clique sur « Insérer dans le terminal », appuie sur **Entrée**, puis compare avec ce que tu dois voir.",
+  "conclusion": "Tu as un cluster sur ton poste. Tu as déclaré 2 copies de nginx, supprimé les pods et vu le Deployment en recréer de nouveaux, puis changé d'avis **dans le fichier** (`diff`, puis `apply`) pour passer à 3 copies.",
+  "retour": {
+    "texte": "Retour au cours : Kubernetes : état désiré et réconciliation",
+    "lien": "../../Kubernetes-etat-desire/"
+  },
+  "etapes": [
+    {
+      "titre": "Télécharger kubectl",
+      "pourquoi": "`kubectl` est la télécommande de Kubernetes : c'est avec lui que tu parleras au cluster. On télécharge d'abord sa dernière version stable pour Linux.",
+      "consigne": "Télécharge le programme `kubectl` dans ton dossier courant.",
+      "commande": "curl -LO \"https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl\"",
+      "options": [
+        [
+          "curl -LO URL",
+          "télécharge un fichier : `-O` le garde sous son nom d'origine, `-L` suit les redirections"
+        ],
+        [
+          "$(curl -L -s https://dl.k8s.io/release/stable.txt)",
+          "s'exécute en premier : lit le numéro de la dernière version stable (`-s` : sans barre de progression)"
+        ],
+        [
+          "/bin/linux/amd64/kubectl",
+          "la version pour Linux sur processeur x86-64 (remplace `amd64` par `arm64` sur un processeur ARM)"
+        ]
+      ],
+      "sortie": "  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current\n                                 Dload  Upload  Total   Spent   Left   Speed\n100 59.01M 100 59.01M   0      0 117.3M      0                              0",
+      "remarque": "curl affiche une barre de progression : la dernière ligne commence par `100`, signe que les quelque **59 Mo** sont arrivés. Le fichier `kubectl` est maintenant dans ton dossier.",
+      "attendu": "^curl -LO .*dl\\.k8s\\.io/release/.*/bin/linux/(amd64|arm64)/kubectl",
+      "indice": "vérifie l'option `-LO` (deux majuscules) et l'adresse complète, qui finit par `/bin/linux/amd64/kubectl`.",
+      "bravo": "kubectl est téléchargé.",
+      "robot": [
+        "On commence par la **télécommande** du cluster : `kubectl`. 📡",
+        "C'est comme aller chercher un outil au magasin : `curl` le rapporte, et la petite commande entre `$( )` vérifie d'abord quelle est la **dernière version** en rayon.",
+        "👀 Surveille la barre de progression : la dernière ligne doit afficher **100**."
+      ]
+    },
+    {
+      "titre": "Installer kubectl",
+      "pourquoi": "Un fichier téléchargé n'est pas encore une commande. On le range dans `/usr/local/bin`, un dossier où le terminal cherche les commandes, et on le rend exécutable.",
+      "consigne": "Installe `kubectl` dans `/usr/local/bin`, puis supprime le fichier téléchargé.",
+      "commande": "sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && rm kubectl",
+      "options": [
+        [
+          "sudo",
+          "exécute la commande avec les droits d'administrateur (ton mot de passe peut être demandé)"
+        ],
+        [
+          "install",
+          "copie un fichier en réglant son propriétaire et ses droits"
+        ],
+        [
+          "-o root -g root",
+          "le fichier appartiendra à l'administrateur `root`"
+        ],
+        [
+          "-m 0755",
+          "droits : tout le monde peut l'exécuter, seul `root` peut le modifier"
+        ],
+        [
+          "kubectl /usr/local/bin/kubectl",
+          "la source, puis la destination"
+        ],
+        [
+          "&& rm kubectl",
+          "si l'installation réussit, supprime la copie téléchargée"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : sous Linux, **pas de nouvelles, bonnes nouvelles**. Si `sudo` te demande ton mot de passe, les caractères tapés restent invisibles : c'est normal.",
+      "attendu": "^sudo install (?=.*-m 0?755).*kubectl /usr/local/bin/kubectl",
+      "indice": "il faut `sudo install`, les droits `-m 0755`, puis la source `kubectl` et la destination `/usr/local/bin/kubectl`.",
+      "bravo": "kubectl est installé.",
+      "robot": [
+        "Maintenant, on **range l'outil** à sa place. 🧰",
+        "`/usr/local/bin`, c'est le tableau à outils accroché au mur de l'atelier : le terminal y cherche chaque commande que tu tapes.",
+        "👀 Ici, le silence est une bonne nouvelle : aucune ligne ne doit s'afficher."
+      ]
+    },
+    {
+      "titre": "Télécharger Minikube",
+      "pourquoi": "Minikube crée un cluster Kubernetes complet sur ton seul poste, pour apprendre. On télécharge sa dernière version de la même façon.",
+      "consigne": "Télécharge le programme `minikube-linux-amd64`.",
+      "commande": "curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64",
+      "options": [
+        [
+          "curl -LO",
+          "télécharge le fichier en gardant son nom"
+        ],
+        [
+          "releases/latest/download/",
+          "toujours la dernière version publiée"
+        ],
+        [
+          "minikube-linux-amd64",
+          "la version pour Linux sur processeur x86-64"
+        ]
+      ],
+      "sortie": "  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current\n                                 Dload  Upload  Total   Spent   Left   Speed\n100 136.0M 100 136.0M   0      0 51.71M      0   00:02   00:02         58.31M",
+      "remarque": "Celui-ci est plus gros, environ **136 Mo** : Minikube embarque tout ce qu'il faut pour fabriquer un cluster.",
+      "attendu": "^curl -LO .*minikube-linux-(amd64|arm64)",
+      "indice": "l'adresse doit finir par `minikube-linux-amd64`, et l'option est `-LO`.",
+      "bravo": "Minikube est téléchargé.",
+      "robot": [
+        "Deuxième outil : **Minikube**, ton cluster de poche. 🧳",
+        "Si Kubernetes est une usine entière, Minikube en est la **maquette** posée sur ton bureau : tout y est, en petit.",
+        "👀 Compare avec kubectl : la ligne finale affiche une taille bien plus grosse."
+      ]
+    },
+    {
+      "titre": "Installer Minikube",
+      "pourquoi": "Même opération que pour kubectl : on range le programme dans `/usr/local/bin`, sous un nom plus court.",
+      "consigne": "Installe `minikube` dans `/usr/local/bin`, puis supprime le fichier téléchargé.",
+      "commande": "sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64",
+      "options": [
+        [
+          "sudo install",
+          "copie en administrateur et rend le fichier exécutable"
+        ],
+        [
+          "minikube-linux-amd64 /usr/local/bin/minikube",
+          "la source, puis la destination : la commande s'appellera simplement `minikube`"
+        ],
+        [
+          "&& rm minikube-linux-amd64",
+          "supprime le téléchargement si tout s'est bien passé"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Encore un silence de bon augure. Le fichier a changé de nom au passage : tu taperas `minikube`, pas `minikube-linux-amd64`.",
+      "attendu": "^sudo install minikube-linux-(amd64|arm64) /usr/local/bin/minikube",
+      "indice": "la source est `minikube-linux-amd64`, la destination `/usr/local/bin/minikube`.",
+      "bravo": "Minikube est installé.",
+      "robot": [
+        "Même geste, deuxième outil.",
+        "On colle une **étiquette** plus courte sur la boîte : `minikube` au lieu de `minikube-linux-amd64`, bien plus facile à taper tous les jours.",
+        "👀 Aucun message attendu : le `rm` final fait le ménage en silence."
+      ]
+    },
+    {
+      "titre": "Vérifier kubectl",
+      "pourquoi": "Avant de construire, on vérifie que l'outil répond. `--client` demande la version de kubectl lui-même, sans chercher de cluster : tu n'en as pas encore.",
+      "consigne": "Affiche la version de `kubectl`, côté client seulement.",
+      "commande": "kubectl version --client",
+      "options": [
+        [
+          "kubectl version",
+          "affiche la version de kubectl et, s'il en trouve un, celle du cluster"
+        ],
+        [
+          "--client",
+          "seulement kubectl, sans contacter de cluster"
+        ]
+      ],
+      "sortie": "Client Version: v1.37.1\nKustomize Version: v5.8.1",
+      "remarque": "**Client Version** est la version de kubectl. Kustomize est un outil intégré, utile plus tard. Ton numéro sera sans doute plus récent.",
+      "attendu": "^kubectl version (?=.*--client)",
+      "indice": "n'oublie pas `--client` : sans cluster, kubectl afficherait une erreur de connexion.",
+      "bravo": "kubectl répond.",
+      "robot": [
+        "Petit essai micro : la télécommande fonctionne-t-elle ? 🎤",
+        "C'est comme appuyer sur un bouton pour voir si la **diode** s'allume, avant même d'avoir branché la télé.",
+        "👀 Cherche la ligne **Client Version** et son numéro en `v1.`"
+      ]
+    },
+    {
+      "titre": "Vérifier Minikube",
+      "pourquoi": "Même vérification pour Minikube : s'il affiche sa version, il est bien installé et trouvé par le terminal.",
+      "consigne": "Affiche la version de Minikube.",
+      "commande": "minikube version",
+      "options": [
+        [
+          "minikube version",
+          "affiche la version de Minikube et le code source dont il est issu"
+        ]
+      ],
+      "sortie": "minikube version: v1.39.0\ncommit: 7a9f6a841470a207de8cf4bafcccee0969d8ba10",
+      "remarque": "Le **commit** identifie précisément le code source de cette version. Les deux outils sont prêts.",
+      "bravo": "Minikube répond.",
+      "robot": [
+        "Et la maquette, elle répond ?",
+        "C'est la plaque signalétique sous un appareil : le modèle, et même le **numéro de série** exact de sa fabrication.",
+        "👀 Tu dois lire `minikube version: v1.` suivi d'un numéro."
+      ]
+    },
+    {
+      "titre": "Démarrer le cluster",
+      "pourquoi": "Cette commande fabrique un cluster d'un seul nœud. Avec `--driver=docker`, ce nœud est lui-même un conteneur Docker. La première fois, compte quelques minutes : environ 1 Go est téléchargé.",
+      "consigne": "Démarre Minikube avec le pilote Docker.",
+      "commande": "minikube start --driver=docker",
+      "options": [
+        [
+          "minikube start",
+          "crée le cluster s'il n'existe pas, puis le démarre"
+        ],
+        [
+          "--driver=docker",
+          "le nœud du cluster sera un conteneur Docker"
+        ]
+      ],
+      "sortie": "😄  minikube v1.39.0 on Ubuntu 26.04 (kvm/amd64)\n✨  Using the docker driver based on existing profile\n👍  Starting \"minikube\" primary control-plane node in \"minikube\" cluster\n🚜  Pulling base image v0.0.51 ...\n🔄  Restarting existing docker container for \"minikube\" ...\n📦  Preparing Kubernetes v1.37.0 on containerd 2.3.4 ...\n🔎  Verifying Kubernetes components...\n    ▪ Using image docker.io/kubernetesui/metrics-scraper:v1.0.8\n    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5\n    ▪ Using image docker.io/kubernetesui/dashboard:v2.7.0\n    ▪ Using image registry.k8s.io/metrics-server/metrics-server:v0.9.0\n💡  Some dashboard features require the metrics-server addon. To enable all features please run:\n\n\tminikube addons enable metrics-server\n\n🌟  Enabled addons: metrics-server, storage-provisioner, dashboard, default-storageclass\n🏄  Done! kubectl is now configured to use \"minikube\" cluster and \"default\" namespace by default",
+      "remarque": "La dernière ligne compte : **Done!**, et kubectl est maintenant **configuré** pour parler à ce cluster, dans le namespace `default`. La première fois, des lignes de téléchargement s'ajoutent. N'utilise jamais `sudo` ici.",
+      "attendu": "^minikube start(?=.*--driver[ =]docker)",
+      "indice": "écris `--driver=docker`, et surtout **sans** `sudo` devant.",
+      "bravo": "Ton cluster est démarré.",
+      "robot": [
+        "Le grand moment : on **allume ton cluster** ! 🚀",
+        "Imagine une usine miniature montée dans une seule boîte en carton : la boîte, c'est un **conteneur Docker**, et l'usine Kubernetes tourne dedans.",
+        "👀 Attends la ligne **Done!** : elle annonce aussi que kubectl est branché sur le cluster."
+      ]
+    },
+    {
+      "titre": "Bilan de santé",
+      "pourquoi": "On vérifie que les trois pièces essentielles tournent : la machine du nœud (host), son agent (kubelet) et l'API server, la porte d'entrée du cluster.",
+      "consigne": "Affiche l'état du cluster Minikube.",
+      "commande": "minikube status",
+      "options": [
+        [
+          "minikube status",
+          "l'état du nœud et de ses composants"
+        ]
+      ],
+      "sortie": "minikube\ntype: Control Plane\nhost: Running\nkubelet: Running\napiserver: Running\nkubeconfig: Configured",
+      "remarque": "Trois **Running** (host, kubelet, apiserver) et `kubeconfig: Configured` : le fichier qui dit à kubectl où trouver le cluster est prêt.",
+      "bravo": "Tout est au vert.",
+      "robot": [
+        "Bilan de santé express. 🩺",
+        "Comme le tableau de bord d'une voiture au démarrage : chaque **voyant** doit passer au vert.",
+        "👀 Compte les **Running** : il en faut trois."
+      ]
+    },
+    {
+      "titre": "Lister les nœuds",
+      "pourquoi": "Ta première vraie commande Kubernetes : la liste des machines du cluster. Chez toi, il n'y en a qu'une.",
+      "consigne": "Liste les nœuds du cluster.",
+      "commande": "kubectl get nodes",
+      "options": [
+        [
+          "kubectl get",
+          "liste des objets du cluster"
+        ],
+        [
+          "nodes",
+          "le type d'objet : les machines du cluster"
+        ]
+      ],
+      "sortie": "NAME       STATUS   ROLES           AGE     VERSION\nminikube   Ready    control-plane   5d20h   v1.37.0",
+      "remarque": "**Ready** : le nœud accepte du travail. `control-plane` : il porte aussi le plan de contrôle, il fait donc tout à la fois. Ton `AGE` sera de quelques minutes.",
+      "attendu": "^kubectl get (nodes|node|no)$",
+      "bravo": "Un nœud prêt à travailler.",
+      "robot": [
+        "Première question posée au cluster : « qui travaille ici ? » 👷",
+        "Les nœuds sont les **ateliers** de l'usine. La tienne n'en a qu'un, qui sert aussi de bureau à la direction.",
+        "👀 La colonne **STATUS** doit dire `Ready`."
+      ]
+    },
+    {
+      "titre": "Où suis-je ?",
+      "pourquoi": "kubectl lit le fichier `~/.kube/config` pour savoir à quel cluster parler. Un **contexte** y associe un cluster, un utilisateur et un namespace par défaut. On vérifie toujours où l'on est avant d'agir.",
+      "consigne": "Affiche tes contextes kubectl.",
+      "commande": "kubectl config get-contexts",
+      "options": [
+        [
+          "kubectl config",
+          "lit ou modifie le fichier `~/.kube/config`"
+        ],
+        [
+          "get-contexts",
+          "liste les contextes ; l'étoile marque celui qui est utilisé"
+        ]
+      ],
+      "sortie": "CURRENT   NAME       CLUSTER    AUTHINFO   NAMESPACE\n*         minikube   minikube   minikube   default",
+      "remarque": "L'**étoile** est devant `minikube` : toutes tes commandes partiront vers ce cluster. Sans `-n`, elles visent le namespace `default`.",
+      "bravo": "Tu sais à quel cluster tu parles.",
+      "robot": [
+        "Avant de travailler, on regarde **quel badge** on tient en main. 🪪",
+        "`~/.kube/config`, c'est ton trousseau de badges : chacun ouvre les portes d'un bâtiment (un cluster) différent.",
+        "👀 Repère l'**étoile** dans la colonne CURRENT."
+      ]
+    },
+    {
+      "titre": "Un dossier de travail",
+      "pourquoi": "Un namespace Kubernetes est un **dossier logique** dans le cluster. En rangeant tout dans `demo`, tu pourras tout effacer d'un coup à la fin.",
+      "consigne": "Crée le namespace `demo`.",
+      "commande": "kubectl create namespace demo",
+      "options": [
+        [
+          "kubectl create namespace",
+          "crée un namespace (abréviation : `ns`)"
+        ],
+        [
+          "demo",
+          "son nom"
+        ]
+      ],
+      "sortie": "namespace/demo created",
+      "remarque": "kubectl répond toujours sous la forme `type/nom action`. Ici, l'objet `namespace/demo` est **created**.",
+      "attendu": "^kubectl create (namespace|ns) demo$",
+      "bravo": "Ton dossier de travail est prêt.",
+      "robot": [
+        "On se fait un **coin à soi** dans le cluster. 📁",
+        "Un namespace, c'est un tiroir étiqueté « demo » dans une grande commode : tout ce que tu y ranges se retrouve et se jette ensemble.",
+        "👀 La réponse tient en une ligne qui finit par `created`."
+      ]
+    },
+    {
+      "titre": "Écrire l'état désiré",
+      "pourquoi": "Voici l'**état désiré** : un fichier qui décrit le résultat voulu (deux copies de nginx), et pas les commandes pour l'obtenir. On le crée d'un seul bloc.",
+      "consigne": "Crée le fichier `web.yaml` qui décrit un Deployment `web` de 2 copies de `nginx:1.27`.",
+      "commande": "cat > web.yaml <<'EOF'\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: web\n  template:\n    metadata:\n      labels:\n        app: web\n    spec:\n      containers:\n        - name: web\n          image: nginx:1.27\n          ports:\n            - containerPort: 80\nEOF",
+      "options": [
+        [
+          "cat > web.yaml",
+          "écrit dans le fichier `web.yaml` tout ce qui suit"
+        ],
+        [
+          "<<'EOF' … EOF",
+          "le texte entre ces deux repères devient le contenu du fichier"
+        ],
+        [
+          "kind: Deployment",
+          "le type d'objet : un groupe de pods identiques"
+        ],
+        [
+          "replicas: 2",
+          "le nombre de copies voulues : la consigne du thermostat"
+        ],
+        [
+          "selector et labels app: web",
+          "le Deployment reconnaît ses pods à l'étiquette `app: web` ; les deux doivent correspondre"
+        ],
+        [
+          "template",
+          "le moule à partir duquel chaque pod est fabriqué"
+        ],
+        [
+          "image: nginx:1.27",
+          "l'image à lancer, avec un tag précis"
+        ],
+        [
+          "containerPort: 80",
+          "le port d'écoute, à titre d'information : rien n'est publié"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est écrit. En YAML, **l'indentation compte** : deux espaces par niveau, jamais de tabulation. Tu peux le relire avec `cat web.yaml`.",
+      "attendu": "^cat > web\\.yaml <<",
+      "bravo": "Ta commande est rédigée.",
+      "robot": [
+        "On rédige notre **commande** au cluster. 📝",
+        "Au restaurant, tu ne dictes pas la recette au cuisinier : tu commandes « une omelette ». Ici, tu commandes « **2 copies** de nginx », et c'est tout.",
+        "👀 Aucune réponse attendue : le fichier se remplit en silence."
+      ]
+    },
+    {
+      "titre": "Déclarer au cluster",
+      "pourquoi": "`apply` envoie la déclaration au cluster, qui l'enregistre. À cet instant, rien ne tourne encore : le cluster sait seulement ce que tu veux.",
+      "consigne": "Envoie le fichier `web.yaml` au cluster, dans le namespace `demo`.",
+      "commande": "kubectl apply -n demo -f web.yaml",
+      "options": [
+        [
+          "kubectl apply",
+          "enregistre l'état désiré décrit dans un fichier"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ],
+        [
+          "-f web.yaml",
+          "le fichier à appliquer"
+        ]
+      ],
+      "sortie": "deployment.apps/web created",
+      "remarque": "**created** : l'état désiré est enregistré. Relancer la même commande sans rien changer ne ferait rien : `apply` est **idempotent**.",
+      "attendu": "^kubectl apply (?=.*(-n|--namespace)[ =]demo\\b)(?=.*-f[ =]web\\.yaml)",
+      "indice": "il faut `-n demo` et `-f web.yaml`.",
+      "bravo": "L'état désiré est enregistré.",
+      "robot": [
+        "On **passe la commande** en cuisine ! 🛎️",
+        "Tu glisses ton bon de commande au comptoir : la cuisine le note, mais l'assiette n'est pas encore prête.",
+        "👀 Le mot clé est `created` : la commande est enregistrée, pas encore servie."
+      ]
+    },
+    {
+      "titre": "Suivre la convergence",
+      "pourquoi": "Le cluster rapproche maintenant la réalité de ta demande, une copie après l'autre. `rollout status` raconte cette progression et rend la main quand tout est prêt.",
+      "consigne": "Suis le déploiement `web` jusqu'à ce qu'il soit terminé.",
+      "commande": "kubectl rollout status deployment/web -n demo",
+      "options": [
+        [
+          "kubectl rollout status",
+          "attend et raconte la progression d'un déploiement"
+        ],
+        [
+          "deployment/web",
+          "le Deployment suivi : type, puis nom"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ]
+      ],
+      "sortie": "Waiting for deployment \"web\" rollout to finish: 0 of 2 updated replicas are available...\nWaiting for deployment \"web\" rollout to finish: 1 of 2 updated replicas are available...\ndeployment \"web\" successfully rolled out",
+      "remarque": "On passe de 0 à 1 puis à 2 copies disponibles, jusqu'à **successfully rolled out** : l'état observé égale l'état désiré. La ligne « 0 of 2 » peut manquer si tout va vite.",
+      "attendu": "^kubectl rollout status (deployments?[ /]web|deploy[ /]web)\\b(?=.*(-n|--namespace)[ =]demo\\b)",
+      "indice": "écris `deployment/web` et n'oublie pas `-n demo`.",
+      "bravo": "Les deux copies sont prêtes.",
+      "robot": [
+        "Regardons la cuisine travailler. 👨‍🍳",
+        "C'est le **suivi de livraison** d'un colis : « en préparation », « 1 sur 2 », puis « livré ».",
+        "👀 Attends la phrase **successfully rolled out**."
+      ]
+    },
+    {
+      "titre": "Voir les pods",
+      "pourquoi": "On regarde enfin ce qui tourne : les pods fabriqués à partir du modèle, avec leur adresse IP et le nœud qui les héberge.",
+      "consigne": "Liste les pods étiquetés `app=web` du namespace `demo`, avec leurs détails.",
+      "commande": "kubectl get pods -n demo -l app=web -o wide",
+      "options": [
+        [
+          "kubectl get pods",
+          "liste les pods"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ],
+        [
+          "-l app=web",
+          "seulement ceux qui portent l'étiquette `app=web`"
+        ],
+        [
+          "-o wide",
+          "ajoute des colonnes : IP, nœud…"
+        ]
+      ],
+      "sortie": "NAME                  READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES\nweb-8c96c8dfc-4ggsr   1/1     Running   0          7s    10.244.0.19   minikube   <none>           <none>\nweb-8c96c8dfc-dr5t4   1/1     Running   0          7s    10.244.0.18   minikube   <none>           <none>",
+      "remarque": "Deux pods **Running**, chacun avec **sa propre IP**, alors que personne n'a lancé de conteneur à la main. Leurs noms commencent par `web-` suivi d'une empreinte : c'est le cluster qui les a fabriqués.",
+      "attendu": "^kubectl get (pods?|po) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b)(?=.*-o[ =]?wide)",
+      "indice": "il faut `-n demo`, `-l app=web` et `-o wide`.",
+      "bravo": "Deux pods tournent, comme demandé.",
+      "robot": [
+        "L'assiette est servie : voyons les **pods**. 🍽️",
+        "Chaque pod est une copie sortie du même moule, comme deux gâteaux cuits dans le même **moule à cake**.",
+        "👀 Note les **noms** des deux pods : on va s'en resservir juste après."
+      ]
+    },
+    {
+      "titre": "Tout casser",
+      "pourquoi": "Place au test : on supprime **tous** les pods à la main. Le contrôleur du Deployment va voir 0 pod là où 2 sont désirés, et en recréer.",
+      "consigne": "Supprime tous les pods `app=web` du namespace `demo`, puis suis le déploiement.",
+      "commande": "kubectl delete pod -n demo -l app=web --wait=true && kubectl rollout status deployment/web -n demo",
+      "options": [
+        [
+          "kubectl delete pod",
+          "supprime des pods"
+        ],
+        [
+          "-l app=web",
+          "tous ceux qui portent l'étiquette `app=web`"
+        ],
+        [
+          "--wait=true",
+          "attend qu'ils aient vraiment disparu"
+        ],
+        [
+          "&&",
+          "si la suppression réussit, enchaîne sur la commande suivante"
+        ],
+        [
+          "kubectl rollout status deployment/web -n demo",
+          "suit le retour à l'état désiré"
+        ]
+      ],
+      "sortie": "pod \"web-8c96c8dfc-4ggsr\" deleted from demo namespace\npod \"web-8c96c8dfc-dr5t4\" deleted from demo namespace\ndeployment \"web\" successfully rolled out",
+      "remarque": "Une ligne **deleted** par pod supprimé, puis **successfully rolled out** : le Deployment est de nouveau complet. Personne n'a rien relancé.",
+      "attendu": "^kubectl delete (pods?|po) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b).*&& kubectl rollout status",
+      "indice": "il faut `kubectl delete pod -n demo -l app=web --wait=true`, puis `&&` et le `rollout status` déjà utilisé.",
+      "bravo": "Le cluster a comblé l'écart tout seul.",
+      "robot": [
+        "On joue les **saboteurs** : tous les pods à la poubelle ! 💣",
+        "Un **surveillant de piscine** compte ses nageurs : s'il en manque, il en fait entrer d'autres, sans chercher à savoir qui est sorti.",
+        "👀 Compte les lignes **deleted**, puis guette le retour de `successfully rolled out`."
+      ]
+    },
+    {
+      "titre": "Des remplaçants",
+      "pourquoi": "On vérifie le résultat : le Deployment demande toujours 2 pods, il doit donc y en avoir 2. Mais lesquels ?",
+      "consigne": "Liste à nouveau les pods `app=web` du namespace `demo`.",
+      "commande": "kubectl get pods -n demo -l app=web",
+      "options": [
+        [
+          "kubectl get pods",
+          "liste les pods"
+        ],
+        [
+          "-n demo -l app=web",
+          "même filtre qu'avant : namespace `demo`, étiquette `app=web`"
+        ]
+      ],
+      "sortie": "NAME                  READY   STATUS    RESTARTS   AGE\nweb-8c96c8dfc-rv85c   1/1     Running   0          2s\nweb-8c96c8dfc-wxmqt   1/1     Running   0          2s",
+      "remarque": "Toujours **deux** pods `Running`, mais avec des **noms nouveaux** et un `AGE` de quelques secondes : ce ne sont pas les anciens qui reviennent, ce sont des **remplaçants**.",
+      "attendu": "^kubectl get (pods?|po) (?=.*(-n|--namespace)[ =]demo\\b)(?=.*(-l|--selector)[ =]app=web\\b)",
+      "indice": "même commande qu'avant, sans `-o wide` : `-n demo -l app=web`.",
+      "bravo": "Deux nouveaux pods ont pris la relève.",
+      "robot": [
+        "Alors, la piscine est-elle de nouveau pleine ? 🏊",
+        "Compare avec la liste d'avant comme deux **photos de classe** : même effectif, mais d'autres visages.",
+        "👀 Regarde les **noms** et l'**AGE** : ils ont changé."
+      ]
+    },
+    {
+      "titre": "Modifier le fichier",
+      "pourquoi": "Tu veux maintenant 3 copies. On ne le dit pas au cluster : on **modifie le fichier**, qui reste la référence. `sed` fait le remplacement sans ouvrir d'éditeur.",
+      "consigne": "Remplace `replicas: 2` par `replicas: 3` dans `web.yaml`.",
+      "commande": "sed -i 's/replicas: 2/replicas: 3/' web.yaml",
+      "options": [
+        [
+          "sed -i",
+          "modifie le fichier directement, sur place"
+        ],
+        [
+          "'s/replicas: 2/replicas: 3/'",
+          "`s` comme substituer : cherche le premier texte, met le second à la place"
+        ],
+        [
+          "web.yaml",
+          "le fichier modifié"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche, mais le fichier a changé : vérifie avec `grep replicas web.yaml`. Le cluster, lui, n'en sait encore **rien**.",
+      "attendu": "^sed -i .*s/replicas: 2/replicas: 3/.*web\\.yaml",
+      "indice": "la règle s'écrit entre apostrophes, `'s/replicas: 2/replicas: 3/'`, suivie du nom du fichier.",
+      "bravo": "Le fichier dit maintenant 3.",
+      "robot": [
+        "Changement d'avis : on veut **trois** copies. ✏️",
+        "On ne crie pas en cuisine : on **corrige le bon de commande**. C'est le fichier qui fait foi.",
+        "👀 Silence attendu : seul le fichier change, pas le cluster."
+      ]
+    },
+    {
+      "titre": "Voir l'écart",
+      "pourquoi": "Avant d'appliquer, on regarde ce qui **changerait** dans le cluster. `diff` compare le fichier à l'objet enregistré, sans rien modifier.",
+      "consigne": "Affiche l'écart entre `web.yaml` et le cluster, dans le namespace `demo`.",
+      "commande": "kubectl diff -n demo -f web.yaml",
+      "options": [
+        [
+          "kubectl diff",
+          "montre ce que `apply` changerait, sans rien appliquer"
+        ],
+        [
+          "-n demo -f web.yaml",
+          "le même namespace et le même fichier que pour `apply`"
+        ]
+      ],
+      "sortie": "diff -u -N /tmp/LIVE-3787340850/apps.v1.Deployment.demo.web /tmp/MERGED-2815887997/apps.v1.Deployment.demo.web\n--- /tmp/LIVE-3787340850/apps.v1.Deployment.demo.web\t2026-10-27 20:22:14.204015003 +0100\n+++ /tmp/MERGED-2815887997/apps.v1.Deployment.demo.web\t2026-10-27 20:22:14.204015003 +0100\n@@ -6,14 +6,14 @@\n     kubectl.kubernetes.io/last-applied-configuration: |\n       {\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"web\",\"namespace\":\"demo\"},\"spec\":{\"replicas\":2,\"selector\":{\"matchLabels\":{\"app\":\"web\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"web\"}},\"spec\":{\"containers\":[{\"image\":\"nginx:1.27\",\"name\":\"web\",\"ports\":[{\"containerPort\":80}]}]}}}}\n   creationTimestamp: \"2026-10-27T19:22:04Z\"\n-  generation: 1\n+  generation: 2\n   name: web\n   namespace: demo\n   resourceVersion: \"39379\"\n   uid: 4083e60b-8d8a-441a-8b88-b2e837218035\n spec:\n   progressDeadlineSeconds: 600\n-  replicas: 2\n+  replicas: 3\n   revisionHistoryLimit: 10\n   selector:\n     matchLabels:",
+      "remarque": "Les lignes en `-` disparaissent, celles en `+` arrivent : **replicas** passe de 2 à 3, et **generation**, le compteur des changements de la `spec`, augmente de 1.",
+      "attendu": "^kubectl diff (?=.*(-n|--namespace)[ =]demo\\b)(?=.*-f[ =]web\\.yaml)",
+      "indice": "même forme que `apply` : `kubectl diff -n demo -f web.yaml`.",
+      "bravo": "Tu as vu l'écart avant d'agir.",
+      "robot": [
+        "Avant de signer, on **relit le contrat**. 🔍",
+        "C'est le mode « suivi des modifications » d'un traitement de texte : ce qui est barré, ce qui est ajouté.",
+        "👀 Cherche la ligne `-  replicas: 2` et sa voisine `+  replicas: 3`."
+      ]
+    },
+    {
+      "titre": "Appliquer le changement",
+      "pourquoi": "On envoie la nouvelle déclaration. Kubernetes ne recrée pas tout : il compare et n'applique que l'écart.",
+      "consigne": "Applique de nouveau `web.yaml` dans le namespace `demo`.",
+      "commande": "kubectl apply -n demo -f web.yaml",
+      "options": [
+        [
+          "kubectl apply",
+          "enregistre la nouvelle version de l'état désiré"
+        ],
+        [
+          "-n demo -f web.yaml",
+          "le namespace et le fichier modifié"
+        ]
+      ],
+      "sortie": "deployment.apps/web configured",
+      "remarque": "**configured** et non plus `created` : l'objet existait déjà, kubectl a seulement appliqué l'écart.",
+      "attendu": "^kubectl apply (?=.*(-n|--namespace)[ =]demo\\b)(?=.*-f[ =]web\\.yaml)",
+      "indice": "la même commande que la première fois : `kubectl apply -n demo -f web.yaml`.",
+      "bravo": "La nouvelle consigne est enregistrée.",
+      "robot": [
+        "Contrat relu, on **signe**. ✅",
+        "Le bon de commande corrigé repart en cuisine : la cuisine ne refait pas tout, elle ajoute juste une assiette.",
+        "👀 Le mot a changé : on attend `configured`."
+      ]
+    },
+    {
+      "titre": "Consigne atteinte ?",
+      "pourquoi": "On vérifie que le cluster a rattrapé la nouvelle consigne : 3 pods prêts sur 3 désirés.",
+      "consigne": "Affiche l'état du Deployment `web` du namespace `demo`.",
+      "commande": "kubectl get deployment web -n demo",
+      "options": [
+        [
+          "kubectl get deployment web",
+          "affiche un seul Deployment, par son nom"
+        ],
+        [
+          "-n demo",
+          "dans le namespace `demo`"
+        ]
+      ],
+      "sortie": "NAME   READY   UP-TO-DATE   AVAILABLE   AGE\nweb    3/3     3            3           15s",
+      "remarque": "**READY 3/3** : 3 pods prêts sur 3 désirés. Si tu vois `2/3`, attends quelques secondes et relance : le troisième démarre.",
+      "attendu": "^kubectl get (deployments?|deploy)[ /]web\\b(?=.*(-n|--namespace)[ =]demo\\b)",
+      "indice": "écris `kubectl get deployment web -n demo`.",
+      "bravo": "Le cluster a rejoint la consigne.",
+      "robot": [
+        "Le thermostat a-t-il rattrapé la consigne ? 🌡️",
+        "On a monté le thermostat de 2 à 3 : le cluster **mesure**, **compare** et ajoute ce qui manque.",
+        "👀 La colonne **READY** doit afficher `3/3`."
+      ]
+    },
+    {
+      "titre": "Vider le tiroir",
+      "pourquoi": "Supprimer le namespace efface d'un coup **tout** ce qu'il contient : le Deployment et ses pods. C'est l'intérêt d'avoir tout rangé dans `demo`.",
+      "consigne": "Supprime le namespace `demo`.",
+      "commande": "kubectl delete namespace demo",
+      "options": [
+        [
+          "kubectl delete namespace",
+          "supprime un namespace et tout son contenu"
+        ],
+        [
+          "demo",
+          "le namespace visé"
+        ]
+      ],
+      "sortie": "namespace \"demo\" deleted",
+      "remarque": "Une seule ligne, mais tout le contenu est parti. Cela peut prendre quelques secondes.",
+      "attendu": "^kubectl delete (namespace|ns) demo$",
+      "bravo": "Le cluster est propre.",
+      "robot": [
+        "L'expérience est finie, on **vide le tiroir**. 🧹",
+        "On jette le tiroir entier plutôt que chaque objet un par un : c'est tout l'intérêt de `demo`.",
+        "👀 Une seule ligne de confirmation, qui finit par `deleted`."
+      ]
+    },
+    {
+      "titre": "Supprimer le fichier",
+      "pourquoi": "Le fichier `web.yaml` a servi : on le supprime de ton dossier. Dans un vrai projet, on le garderait dans Git.",
+      "consigne": "Supprime le fichier `web.yaml`.",
+      "commande": "rm web.yaml",
+      "options": [
+        [
+          "rm",
+          "supprime un fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier a disparu. Vérifie avec `ls`.",
+      "bravo": "Fichier supprimé.",
+      "robot": [
+        "On range aussi le **brouillon**. 🗑️",
+        "Le bon de commande a été servi, on le jette. Dans une vraie équipe, il serait archivé dans **Git**.",
+        "👀 Pas de message : `rm` travaille en silence."
+      ]
+    },
+    {
+      "titre": "Mettre le cluster en veille",
+      "pourquoi": "On arrête le cluster sans l'effacer : tu le relanceras avec `minikube start` au prochain lab. `minikube delete`, lui, l'effacerait complètement.",
+      "consigne": "Arrête Minikube.",
+      "commande": "minikube stop",
+      "options": [
+        [
+          "minikube stop",
+          "arrête le nœud du cluster, sans rien effacer"
+        ]
+      ],
+      "sortie": "✋  Stopping node \"minikube\"  ...\n🛑  Powering off \"minikube\" via SSH ...\n🛑  1 node stopped.",
+      "remarque": "Le nœud est **arrêté**, pas effacé. Tant qu'il dort, `kubectl get nodes` ne répond plus : c'est normal.",
+      "bravo": "Le cluster est en veille.",
+      "robot": [
+        "Dernier geste : on **éteint l'usine** pour la nuit. 🌙",
+        "C'est mettre un ordinateur en veille plutôt que le jeter : tout sera là au réveil.",
+        "👀 Minikube annonce l'arrêt de son nœud : `1 node stopped.`"
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Bip bip ! Ici **Conti**, ton guide pour entrer dans le monde de Kubernetes. 🤖",
+    "Mission du jour : installer ton propre cluster, lui confier une application, puis la **casser** pour le regarder se réparer, comme un thermostat qui rallume la chaudière.",
+    "Ce terminal est un bac à sable : aucune commande ne peut abîmer quoi que ce soit. Prêt ?"
+  ],
+  "robotFin": [
+    "Bravo, ton cluster tourne, et il se répare tout seul ! 🎉",
+    "Tu as vu l'**état désiré** écrit dans un fichier, la **réconciliation** qui remplace les pods supprimés, et la règle « **le fichier fait foi** » avec `diff` puis `apply`.",
+    "Voici ton badge de **Maître du thermostat**. Rendez-vous au prochain lab !"
+  ],
+  "badge": "Maître du thermostat"
+}

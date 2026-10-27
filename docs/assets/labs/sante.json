@@ -1,0 +1,397 @@
+{
+  "titre": "Démarré n'est pas disponible",
+  "duree": "10 min",
+  "intro": "Tu vas faire attendre un service `client` jusqu'à ce qu'un service `lent` soit vraiment prêt, puis rendre `lent` malade pour constater que Docker se contente de le signaler. À chaque étape : clique sur « Insérer dans le terminal », appuie sur **Entrée**, et compare.",
+  "conclusion": "`client` a démarré dix secondes après `lent`, au feu vert du healthcheck. Puis `lent` est passé `unhealthy` en restant `Up`, avec zéro redémarrage : la sonde mesure, elle ne répare rien.",
+  "retour": {
+    "texte": "Retour au cours : Démarré n'est pas disponible",
+    "lien": "../../Demarre-n-est-pas-disponible/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer le dossier du projet",
+      "pourquoi": "Comme pour tout projet Compose, on commence par un dossier : il contiendra le fichier, et son nom deviendra le nom du projet (`sante`).",
+      "consigne": "Crée le dossier `sante` et entre dedans.",
+      "commande": "mkdir sante && cd sante",
+      "options": [
+        [
+          "mkdir sante",
+          "crée le dossier du projet"
+        ],
+        [
+          "&&",
+          "enchaîne la suite si la première commande a réussi"
+        ],
+        [
+          "cd sante",
+          "entre dans le dossier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : c'est normal. Ton invite se termine maintenant par `sante`.",
+      "attendu": "^mkdir (-p )?sante && cd sante$",
+      "indice": "`mkdir sante`, puis `&&`, puis `cd sante`.",
+      "bravo": "Le dossier est prêt.",
+      "robot": [
+        "On ouvre un nouveau chantier : le projet `sante`. 🏗️",
+        "Comme le **carnet de santé** d'un enfant : un nom sur la couverture, et tout ce qui suivra sera rangé dedans.",
+        "👀 Pas de réponse du terminal : vérifie juste que ton invite indique `sante`."
+      ]
+    },
+    {
+      "titre": "Écrire le fichier",
+      "pourquoi": "Deux services : `lent` met volontairement 10 secondes à être prêt (il crée alors le fichier `/tmp/pret`), et sa **sonde de santé** vérifie que ce fichier existe. `client` doit attendre que `lent` soit déclaré sain avant de démarrer.",
+      "consigne": "Écris le fichier `compose.yaml` avec les services `lent` et `client`.",
+      "commande": "cat > compose.yaml <<'EOF'\nservices:\n  lent:\n    image: alpine:3.22\n    command: sh -c 'echo \"lent lancé à $$(date +%T)\"; sleep 10; touch /tmp/pret; sleep infinity'\n    healthcheck:\n      test: [\"CMD-SHELL\", \"test -f /tmp/pret\"]\n      interval: 2s\n      timeout: 1s\n      retries: 3\n      start_period: 15s\n  client:\n    image: alpine:3.22\n    command: sh -c 'echo \"client démarré à $$(date +%T)\"; sleep infinity'\n    depends_on:\n      lent:\n        condition: service_healthy\nEOF",
+      "options": [
+        [
+          "cat > compose.yaml",
+          "écrit dans compose.yaml tout ce qui suit"
+        ],
+        [
+          "<<'EOF'",
+          "envoie les lignes suivantes jusqu'à la ligne EOF, sans que le terminal touche aux `$`"
+        ],
+        [
+          "command: sh -c '...'",
+          "lent note l'heure, attend 10 s, crée /tmp/pret, puis reste allumé"
+        ],
+        [
+          "$$(date +%T)",
+          "Compose remplace les `$` par des variables : `$$` fait arriver un vrai `$` dans le conteneur"
+        ],
+        [
+          "healthcheck: / test: [\"CMD-SHELL\", \"test -f /tmp/pret\"]",
+          "la sonde : « le fichier /tmp/pret existe-t-il ? », lancée dans un shell"
+        ],
+        [
+          "interval: 2s / timeout: 1s",
+          "un test toutes les 2 s ; plus d'une seconde compte comme un échec"
+        ],
+        [
+          "retries: 3",
+          "3 échecs de suite pour passer unhealthy"
+        ],
+        [
+          "start_period: 15s",
+          "pendant 15 s, les échecs ne comptent pas : le temps de se préparer"
+        ],
+        [
+          "depends_on: / condition: service_healthy",
+          "client attend que lent soit healthy"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est écrit. Relis bien les décalages : `healthcheck` est au même niveau que `command`, sous `lent`.",
+      "attendu": "^cat > compose\\.yaml <<",
+      "indice": "le bloc commence par `cat > compose.yaml <<'EOF'` et finit par une ligne `EOF` seule.",
+      "bravo": "Le fichier est écrit.",
+      "robot": [
+        "On écrit la recette : un service lent à chauffer, et un client qui patiente. 🍳",
+        "Pense à un **restaurant** : la cuisine (`lent`) met 10 secondes à chauffer, et le serveur passe toutes les 2 secondes demander « on peut envoyer ? ».",
+        "👀 Rien à voir pour l'instant : un fichier écrit en silence."
+      ]
+    },
+    {
+      "titre": "Lancer et observer l'attente",
+      "pourquoi": "Grâce à `condition: service_healthy`, Compose démarre `lent`, puis **attend** son feu vert avant de démarrer `client`. La commande met donc une dizaine de secondes à rendre la main.",
+      "consigne": "Lance le projet en arrière-plan.",
+      "commande": "docker compose up -d",
+      "options": [
+        [
+          "up",
+          "crée et démarre les services, dans l'ordre des dépendances"
+        ],
+        [
+          "-d",
+          "en arrière-plan ; ici, la main ne revient qu'après le feu vert de lent"
+        ]
+      ],
+      "sortie": " Network sante_default Creating\n Network sante_default Creating\n Network sante_default Created\n Network sante_default Created\n Container sante-lent-1 Creating\n Container sante-lent-1 Created\n Container sante-client-1 Creating\n Container sante-client-1 Created\n Container sante-lent-1 Starting\n Container sante-lent-1 Started\n Container sante-lent-1 Waiting\n Container sante-lent-1 Healthy\n Container sante-client-1 Starting\n Container sante-client-1 Started",
+      "remarque": "`client` est **créé** tout de suite, mais il ne **démarre** qu'après `lent Waiting` puis `lent Healthy`. C'est l'effet de `service_healthy`.",
+      "attendu": "^docker compose up (?=.*(-d|--detach)\\b)",
+      "indice": "`docker compose up` suivi de `-d`.",
+      "bravo": "client a attendu le feu vert.",
+      "robot": [
+        "On lance, et on observe la patience de Compose. ⏳",
+        "Le serveur ne fait entrer les clients qu'au **feu vert** de la cuisine : avant, il les garde à la porte.",
+        "👀 Guette la séquence `Waiting`, puis `Healthy`, et seulement ensuite `client Started`."
+      ]
+    },
+    {
+      "titre": "Lire la santé",
+      "pourquoi": "`docker compose ps` affiche l'état de chaque conteneur, et pour ceux qui ont une sonde, leur santé entre parenthèses.",
+      "consigne": "Affiche l'état des conteneurs du projet.",
+      "commande": "docker compose ps",
+      "options": [
+        [
+          "docker compose ps",
+          "état des conteneurs du projet ; la santé apparaît entre parenthèses"
+        ]
+      ],
+      "sortie": "NAME             IMAGE         COMMAND                   SERVICE   CREATED          STATUS                    PORTS\nsante-client-1   alpine:3.22   \"sh -c 'echo \\\"client…\"   client    11 seconds ago   Up Less than a second\nsante-lent-1     alpine:3.22   \"sh -c 'echo \\\"lent l…\"   lent      11 seconds ago   Up 11 seconds (healthy)",
+      "remarque": "Les deux conteneurs ont été **créés** en même temps (11 secondes), mais `client` vient à peine de **démarrer**. `lent` affiche `(healthy)`.",
+      "attendu": "^docker compose ps$",
+      "bravo": "lent est healthy.",
+      "robot": [
+        "Prenons le pouls du projet. 🩺",
+        "La parenthèse après `Up`, c'est le **bulletin de santé** affiché sur la porte de la chambre.",
+        "👀 Cherche `(healthy)` sur la ligne de `lent`, et compare les durées des deux `Up`."
+      ]
+    },
+    {
+      "titre": "Vérifier l'ordre",
+      "pourquoi": "Chaque service a écrit l'heure de son démarrage. Les journaux du projet le prouvent : les deux heures sont séparées d'environ 10 secondes.",
+      "consigne": "Affiche les journaux des deux services.",
+      "commande": "docker compose logs",
+      "options": [
+        [
+          "docker compose logs",
+          "les messages de tous les services du projet, préfixés par leur nom"
+        ]
+      ],
+      "sortie": "lent-1    | lent lancé à 15:44:59\nclient-1  | client démarré à 15:45:10",
+      "remarque": "11 secondes d'écart entre `lent` et `client`. Tes heures seront différentes, l'écart sera le même.",
+      "attendu": "^docker compose logs$",
+      "bravo": "L'ordre est prouvé.",
+      "robot": [
+        "Les preuves, maintenant : chacun a pointé à son arrivée. 🕒",
+        "Comme la **pointeuse** d'une usine : on lit l'heure d'arrivée de chaque employé.",
+        "👀 Fais la soustraction : environ **10 secondes** entre les deux heures."
+      ]
+    },
+    {
+      "titre": "Rendre lent malade",
+      "pourquoi": "La sonde de `lent` teste l'existence du fichier `/tmp/pret`. Si on le supprime, les prochains tests échoueront : le service « tombe malade », sans que son programme s'arrête.",
+      "consigne": "Supprime le fichier `/tmp/pret` dans le conteneur `lent`.",
+      "commande": "docker compose exec lent rm /tmp/pret",
+      "options": [
+        [
+          "docker compose exec lent",
+          "lance une commande dans le conteneur du service lent"
+        ],
+        [
+          "rm /tmp/pret",
+          "supprime le fichier testé par la sonde"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est supprimé. Le programme de `lent`, lui, tourne toujours.",
+      "attendu": "^docker compose exec lent rm (-f )?/tmp/pret$",
+      "bravo": "Le fichier testé a disparu.",
+      "robot": [
+        "Place à l'expérience : on rend la cuisine malade. 🤒",
+        "On retire le **panneau « prêt »** de la porte de la cuisine : les cuisiniers sont toujours là, mais le serveur va croire que rien ne sort.",
+        "👀 Aucun message : l'effet se verra dans quelques secondes."
+      ]
+    },
+    {
+      "titre": "Laisser passer le temps",
+      "pourquoi": "La sonde passe toutes les 2 secondes et il faut 3 échecs de suite pour déclarer le conteneur `unhealthy`. On attend 10 secondes pour être sûr.",
+      "consigne": "Attends 10 secondes.",
+      "commande": "sleep 10",
+      "options": [
+        [
+          "sleep 10",
+          "ne fait rien pendant 10 secondes"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le terminal te rend la main après 10 secondes.",
+      "attendu": "^sleep ([1-9]\\d|\\d{3,})$",
+      "indice": "attends au moins 10 secondes : `sleep 10`.",
+      "bravo": "10 secondes écoulées.",
+      "robot": [
+        "Un peu de patience, on laisse la sonde faire ses tournées. ☕",
+        "Le serveur doit revenir **trois fois de suite** trouver la porte sans panneau avant de déclarer la cuisine en panne.",
+        "👀 Rien à voir : juste 10 secondes de silence."
+      ]
+    },
+    {
+      "titre": "Malade, mais toujours Up",
+      "pourquoi": "On relit l'état des conteneurs. La question : Docker a-t-il arrêté, relancé ou remplacé le conteneur malade ?",
+      "consigne": "Affiche de nouveau l'état des conteneurs.",
+      "commande": "docker compose ps",
+      "options": [
+        [
+          "docker compose ps",
+          "état et santé des conteneurs du projet"
+        ]
+      ],
+      "sortie": "NAME             IMAGE         COMMAND                   SERVICE   CREATED          STATUS                      PORTS\nsante-client-1   alpine:3.22   \"sh -c 'echo \\\"client…\"   client    23 seconds ago   Up 12 seconds\nsante-lent-1     alpine:3.22   \"sh -c 'echo \\\"lent l…\"   lent      23 seconds ago   Up 23 seconds (unhealthy)",
+      "remarque": "`lent` est `(unhealthy)`, et pourtant **toujours `Up`** depuis 23 secondes. `client`, lui, ne s'est rendu compte de rien.",
+      "attendu": "^docker compose ps$",
+      "bravo": "lent est unhealthy, mais toujours Up.",
+      "robot": [
+        "Retour au chevet du malade. 🛏️",
+        "Le **thermomètre** affiche de la fièvre… et c'est tout : personne n'appelle le médecin.",
+        "👀 Sur la ligne de `lent`, lis `(unhealthy)` juste après un `Up` qui n'a jamais été interrompu."
+      ]
+    },
+    {
+      "titre": "Compter les redémarrages",
+      "pourquoi": "Docker garde le nombre de fois qu'il a relancé un conteneur. Si la sonde déclenchait une réparation, ce compteur aurait bougé.",
+      "consigne": "Lis le nombre de redémarrages du conteneur `sante-lent-1`.",
+      "commande": "docker inspect -f '{{.RestartCount}}' sante-lent-1",
+      "options": [
+        [
+          "docker inspect",
+          "affiche la fiche technique d'un conteneur"
+        ],
+        [
+          "-f '{{.RestartCount}}'",
+          "n'en garde que le nombre de redémarrages"
+        ],
+        [
+          "sante-lent-1",
+          "le nom réel du conteneur, tel qu'affiché par docker compose ps"
+        ]
+      ],
+      "sortie": "0",
+      "remarque": "0**. Docker a constaté la maladie sans rien faire : pas de redémarrage, pas d'alerte. Le healthcheck **mesure**, il ne répare pas.",
+      "attendu": "^docker (container )?inspect (?=.*RestartCount).*sante-lent-1$",
+      "indice": "il faut le format `-f '{{.RestartCount}}'` et le nom `sante-lent-1`.",
+      "bravo": "Zéro redémarrage : la sonde n'a rien réparé.",
+      "robot": [
+        "Mène l'enquête : quelqu'un a-t-il tenté de soigner `lent` ? 🔎",
+        "On consulte le **registre des interventions** de l'infirmerie : combien de fois le patient a-t-il été pris en charge ?",
+        "👀 Un seul chiffre s'affiche : s'il vaut `0`, personne n'est intervenu."
+      ]
+    },
+    {
+      "titre": "Soigner lent",
+      "pourquoi": "On remet le fichier `/tmp/pret` en place : la prochaine sonde réussira. Aucun redémarrage n'est nécessaire.",
+      "consigne": "Recrée le fichier `/tmp/pret` dans le conteneur `lent`.",
+      "commande": "docker compose exec lent touch /tmp/pret",
+      "options": [
+        [
+          "docker compose exec lent",
+          "lance une commande dans le conteneur lent"
+        ],
+        [
+          "touch /tmp/pret",
+          "crée le fichier (vide) testé par la sonde"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est revenu. Le prochain test de la sonde réussira.",
+      "attendu": "^docker compose exec lent touch /tmp/pret$",
+      "bravo": "Le fichier est revenu.",
+      "robot": [
+        "On joue les soignants : on remet le panneau sur la porte. 🩹",
+        "Le serveur, à sa prochaine tournée, verra le **panneau « prêt »** et repartira rassuré.",
+        "👀 Pas de message : le résultat se lira à l'étape suivante."
+      ]
+    },
+    {
+      "titre": "Attendre une sonde",
+      "pourquoi": "La sonde passe toutes les 2 secondes : en 3 secondes, au moins un test aura réussi. Et un seul succès suffit pour redevenir `healthy`.",
+      "consigne": "Attends 3 secondes.",
+      "commande": "sleep 3",
+      "options": [
+        [
+          "sleep 3",
+          "ne fait rien pendant 3 secondes"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le terminal te rend la main après 3 secondes.",
+      "attendu": "^sleep ([3-9]|\\d{2,})$",
+      "indice": "attends au moins 3 secondes : `sleep 3`.",
+      "bravo": "3 secondes écoulées.",
+      "robot": [
+        "Courte pause, le temps d'une tournée. ⏱️",
+        "Un **seul** passage du serveur suffit pour voir le panneau revenu : pas besoin d'attendre trois fois.",
+        "👀 Rien à voir : juste 3 secondes de silence."
+      ]
+    },
+    {
+      "titre": "Guéri sans redémarrer",
+      "pourquoi": "On relit l'état, en ne gardant que le service et son état. `lent` doit être redevenu sain, et son `Up` doit continuer de compter depuis le début.",
+      "consigne": "Affiche seulement le service et son état.",
+      "commande": "docker compose ps --format \"table {{.Service}}\\t{{.Status}}\"",
+      "options": [
+        [
+          "--format \"table ...\"",
+          "un tableau avec seulement les colonnes choisies"
+        ],
+        [
+          "{{.Service}} {{.Status}}",
+          "le nom du service et son état"
+        ],
+        [
+          "\\t",
+          "une tabulation entre les colonnes"
+        ]
+      ],
+      "sortie": "SERVICE   STATUS\nclient    Up 16 seconds\nlent      Up 27 seconds (healthy)",
+      "remarque": "`lent` est `(healthy)` et son `Up 27 seconds` continue de compter : il n'a **jamais** été redémarré. La santé a suivi l'état réel, dans les deux sens.",
+      "attendu": "^docker compose ps --format",
+      "indice": "`docker compose ps --format` suivi du modèle de tableau entre guillemets.",
+      "bravo": "lent est de nouveau healthy.",
+      "robot": [
+        "Dernière visite médicale. 🩻",
+        "Le thermomètre redescend tout seul quand la fièvre tombe : il **suit** l'état réel, dans un sens comme dans l'autre.",
+        "👀 Cherche `(healthy)` sur la ligne de `lent`, avec un `Up` qui n'est pas reparti de zéro."
+      ]
+    },
+    {
+      "titre": "Tout ranger",
+      "pourquoi": "`down` arrête et supprime les conteneurs puis le réseau du projet.",
+      "consigne": "Arrête et supprime le projet.",
+      "commande": "docker compose down",
+      "options": [
+        [
+          "down",
+          "arrête et supprime les conteneurs et le réseau du projet"
+        ]
+      ],
+      "sortie": " Container sante-client-1 Stopping\n Container sante-client-1 Stopped\n Container sante-client-1 Removing\n Container sante-client-1 Removed\n Container sante-lent-1 Stopping\n Container sante-lent-1 Stopped\n Container sante-lent-1 Removing\n Container sante-lent-1 Removed\n Network sante_default Removing\n Network sante_default Removed",
+      "remarque": "`client` part **avant** `lent`. Compose arrête dans l'ordre inverse des dépendances : on ne coupe pas la cuisine avant d'avoir fait sortir les clients.",
+      "attendu": "^docker compose down$",
+      "bravo": "Le projet est rangé.",
+      "robot": [
+        "Fermeture du restaurant pour ce soir. 🌙",
+        "On fait d'abord **sortir les clients**, puis on éteint la cuisine : Compose arrête dans l'ordre inverse du démarrage.",
+        "👀 Regarde qui part en premier : `client`, puis `lent`, puis le réseau."
+      ]
+    },
+    {
+      "titre": "Supprimer le dossier",
+      "pourquoi": "Il ne reste que le dossier et son fichier. On sort du dossier, puis on le supprime.",
+      "consigne": "Remonte d'un dossier et supprime `sante`.",
+      "commande": "cd .. && rm -r sante",
+      "options": [
+        [
+          "cd ..",
+          "remonte au dossier parent"
+        ],
+        [
+          "rm -r sante",
+          "supprime le dossier et son contenu (-r : récursif)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier a disparu et ton invite est revenue à `~`.",
+      "attendu": "^cd \\.\\. && rm -(r|rf|fr) sante$",
+      "indice": "d'abord `cd ..`, puis `rm -r sante`.",
+      "bravo": "Machine propre.",
+      "robot": [
+        "Dernier geste : on range le carnet de santé. 📕",
+        "Le dossier a servi, on le referme et on le jette : plus de projet `sante`.",
+        "👀 Aucun message : vérifie seulement que ton invite est revenue à `~`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Bonjour, je suis **Conti**, et aujourd'hui je porte la blouse blanche. 🩺",
+    "Mission du jour : apprendre la différence entre un service **allumé** et un service **prêt**, comme une cuisine ouverte qui chauffe encore.",
+    "Tout se passe dans un bac à sable : tu peux rendre les conteneurs malades sans risque. On commence ?"
+  ],
+  "robotFin": [
+    "Diagnostic posé, bravo ! 🎉",
+    "Tu as vu le **healthcheck** qui mesure, `service_healthy` qui fait **attendre** `client`, et un conteneur **unhealthy mais Up** que personne ne répare (0 redémarrage).",
+    "Je te remets ton badge, docteur. À très vite !"
+  ],
+  "badge": "Docteur du feu vert"
+}

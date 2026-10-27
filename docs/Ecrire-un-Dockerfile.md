@@ -231,6 +231,14 @@ Cet ordre accélère les reconstructions grâce au **cache** (voir [Contexte de 
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/dockerfile.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 15 minutes. Tu vas fabriquer l'image `atelier:1.0` : **garde-la** à la fin, la page [Versionner et publier une image](Versionner-et-publier-une-image.md) s'en resservira.
 
 **Étape 1 · Créer le dossier et les deux fichiers**

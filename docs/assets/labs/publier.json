@@ -1,0 +1,487 @@
+{
+  "titre": "Versionner et publier une image",
+  "duree": "15 min",
+  "intro": "Tu repars de l'image `atelier:1.0` (déjà prête dans ce terminal, avec son dossier `atelier`), tu modifies le code, tu construis une version `1.1`, puis tu la publies dans un registre lancé sur ta machine et tu vérifies ce qu'il contient.",
+  "conclusion": "Tu as vu que modifier `app.py` ne change pas le conteneur `1.0`, que `1.1` est une nouvelle image avec son propre identifiant, que `tag` n'ajoute qu'un nom, et qu'un second `push` ne renvoie rien car le registre reconnaît chaque couche à son empreinte.",
+  "retour": {
+    "texte": "Retour au cours : Versionner et publier une image",
+    "lien": "../../Versionner-et-publier-une-image/"
+  },
+  "preparation": [
+    "mkdir atelier && cd atelier",
+    "cat > app.py <<'EOF'\nfrom http.server import BaseHTTPRequestHandler, HTTPServer\nfrom os import getenv\n\n\nclass App(BaseHTTPRequestHandler):\n    def do_GET(self):\n        body = b\"Bonjour depuis Docker !\\n\"\n        self.send_response(200)\n        self.send_header(\"Content-Type\", \"text/plain; charset=utf-8\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\nHTTPServer((\"0.0.0.0\", int(getenv(\"PORT\", \"8080\"))), App).serve_forever()\nEOF",
+    "cat > Dockerfile <<'EOF'\nFROM python:3.12-alpine\nWORKDIR /app\nRUN adduser -D -u 10001 app\nCOPY --chown=app:app app.py .\nENV PORT=8080\nENV PYTHONUNBUFFERED=1\nUSER app\nEXPOSE 8080\nCMD [\"python\", \"app.py\"]\nEOF",
+    "docker build -q -t atelier:1.0 ."
+  ],
+  "etapes": [
+    {
+      "titre": "Lancer la version 1.0",
+      "pourquoi": "On part d'un conteneur qui tourne sur l'image `atelier:1.0`, comme un service en production. Il servira de témoin quand on modifiera le code.",
+      "consigne": "Lance `atelier:1.0` en arrière-plan, nommé `web`, sur le port 8080 local.",
+      "commande": "docker run -d --name web -p 127.0.0.1:8080:8080 atelier:1.0",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan"
+        ],
+        [
+          "--name web",
+          "le conteneur témoin"
+        ],
+        [
+          "-p 127.0.0.1:8080:8080",
+          "le port 8080 de ta machine, en local seulement, mène au port 8080 du conteneur"
+        ],
+        [
+          "atelier:1.0",
+          "l'image construite dans le lab précédent (déjà prête ici)"
+        ]
+      ],
+      "sortie": "d712164ca6c5d9efed1bbe986875083255e1e6c92762c98d3a1e2cdcf96aa231",
+      "remarque": "L'identifiant du conteneur, le tien sera différent. La version 1.0 est en service.",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]web\\b)(?=.*-p[ =]?\\S*8080:8080).*atelier:1\\.0$",
+      "indice": "vérifie `-d`, `--name web` et `-p 127.0.0.1:8080:8080`, puis l'image `atelier:1.0` en dernier.",
+      "bravo": "La version 1.0 tourne.",
+      "robot": [
+        "On met en service l'édition **1.0** de ton image. 📗",
+        "C'est le livre déjà imprimé, posé en vitrine de la librairie.",
+        "👀 Un long identifiant en retour : le conteneur témoin est lancé."
+      ]
+    },
+    {
+      "titre": "Modifier le code",
+      "pourquoi": "On change le texte de la réponse dans `app.py`, comme on corrigerait un bug. `sed -i` fait le remplacement directement dans le fichier.",
+      "consigne": "Remplace la phrase de réponse dans `app.py` par la version 2.",
+      "commande": "sed -i 's/Bonjour depuis Docker !/Bonjour depuis Docker, version 2 !/' app.py",
+      "options": [
+        [
+          "sed -i",
+          "modifie le fichier sur place"
+        ],
+        [
+          "'s/ancien/nouveau/'",
+          "remplace le premier texte par le second"
+        ],
+        [
+          "app.py",
+          "le fichier à modifier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : `app.py` contient maintenant « version 2 ». Le conteneur `web`, lui, n'en sait encore rien.",
+      "attendu": "^sed -i .*version 2.* app\\.py$",
+      "indice": "l'expression `'s/…/…/'` entre apostrophes, puis le fichier `app.py`.",
+      "bravo": "Le code est modifié.",
+      "robot": [
+        "On corrige le manuscrit : nouvelle phrase d'accueil. ✏️",
+        "C'est l'auteur qui retouche son texte… mais les livres déjà en vitrine ne changent pas tout seuls.",
+        "👀 Pas de sortie : le fichier est modifié en silence."
+      ]
+    },
+    {
+      "titre": "Le conteneur n'a pas changé",
+      "pourquoi": "Question piège : maintenant que le code est modifié, que répond le conteneur ? On l'interroge.",
+      "consigne": "Interroge le conteneur sur le port 8080.",
+      "commande": "curl http://127.0.0.1:8080",
+      "options": [
+        [
+          "curl URL",
+          "envoie une requête web et affiche la réponse"
+        ]
+      ],
+      "sortie": "Bonjour depuis Docker !",
+      "remarque": "L'**ancien** texte. `COPY` a recopié le code dans l'image au moment du build ; le conteneur ne suit pas ton dossier.",
+      "attendu": "^curl .*8080/?$",
+      "bravo": "Le conteneur répond toujours la version 1.0.",
+      "robot": [
+        "Alors, le livre en vitrine a-t-il changé ? 🤔",
+        "On ne corrige pas les exemplaires déjà imprimés : il faudra une **nouvelle édition**.",
+        "👀 Regarde si la phrase contient « version 2 »… ou pas."
+      ]
+    },
+    {
+      "titre": "Construire la version 1.1",
+      "pourquoi": "Pour profiter du code modifié, il faut une nouvelle image, sous un nouveau tag. `-q` n'affiche que son identifiant.",
+      "consigne": "Construis `atelier:1.1` à partir du dossier courant, en mode silencieux.",
+      "commande": "docker build -q -t atelier:1.1 .",
+      "options": [
+        [
+          "-q",
+          "silencieux : n'affiche que l'identifiant de l'image"
+        ],
+        [
+          "-t atelier:1.1",
+          "le nouveau tag, pour la nouvelle version"
+        ],
+        [
+          ".",
+          "le contexte : le dossier `atelier`, avec le code modifié"
+        ]
+      ],
+      "sortie": "sha256:e097545272d0367a9499dad55ebbf6a208240eba0e1b0fd72b6bc87c9008de54",
+      "remarque": "Un identifiant différent de celui de `1.0`. Une nouvelle version, c'est une **nouvelle image** ; `1.0` reste intacte.",
+      "attendu": "^docker (image )?build (?=.*(-t|--tag)[ =]atelier:1\\.1\\b).* \\.$",
+      "indice": "il faut `-t atelier:1.1` et le `.` final.",
+      "bravo": "La version 1.1 est construite.",
+      "robot": [
+        "On imprime la **nouvelle édition** : 1.1. 🖨️",
+        "La 1.0 reste sur l'étagère ; la 1.1 sort toute fraîche de l'imprimerie.",
+        "👀 Une seule ligne `sha256:…` : retiens son début, on le recroisera."
+      ]
+    },
+    {
+      "titre": "Lancer la 1.1 à côté",
+      "pourquoi": "Les deux versions peuvent tourner en même temps, chacune dans son conteneur et sur son port.",
+      "consigne": "Lance `atelier:1.1` en arrière-plan, nommé `web2`, sur le port 8081 local.",
+      "commande": "docker run -d --name web2 -p 127.0.0.1:8081:8080 atelier:1.1",
+      "options": [
+        [
+          "--name web2",
+          "un second conteneur"
+        ],
+        [
+          "-p 127.0.0.1:8081:8080",
+          "le port 8081 de ta machine mène au port 8080 de ce conteneur"
+        ],
+        [
+          "atelier:1.1",
+          "la nouvelle image"
+        ]
+      ],
+      "sortie": "5b11cbf16fd2596d444be1f50954fa8d731e5453101857d3f12aeb89fd978fb8",
+      "remarque": "Un nouvel identifiant de conteneur. Le port de ta machine change (8081), celui du conteneur reste 8080.",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]web2\\b)(?=.*-p[ =]?\\S*8081:8080).*atelier:1\\.1$",
+      "indice": "cette fois `--name web2`, `-p 127.0.0.1:8081:8080` et l'image `atelier:1.1`.",
+      "bravo": "La 1.1 tourne à côté de la 1.0.",
+      "robot": [
+        "Deux éditions en vitrine, côte à côte !",
+        "Comme deux exemplaires sur la même table : l'ancien à gauche, le nouveau à droite.",
+        "👀 Un second identifiant : `web2` est né."
+      ]
+    },
+    {
+      "titre": "Comparer les deux versions",
+      "pourquoi": "On interroge les deux conteneurs l'un après l'autre. Le `;` enchaîne deux commandes sur une seule ligne.",
+      "consigne": "Interroge le port 8080, puis le port 8081.",
+      "commande": "curl http://127.0.0.1:8080; curl http://127.0.0.1:8081",
+      "options": [
+        [
+          "curl …8080",
+          "la version 1.0"
+        ],
+        [
+          ";",
+          "enchaîne la commande suivante, quoi qu'il arrive"
+        ],
+        [
+          "curl …8081",
+          "la version 1.1"
+        ]
+      ],
+      "sortie": "Bonjour depuis Docker !\nBonjour depuis Docker, version 2 !",
+      "remarque": "Deux réponses différentes, une par version. Pour mettre à jour un service, on **recrée** son conteneur à partir de la nouvelle image.",
+      "attendu": "^curl \\S*8080/? ?; ?curl \\S*8081/?$",
+      "indice": "deux `curl` séparés par un point-virgule : d'abord 8080, puis 8081.",
+      "bravo": "Les deux versions répondent chacune à leur façon.",
+      "robot": [
+        "Lisons la première page des deux éditions. 📚",
+        "Même titre, même couverture… mais pas tout à fait le même texte.",
+        "👀 La deuxième ligne doit contenir « version 2 »."
+      ]
+    },
+    {
+      "titre": "Lister les versions",
+      "pourquoi": "On regarde les images `atelier` présentes sur la machine.",
+      "consigne": "Liste les images `atelier`.",
+      "commande": "docker image ls atelier",
+      "options": [
+        [
+          "docker image ls atelier",
+          "liste les images du dépôt `atelier`"
+        ]
+      ],
+      "sortie": "IMAGE         ID             DISK USAGE   CONTENT SIZE   EXTRA\natelier:1.0   547a15591fd6       74.2MB         18.1MB   U\natelier:1.1   e097545272d0       74.2MB         18.1MB   U",
+      "remarque": "Deux tags, deux **ID** différents ; `e097545272d0` est le début de l'identifiant de l'étape 4. Le `U` signale que chaque image est utilisée par un conteneur.",
+      "attendu": "^docker (image ls|images) atelier$",
+      "bravo": "Deux versions, deux images.",
+      "robot": [
+        "Faisons l'inventaire de l'étagère.",
+        "Deux éditions, deux numéros d'imprimeur différents.",
+        "👀 Compare la colonne **ID** des deux lignes."
+      ]
+    },
+    {
+      "titre": "Démarrer un registre",
+      "pourquoi": "Un registre stocke et distribue des images. L'image officielle `registry:2` en fournit un vrai, dans un simple conteneur, sur le port 5000 de ta machine.",
+      "consigne": "Lance un registre nommé `registre`, publié sur le port 5000 local.",
+      "commande": "docker run -d --name registre -p 127.0.0.1:5000:5000 registry:2",
+      "options": [
+        [
+          "--name registre",
+          "le nom du conteneur"
+        ],
+        [
+          "-p 127.0.0.1:5000:5000",
+          "le port 5000 de ta machine mène au port 5000 du registre"
+        ],
+        [
+          "registry:2",
+          "l'image officielle d'un registre d'images"
+        ]
+      ],
+      "sortie": "c86ce4b450e140f745d909414b0c6a81b1860404378214e3db599613b4220999",
+      "remarque": "Le registre n'est qu'un conteneur de plus. Si l'image `registry:2` n'est pas encore là, des lignes de téléchargement s'affichent avant l'identifiant.",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]registre\\b)(?=.*-p[ =]?\\S*5000:5000).*registry:2$",
+      "indice": "vérifie `-d`, `--name registre`, `-p 127.0.0.1:5000:5000` puis l'image `registry:2`.",
+      "bravo": "Le registre est en service.",
+      "robot": [
+        "On ouvre notre propre **entrepôt** d'images. 🏭",
+        "Le registre, c'est l'entrepôt de l'éditeur : il range les éditions et les expédie à qui les demande. Il ne lit jamais les livres.",
+        "👀 Un identifiant de conteneur, comme d'habitude : l'entrepôt est ouvert."
+      ]
+    },
+    {
+      "titre": "Nommer l'image pour le registre",
+      "pourquoi": "C'est le **nom** de l'image qui dit à `push` où l'envoyer. On ajoute donc un nom qui commence par l'adresse du registre.",
+      "consigne": "Ajoute le nom `localhost:5000/atelier:1.1` à l'image `atelier:1.1`.",
+      "commande": "docker image tag atelier:1.1 localhost:5000/atelier:1.1",
+      "options": [
+        [
+          "docker image tag",
+          "ajoute un nom à une image existante"
+        ],
+        [
+          "atelier:1.1",
+          "l'image source"
+        ],
+        [
+          "localhost:5000/atelier:1.1",
+          "le nouveau nom : registre `localhost:5000`, dépôt `atelier`, tag `1.1`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : aucune copie, juste une étiquette de plus.",
+      "attendu": "^docker (image )?tag atelier:1\\.1 localhost:5000/atelier:1\\.1$",
+      "indice": "d'abord le nom existant `atelier:1.1`, puis le nouveau `localhost:5000/atelier:1.1`.",
+      "bravo": "L'image porte l'adresse du registre.",
+      "robot": [
+        "On écrit l'**adresse** de l'entrepôt sur le colis. 🏷️",
+        "Comme sur une enveloppe : c'est l'adresse écrite dessus qui dit au facteur où aller.",
+        "👀 Pas de sortie : l'étiquette est collée."
+      ]
+    },
+    {
+      "titre": "Deux noms, même image",
+      "pourquoi": "On vérifie que le nouveau nom désigne bien la même image, sans copie.",
+      "consigne": "Liste les images nommées `atelier:1.1` ou `localhost:5000/atelier:1.1`.",
+      "commande": "docker image ls --filter reference=atelier:1.1 --filter reference=localhost:5000/atelier:1.1",
+      "options": [
+        [
+          "--filter reference=…",
+          "ne garde que les images qui portent ce nom ; deux filtres : l'un ou l'autre"
+        ]
+      ],
+      "sortie": "IMAGE                         ID             DISK USAGE   CONTENT SIZE   EXTRA\nlocalhost:5000/atelier:1.1    e097545272d0       74.2MB         18.1MB   U\natelier:1.1                   e097545272d0       74.2MB         18.1MB   U",
+      "remarque": "Le **même ID** sur les deux lignes. `tag` n'a rien copié.",
+      "attendu": "^docker (image ls|images) (?=.*reference=atelier:1\\.1\\b)(?=.*reference=localhost:5000/atelier:1\\.1\\b)",
+      "indice": "deux `--filter reference=…`, un par nom.",
+      "bravo": "Deux noms, un seul identifiant.",
+      "robot": [
+        "Vérifions qu'on n'a pas photocopié le livre par erreur.",
+        "Une seule édition, deux étiquettes : celle de la librairie et celle de l'entrepôt.",
+        "👀 Compare la colonne **ID**."
+      ]
+    },
+    {
+      "titre": "Publier l'image",
+      "pourquoi": "`docker push` envoie l'image vers le registre désigné par son nom. Au premier envoi, toutes les couches partent, celles de la base comprises.",
+      "consigne": "Publie `localhost:5000/atelier:1.1`.",
+      "commande": "docker push localhost:5000/atelier:1.1",
+      "options": [
+        [
+          "docker push",
+          "envoie une image vers un registre"
+        ],
+        [
+          "localhost:5000/…",
+          "le registre visé, lu dans le nom de l'image"
+        ]
+      ],
+      "sortie": "The push refers to repository [localhost:5000/atelier]\n44136fa355b3: Pushed\n7b229517ed22: Pushed\n6893b7f357bc: Pushed\nbc3bda4835eb: Pushed\n44f1f4ea9467: Pushed\n8dc6b13ab3d0: Pushed\n5043f0a6ec4e: Pushed\n1de81347f285: Pushed\nc03751883ae5: Pushed\n1.1: digest: sha256:e097545272d0367a9499dad55ebbf6a208240eba0e1b0fd72b6bc87c9008de54 size: 856",
+      "remarque": "Chaque morceau est marqué `Pushed`, puis le registre répond avec le **digest** : c'est sous cette empreinte qu'il range l'image. Des lignes `Waiting` ou `Preparing` peuvent s'afficher pendant l'envoi ; tes empreintes seront différentes.",
+      "attendu": "^docker (image )?push localhost:5000/atelier:1\\.1$",
+      "indice": "le nom complet : `localhost:5000/atelier:1.1`.",
+      "bravo": "L'image est publiée.",
+      "robot": [
+        "Expédition vers l'entrepôt ! 🚀",
+        "Le colis part en plusieurs cartons, un par couche, et l'entrepôt délivre un reçu numéroté.",
+        "👀 Compte les `Pushed`, puis lis le `digest` de la dernière ligne."
+      ]
+    },
+    {
+      "titre": "Publier une seconde fois",
+      "pourquoi": "Et si on renvoie exactement la même image ? Avant d'envoyer une couche, Docker demande au registre s'il connaît déjà son empreinte.",
+      "consigne": "Publie de nouveau `localhost:5000/atelier:1.1`, sans rien changer.",
+      "commande": "docker push localhost:5000/atelier:1.1",
+      "options": [
+        [
+          "docker push",
+          "même commande, même image"
+        ]
+      ],
+      "sortie": "The push refers to repository [localhost:5000/atelier]\n7b229517ed22: Layer already exists\n6893b7f357bc: Layer already exists\n1de81347f285: Layer already exists\n44136fa355b3: Already exists\n8dc6b13ab3d0: Layer already exists\nc03751883ae5: Layer already exists\n5043f0a6ec4e: Layer already exists\nbc3bda4835eb: Already exists\n44f1f4ea9467: Layer already exists\n1.1: digest: sha256:e097545272d0367a9499dad55ebbf6a208240eba0e1b0fd72b6bc87c9008de54 size: 856",
+      "remarque": "`already exists` partout, rien ne part. Les couches sont reconnues à leur empreinte, et le digest final est identique.",
+      "attendu": "^docker (image )?push localhost:5000/atelier:1\\.1$",
+      "indice": "exactement la même commande qu'à l'étape précédente.",
+      "bravo": "Rien n'a été renvoyé.",
+      "robot": [
+        "On renvoie le même colis, pour voir.",
+        "L'entrepôt regarde les numéros des cartons : « déjà en stock », il n'en reprend aucun.",
+        "👀 Cherche `Pushed`… tu ne devrais plus en trouver un seul."
+      ]
+    },
+    {
+      "titre": "Interroger le registre",
+      "pourquoi": "Le registre a une interface web pour les programmes, son API. On lui demande la liste des tags du dépôt `atelier`.",
+      "consigne": "Demande au registre les tags du dépôt `atelier`.",
+      "commande": "curl http://127.0.0.1:5000/v2/atelier/tags/list",
+      "options": [
+        [
+          "/v2/",
+          "l'API standard des registres"
+        ],
+        [
+          "atelier/tags/list",
+          "la liste des tags du dépôt `atelier`"
+        ]
+      ],
+      "sortie": "{\"name\":\"atelier\",\"tags\":[\"1.1\"]}",
+      "remarque": "Le dépôt `atelier` et son tag `1.1`. Le registre a seulement stocké : aucun conteneur `atelier` n'y a tourné.",
+      "attendu": "^curl .*5000/v2/atelier/tags/list/?$",
+      "bravo": "Le registre connaît ton image.",
+      "robot": [
+        "On passe un coup de fil à l'entrepôt. ☎️",
+        "« Bonjour, qu'avez-vous en stock pour `atelier` ? » L'entrepôt répond avec son registre d'inventaire.",
+        "👀 Cherche `1.1` dans la liste `tags`."
+      ]
+    },
+    {
+      "titre": "Relever le digest",
+      "pourquoi": "Le digest est l'empreinte exacte de ce qui a été publié. On le relit localement pour le comparer à celui annoncé par `push`.",
+      "consigne": "Affiche les digests connus pour `localhost:5000/atelier:1.1`.",
+      "commande": "docker image inspect -f '{{json .RepoDigests}}' localhost:5000/atelier:1.1",
+      "options": [
+        [
+          "docker image inspect",
+          "décrit l'image"
+        ],
+        [
+          "-f '{{json .RepoDigests}}'",
+          "n'affiche que la liste de ses digests, au format JSON"
+        ]
+      ],
+      "sortie": "[\"atelier@sha256:e097545272d0367a9499dad55ebbf6a208240eba0e1b0fd72b6bc87c9008de54\",\"localhost:5000/atelier@sha256:e097545272d0367a9499dad55ebbf6a208240eba0e1b0fd72b6bc87c9008de54\"]",
+      "remarque": "Le même `sha256:e0975…` que celui annoncé par `push`. Sur un autre poste, `docker pull localhost:5000/atelier@sha256:…` (le digest complet) récupérerait exactement ce contenu, même si le tag avait bougé.",
+      "attendu": "^docker (image )?inspect (?=.*RepoDigests).*localhost:5000/atelier:1\\.1$",
+      "indice": "le modèle `'{{json .RepoDigests}}'` entre apostrophes, puis le nom complet de l'image.",
+      "bravo": "Tu as l'empreinte de ta publication.",
+      "robot": [
+        "On note le **numéro de lot** de l'édition publiée. 🔍",
+        "Le tag est le titre du livre ; le digest, le numéro unique qui garantit que c'est bien ce tirage-là.",
+        "👀 Compare ce digest avec la dernière ligne du `push`."
+      ]
+    },
+    {
+      "titre": "Supprimer les conteneurs",
+      "pourquoi": "On arrête et on supprime les trois conteneurs. `-v` supprime aussi le volume anonyme où le registre rangeait les images publiées.",
+      "consigne": "Supprime `web`, `web2` et `registre`, avec leurs volumes anonymes.",
+      "commande": "docker rm -f -v web web2 registre",
+      "options": [
+        [
+          "-f",
+          "force : arrête d'abord les conteneurs qui tournent"
+        ],
+        [
+          "-v",
+          "supprime aussi leurs volumes anonymes (le stockage du registre)"
+        ],
+        [
+          "web web2 registre",
+          "les trois conteneurs du lab"
+        ]
+      ],
+      "sortie": "web\nweb2\nregistre",
+      "remarque": "Docker répète le nom de chaque conteneur supprimé. Sans `-v`, le volume du registre resterait sur le disque.",
+      "attendu": "^docker (container )?rm (?=(.*\\s)?-[a-z]*f)(?=(.*\\s)?-[a-z]*v).*\\bweb\\b.*\\bweb2\\b.*\\bregistre$",
+      "indice": "il faut `-f` et `-v`, puis les trois noms `web web2 registre`.",
+      "bravo": "Conteneurs supprimés.",
+      "robot": [
+        "On ferme boutique. 🧹",
+        "On vide la vitrine et on ferme l'entrepôt, stock compris.",
+        "👀 Trois noms en retour, un par conteneur."
+      ]
+    },
+    {
+      "titre": "Supprimer les images",
+      "pourquoi": "On retire les trois noms. Une image n'est supprimée (`Deleted`) qu'au dernier nom retiré.",
+      "consigne": "Retire `atelier:1.0`, `atelier:1.1` et `localhost:5000/atelier:1.1`.",
+      "commande": "docker image rm atelier:1.0 atelier:1.1 localhost:5000/atelier:1.1",
+      "options": [
+        [
+          "docker image rm",
+          "retire des noms ; supprime l'image au dernier nom"
+        ],
+        [
+          "atelier:1.0 atelier:1.1 localhost:5000/atelier:1.1",
+          "les trois noms du lab"
+        ]
+      ],
+      "sortie": "Untagged: atelier:1.0\nDeleted: sha256:547a15591fd604550792a2fe270ea11bbce68e631041052aec933a94204b957e\nUntagged: atelier:1.1\nUntagged: localhost:5000/atelier:1.1\nDeleted: sha256:e097545272d0367a9499dad55ebbf6a208240eba0e1b0fd72b6bc87c9008de54",
+      "remarque": "La 1.1 n'est `Deleted` qu'après le retrait de son **second** nom. Nettoyer ton poste n'efface jamais un registre distant.",
+      "attendu": "^docker (image rm|rmi) (?=.*\\batelier:1\\.0\\b)(?=(.*\\s)?atelier:1\\.1\\b)(?=.*localhost:5000/atelier:1\\.1\\b)",
+      "indice": "les trois noms à la suite, séparés par des espaces.",
+      "bravo": "Images supprimées.",
+      "robot": [
+        "On range l'étagère, édition par édition.",
+        "Un livre à deux étiquettes ne part au pilon qu'une fois les deux décollées.",
+        "👀 Compte les `Deleted` : deux images, deux suppressions."
+      ]
+    },
+    {
+      "titre": "Supprimer le dossier",
+      "pourquoi": "Dernier rangement : on remonte d'un dossier et on supprime `atelier`.",
+      "consigne": "Remonte d'un dossier et supprime `atelier`.",
+      "commande": "cd .. && rm -rf atelier",
+      "options": [
+        [
+          "cd ..",
+          "remonte au dossier parent"
+        ],
+        [
+          "rm -rf atelier",
+          "supprime le dossier et son contenu"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier de travail a disparu. La partie images du parcours est terminée.",
+      "attendu": "^cd \\.\\. && rm -r[f]* atelier/?$",
+      "bravo": "Tout est rangé.",
+      "robot": [
+        "Dernier geste : on rend les clés de l'atelier.",
+        "Les manuscrits sont rangés, les éditions distribuées : la boutique peut fermer.",
+        "👀 Pas de sortie : le dossier n'existe plus."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Hello ! **Conti** de retour, et j'ai été mis à jour depuis la dernière fois. 😄",
+    "Aujourd'hui on joue les éditeurs : on imprime une **nouvelle édition** de ton image, puis on l'envoie à l'**entrepôt** (le registre) qui la distribuera.",
+    "Ton dossier `atelier` et l'image `atelier:1.0` sont déjà prêts. Et ici, rien ne casse : vas-y franchement."
+  ],
+  "robotFin": [
+    "Édition publiée, bravo ! 🎉",
+    "Tu as vu qu'une nouvelle version, c'est une **nouvelle image**, qu'un **tag** n'est qu'une étiquette, et que le **registre** range tout sous un **digest** sans jamais reprendre une couche qu'il connaît.",
+    "Voici ton badge d'éditeur. Tes images peuvent maintenant voyager !"
+  ],
+  "badge": "Éditeur d'images"
+}

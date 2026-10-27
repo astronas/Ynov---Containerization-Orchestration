@@ -1,0 +1,382 @@
+{
+  "titre": "Service et Ingress",
+  "duree": "10 min",
+  "intro": "Tu vas lancer trois pods nginx, les mettre derrière un **Service**, l'appeler par son nom depuis un pod, puis regarder sa liste de pods suivre tes changements et le tester depuis ton poste à travers un tunnel. À chaque étape : lis le pourquoi, clique sur « Insérer dans le terminal », appuie sur **Entrée**, puis compare.",
+  "conclusion": "Tu as vu qu'un Service garde la même adresse et le même nom pendant que sa liste de pods (l'EndpointSlice) suit les changements toute seule, que CoreDNS traduit le nom `web` en adresse, et que `port-forward` permet de tester depuis ton poste sans rien exposer.",
+  "retour": {
+    "texte": "Retour au cours : Service et Ingress",
+    "lien": "../../Service-et-Ingress/"
+  },
+  "preparation": [
+    "minikube start --driver=docker"
+  ],
+  "etapes": [
+    {
+      "titre": "Un espace à part",
+      "pourquoi": "On travaille dans un namespace dédié, `labsvc`, pour tout supprimer d'un coup à la fin sans toucher au reste du cluster.",
+      "consigne": "Crée le namespace `labsvc`.",
+      "commande": "kubectl create namespace labsvc",
+      "options": [
+        [
+          "kubectl create namespace",
+          "crée un namespace"
+        ],
+        [
+          "labsvc",
+          "son nom"
+        ]
+      ],
+      "sortie": "namespace/labsvc created",
+      "remarque": "Si tu vois `already exists`, un essai précédent n'a pas été nettoyé : `kubectl delete namespace labsvc`, puis recommence.",
+      "attendu": "^kubectl create (namespace|ns) labsvc$",
+      "bravo": "L'espace de travail est prêt.",
+      "robot": [
+        "On installe notre **standard téléphonique** dans un bureau à part. ☎️",
+        "Un namespace, c'est un étage réservé dans l'immeuble : on peut tout y installer, puis libérer l'étage d'un coup.",
+        "👀 Une ligne qui finit par `created`."
+      ]
+    },
+    {
+      "titre": "Trois employés",
+      "pourquoi": "Il nous faut des pods à joindre. `kubectl create deployment` fabrique un Deployment de trois pods nginx, et pose tout seul l'étiquette `app=web` sur chacun.",
+      "consigne": "Crée le Deployment `web` de 3 pods `nginx:stable` dans le namespace `labsvc`.",
+      "commande": "kubectl create deployment web -n labsvc --image=nginx:stable --replicas=3",
+      "options": [
+        [
+          "kubectl create deployment web",
+          "crée un Deployment nommé `web`, sans écrire de fichier"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ],
+        [
+          "--image=nginx:stable",
+          "l'image des pods"
+        ],
+        [
+          "--replicas=3",
+          "trois copies"
+        ]
+      ],
+      "sortie": "deployment.apps/web created",
+      "remarque": "Le Deployment est **created** ; ses trois pods vont démarrer dans les secondes qui suivent, avec l'étiquette `app=web`.",
+      "attendu": "^kubectl create deployment web (?=.*(-n|--namespace)[ =]labsvc\\b)(?=.*--image[ =]nginx:stable\\b)(?=.*--replicas[ =]3\\b)",
+      "indice": "il faut `-n labsvc`, `--image=nginx:stable` et `--replicas=3`.",
+      "bravo": "Trois pods sont en route.",
+      "robot": [
+        "On embauche **trois employés** identiques. 👥",
+        "Ce sont eux qui répondront au téléphone. Mais chacun a son propre bureau, et il peut **déménager** à tout moment.",
+        "👀 Une ligne `deployment.apps/web created`."
+      ]
+    },
+    {
+      "titre": "Le numéro du standard",
+      "pourquoi": "Un **Service** donne un nom et une adresse stables devant les pods choisis par leur étiquette. `expose` le crée à partir du Deployment, en reprenant son sélecteur `app=web`.",
+      "consigne": "Crée un Service devant le Deployment `web`, sur le port 80.",
+      "commande": "kubectl expose deployment web -n labsvc --port=80",
+      "options": [
+        [
+          "kubectl expose deployment web",
+          "crée un Service nommé `web`, dont le sélecteur reprend les étiquettes des pods du Deployment"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ],
+        [
+          "--port=80",
+          "le port du Service ; le `targetPort` prend la même valeur"
+        ]
+      ],
+      "sortie": "service/web exposed",
+      "remarque": "Ici le mot est **exposed** (et non `created`). Sans `--type`, le Service est un **ClusterIP** : joignable seulement depuis l'intérieur du cluster.",
+      "attendu": "^kubectl expose (deployments?[ /]web|deploy[ /]web)\\b(?=.*(-n|--namespace)[ =]labsvc\\b)(?=.*--port[ =]80\\b)",
+      "indice": "`kubectl expose deployment web -n labsvc --port=80`.",
+      "bravo": "Le standard a son numéro.",
+      "robot": [
+        "On installe le **standard** devant les employés. 📞",
+        "Les employés changent de bureau, mais le **numéro du standard**, lui, ne change jamais : c'est lui qu'on appelle.",
+        "👀 Une ligne `service/web exposed`."
+      ]
+    },
+    {
+      "titre": "Tout le monde est là ?",
+      "pourquoi": "Avant d'appeler le standard, on attend que les trois pods soient prêts : un pod qui démarre n'est pas encore derrière le Service.",
+      "consigne": "Liste les pods du namespace `labsvc`.",
+      "commande": "kubectl get pods -n labsvc",
+      "options": [
+        [
+          "kubectl get pods",
+          "liste les pods"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ]
+      ],
+      "sortie": "NAME                   READY   STATUS    RESTARTS   AGE\nweb-65d84b78bf-8b9n5   1/1     Running   0          15s\nweb-65d84b78bf-m69q7   1/1     Running   0          15s\nweb-65d84b78bf-p224n   1/1     Running   0          15s",
+      "remarque": "Trois pods `1/1 Running`. S'ils sont encore en `ContainerCreating`, l'image se télécharge : attends un peu et relance la commande.",
+      "attendu": "^kubectl get (pods?|po)\\b(?=.*(-n|--namespace)[ =]labsvc\\b)",
+      "indice": "`kubectl get pods -n labsvc`.",
+      "bravo": "Les trois pods sont prêts.",
+      "robot": [
+        "Appel des employés ! 🙋",
+        "Avant d'ouvrir le standard, on vérifie que tout le monde est assis à son poste, casque sur les oreilles.",
+        "👀 Il faut trois lignes `1/1` et `Running`."
+      ]
+    },
+    {
+      "titre": "Le Service et sa liste",
+      "pourquoi": "Le Service a une adresse fixe ; derrière lui, un **EndpointSlice** liste les adresses des pods prêts qui portent son étiquette. Cette liste est tenue à jour toute seule.",
+      "consigne": "Affiche les Services et les EndpointSlices du namespace `labsvc`.",
+      "commande": "kubectl get svc,endpointslices -n labsvc",
+      "options": [
+        [
+          "kubectl get svc,endpointslices",
+          "deux types d'objets d'un coup : Services (`svc`) et EndpointSlices"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ]
+      ],
+      "sortie": "NAME          TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE\nservice/web   ClusterIP   10.96.4.48   <none>        80/TCP    15s\n\nNAME                                       ADDRESSTYPE   PORTS   ENDPOINTS                             AGE\nendpointslice.discovery.k8s.io/web-b5xcl   IPv4          80      10.244.0.39,10.244.0.40,10.244.0.41   15s",
+      "remarque": "Un Service `web` de type **ClusterIP**, avec une adresse en `10.x.x.x`, et un EndpointSlice qui liste **trois** adresses en `10.244.0.x`, une par pod. Deux types demandés d'un coup : chaque nom est précédé de son type. Si tu vois encore `ContainerCreating` (ou `<unset>` dans ENDPOINTS), l'image est en cours de téléchargement : patiente quelques secondes et relance la commande.",
+      "attendu": "^kubectl get (svc|services?),(endpointslices?)\\b(?=.*(-n|--namespace)[ =]labsvc\\b)",
+      "indice": "les deux types s'écrivent collés : `svc,endpointslices`, puis `-n labsvc`.",
+      "bravo": "Le standard connaît ses trois employés.",
+      "robot": [
+        "Jetons un œil à l'**annuaire interne** du standard. 📒",
+        "Le standard tient une liste « qui est présent aujourd'hui » : il ne passera l'appel qu'à quelqu'un de cette liste.",
+        "👀 Compte les adresses de la colonne **ENDPOINTS**, et note la **CLUSTER-IP** du Service."
+      ]
+    },
+    {
+      "titre": "Appeler par le nom",
+      "pourquoi": "Dans le cluster, on joint un Service par son **nom**. On lance un pod jetable `client` qui télécharge la page `http://web`, puis disparaît.",
+      "consigne": "Lance un pod `client` busybox qui affiche la page `http://web`, puis se supprime.",
+      "commande": "kubectl run client -n labsvc -it --rm --restart=Never --image=busybox:1.37 -- wget -qO- http://web",
+      "options": [
+        [
+          "kubectl run client",
+          "crée un pod nommé `client`"
+        ],
+        [
+          "-it",
+          "affiche sa sortie dans ton terminal"
+        ],
+        [
+          "--rm",
+          "supprime le pod quand il a fini"
+        ],
+        [
+          "--restart=Never",
+          "un simple pod, sans Deployment ni redémarrage"
+        ],
+        [
+          "--image=busybox:1.37",
+          "une toute petite image avec les outils de base"
+        ],
+        [
+          "-- wget -qO- http://web",
+          "après `--`, la commande lancée dans le pod : télécharger la page et l'afficher"
+        ]
+      ],
+      "sortie": "All commands and output from this session will be recorded in container logs, including credentials and sensitive information passed through the command prompt.\nIf you don't see a command prompt, try pressing enter.\nwarning: couldn't attach to pod/client, falling back to streaming logs: unable to upgrade connection: container client not found in pod client_labsvc\n<!DOCTYPE html>\n…\n</html>\npod \"client\" deleted from labsvc namespace",
+      "remarque": "La page d'accueil de nginx, puis la confirmation que `client` est supprimé. Le nom **`web`** a suffi : CoreDNS, l'annuaire du cluster, l'a traduit en adresse du Service.",
+      "attendu": "^kubectl run client (?=.*(-n|--namespace)[ =]labsvc\\b)(?=.*--rm\\b)(?=.*--restart[ =]Never\\b)(?=.*--image[ =]busybox).*-- wget -qO- http://web",
+      "indice": "vérifie `-n labsvc`, `-it`, `--rm`, `--restart=Never`, `--image=busybox:1.37`, puis `--` et la commande `wget -qO- http://web`.",
+      "bravo": "Le Service répond à son nom.",
+      "robot": [
+        "On passe un **coup de fil** au standard, depuis l'intérieur. 📲",
+        "Tu ne composes pas le numéro de bureau d'un employé : tu demandes « le service web », et l'annuaire te met en relation.",
+        "👀 Cherche « **Welcome to nginx!** », puis la ligne qui annonce la suppression du pod `client`."
+      ]
+    },
+    {
+      "titre": "Moins d'employés",
+      "pourquoi": "On réduit l'équipe à un seul pod. Le Service doit suivre tout seul : sa liste ne gardera que le pod restant.",
+      "consigne": "Ramène le Deployment `web` du namespace `labsvc` à 1 copie.",
+      "commande": "kubectl scale deployment web -n labsvc --replicas=1",
+      "options": [
+        [
+          "kubectl scale deployment web",
+          "change le nombre de copies du Deployment `web`"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ],
+        [
+          "--replicas=1",
+          "un seul pod : Kubernetes en arrête deux"
+        ]
+      ],
+      "sortie": "deployment.apps/web scaled",
+      "remarque": "**scaled** : deux pods vont s'arrêter. Personne ne touche au Service.",
+      "attendu": "^kubectl scale (deployments?[ /]web|deploy[ /]web)\\b(?=.*(-n|--namespace)[ =]labsvc\\b)(?=.*--replicas[ =]1\\b)",
+      "indice": "`kubectl scale deployment web -n labsvc --replicas=1`.",
+      "bravo": "L'équipe passe à une personne.",
+      "robot": [
+        "Deux employés rentrent chez eux. 🚪",
+        "Le standard n'est pas prévenu par un mail : il **voit** simplement que deux bureaux sont vides.",
+        "👀 Une ligne qui finit par `scaled`."
+      ]
+    },
+    {
+      "titre": "La liste a suivi",
+      "pourquoi": "On relance la même commande qu'avant pour comparer : la liste de pods a changé, mais l'adresse du Service ?",
+      "consigne": "Affiche de nouveau les Services et les EndpointSlices du namespace `labsvc`.",
+      "commande": "kubectl get svc,endpointslices -n labsvc",
+      "options": [
+        [
+          "kubectl get svc,endpointslices",
+          "Services et EndpointSlices"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ]
+      ],
+      "sortie": "NAME          TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE\nservice/web   ClusterIP   10.96.4.48   <none>        80/TCP    29s\n\nNAME                                       ADDRESSTYPE   PORTS   ENDPOINTS     AGE\nendpointslice.discovery.k8s.io/web-b5xcl   IPv4          80      10.244.0.39   29s",
+      "remarque": "L'EndpointSlice ne liste plus qu'**une** adresse, et la **CLUSTER-IP** du Service n'a **pas changé**. C'est tout l'intérêt : les clients ne voient rien.",
+      "attendu": "^kubectl get (svc|services?),(endpointslices?)\\b(?=.*(-n|--namespace)[ =]labsvc\\b)",
+      "indice": "la même commande qu'avant : `kubectl get svc,endpointslices -n labsvc`.",
+      "bravo": "Le standard a mis sa liste à jour.",
+      "robot": [
+        "Comparons l'annuaire d'avant et d'après. 🔍",
+        "Le numéro du standard est imprimé sur les cartes de visite : il ne bouge pas. Seule la **liste interne** des présents change.",
+        "👀 Une seule adresse dans **ENDPOINTS**, et la même **CLUSTER-IP** qu'avant."
+      ]
+    },
+    {
+      "titre": "Un tunnel vers le Service",
+      "pourquoi": "Un ClusterIP n'est pas joignable depuis ton poste. Pour tester, `port-forward` ouvre un **tunnel** temporaire du port 8080 de ton poste vers le Service. Le `&` final le laisse tourner en arrière-plan.",
+      "consigne": "Ouvre un tunnel du port 8080 de ton poste vers le port 80 du Service `web`, en arrière-plan.",
+      "commande": "kubectl port-forward -n labsvc svc/web 8080:80 &",
+      "options": [
+        [
+          "kubectl port-forward",
+          "ouvre un tunnel en passant par l'API de Kubernetes"
+        ],
+        [
+          "-n labsvc",
+          "dans le namespace `labsvc`"
+        ],
+        [
+          "svc/web",
+          "la cible : le Service `web` (on peut aussi viser un pod)"
+        ],
+        [
+          "8080:80",
+          "le port 8080 de ton poste mène au port 80, dans le même ordre que `-p` chez Docker"
+        ],
+        [
+          "&",
+          "lance la commande en arrière-plan et te rend la main"
+        ]
+      ],
+      "sortie": "Forwarding from 127.0.0.1:8080 -> 80\nForwarding from [::1]:8080 -> 80",
+      "remarque": "Le tunnel annonce ses **deux adresses d'écoute** (IPv4 et IPv6), toutes deux locales : personne d'autre sur le réseau ne peut s'en servir. Le terminal peut aussi afficher `[1]` et un numéro : c'est la tâche de fond.",
+      "attendu": "^kubectl port-forward (?=.*(-n|--namespace)[ =]labsvc\\b)(?=.*(svc|service)/web\\b)(?=.*\\b8080:80\\b).*&$",
+      "indice": "n'oublie pas le `&` à la fin, sinon le tunnel garde le terminal bloqué.",
+      "bravo": "Le tunnel est ouvert.",
+      "robot": [
+        "On tire une **ligne directe** jusqu'au standard. 🔌",
+        "C'est une rallonge téléphonique provisoire entre ton bureau et le standard : pratique pour tester, pas pour le grand public.",
+        "👀 Deux lignes **Forwarding from**, vers le port 80."
+      ]
+    },
+    {
+      "titre": "Tester depuis ton poste",
+      "pourquoi": "Le tunnel tourne en arrière-plan : on appelle le port 8080 de ton poste comme le ferait un navigateur, et on ne garde que la ligne du titre.",
+      "consigne": "Appelle `http://localhost:8080` et n'affiche que la ligne `<title>`.",
+      "commande": "curl -s http://localhost:8080 | grep '<title>'",
+      "options": [
+        [
+          "curl -s",
+          "télécharge la page sans barre de progression"
+        ],
+        [
+          "http://localhost:8080",
+          "le port de ton poste relié au tunnel"
+        ],
+        [
+          "| grep '<title>'",
+          "ne garde que la ligne du titre"
+        ]
+      ],
+      "sortie": "Handling connection for 8080\n<title>Welcome to nginx!</title>",
+      "remarque": "Le pod nginx répond, à travers le tunnel et le Service. Une ligne `Handling connection for 8080` peut s'intercaler : c'est le tunnel qui signale chaque connexion.",
+      "attendu": "^curl .*(localhost|127\\.0\\.0\\.1):8080",
+      "indice": "vise `http://localhost:8080`, puis `| grep '<title>'`.",
+      "bravo": "Le Service répond depuis ton poste.",
+      "robot": [
+        "On décroche et on **compose** le numéro. 📞",
+        "Ta requête suit la rallonge jusqu'au standard, qui la passe au seul employé encore présent.",
+        "👀 Le titre « **Welcome to nginx!** »."
+      ]
+    },
+    {
+      "titre": "Fermer le tunnel",
+      "pourquoi": "Le tunnel tourne toujours en arrière-plan. `%1` désigne la première tâche de fond du terminal : on l'arrête.",
+      "consigne": "Arrête la tâche de fond n° 1.",
+      "commande": "kill %1",
+      "options": [
+        [
+          "kill",
+          "arrête un programme"
+        ],
+        [
+          "%1",
+          "la première tâche lancée en arrière-plan avec `&` dans ce terminal"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche tout de suite ; le terminal peut ensuite signaler la fin de la tâche (`Terminated`). Le port 8080 de ton poste est libéré.",
+      "bravo": "Le tunnel est fermé.",
+      "robot": [
+        "On **débranche la rallonge**. ✂️",
+        "Une ligne provisoire ne doit pas rester branchée : on la retire dès que le test est fini.",
+        "👀 Pas de réponse attendue : au plus un petit `Terminated`."
+      ]
+    },
+    {
+      "titre": "Libérer l'étage",
+      "pourquoi": "Supprimer le namespace supprime **tout** ce qu'il contient : le Deployment, ses pods et le Service.",
+      "consigne": "Supprime le namespace `labsvc`.",
+      "commande": "kubectl delete namespace labsvc",
+      "options": [
+        [
+          "kubectl delete namespace",
+          "supprime un namespace et tout son contenu"
+        ],
+        [
+          "labsvc",
+          "le namespace visé"
+        ]
+      ],
+      "sortie": "namespace \"labsvc\" deleted",
+      "remarque": "Une seule ligne, mais le Deployment, les pods et le Service sont partis. Compte quelques secondes.",
+      "attendu": "^kubectl delete (namespace|ns) labsvc$",
+      "bravo": "Le cluster est propre.",
+      "robot": [
+        "Fin de journée : on **rend l'étage**. 🧹",
+        "On ne décroche pas chaque téléphone un par un : on libère l'étage entier.",
+        "👀 Une ligne qui finit par `deleted`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Allô ? Ici **Conti**, standardiste en chef de ce lab. ☎️",
+    "Les pods déménagent sans arrêt et changent d'adresse. Ta mission : leur installer un **standard téléphonique**, un numéro fixe qui passe l'appel au bon employé, quoi qu'il arrive.",
+    "Le cluster du terminal est simulé et déjà démarré : tu peux tout essayer sans risque."
+  ],
+  "robotFin": [
+    "Ligne parfaitement établie, bravo ! 🎉",
+    "Tu as vu le **Service** et son adresse fixe, l'**EndpointSlice** qui suit les pods prêts, le **DNS** du cluster qui traduit `web`, et le tunnel **port-forward**.",
+    "Voici ton badge de **Standardiste du cluster**. À la prochaine !"
+  ],
+  "badge": "Standardiste du cluster"
+}

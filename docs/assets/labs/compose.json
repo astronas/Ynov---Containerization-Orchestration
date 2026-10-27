@@ -1,0 +1,418 @@
+{
+  "titre": "Docker Compose",
+  "duree": "10 min",
+  "intro": "Tu vas décrire un mini-projet de deux services dans un seul fichier `compose.yaml`, le lancer, vérifier que les services se trouvent par leur nom, changer un réglage pour voir Compose ne refaire que le nécessaire, puis tout ranger. À chaque étape : clique sur « Insérer dans le terminal », appuie sur **Entrée**, et compare.",
+  "conclusion": "Un fichier a remplacé une série de `docker run` : Compose a créé le réseau et les conteneurs, les services se sont joints par leur nom, et en changeant le port il n'a recréé que `web`. `down` a tout rangé.",
+  "retour": {
+    "texte": "Retour au cours : Docker Compose",
+    "lien": "../../Docker-Compose/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer le dossier du projet",
+      "pourquoi": "Compose travaille dans un dossier : il y cherche le fichier `compose.yaml`, et le **nom du dossier** devient le nom du projet. Tous les objets créés porteront ce nom en préfixe.",
+      "consigne": "Crée le dossier `atelier` et entre dedans.",
+      "commande": "mkdir atelier && cd atelier",
+      "options": [
+        [
+          "mkdir atelier",
+          "crée un dossier nommé atelier"
+        ],
+        [
+          "&&",
+          "enchaîne la commande suivante si la première a réussi"
+        ],
+        [
+          "cd atelier",
+          "entre dans le dossier : il devient le dossier courant"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : c'est normal. Ton invite indique maintenant `~/atelier`. Ce nom, `atelier`, va servir de **nom de projet**.",
+      "attendu": "^mkdir (-p )?atelier && cd atelier$",
+      "indice": "deux commandes reliées par `&&` : `mkdir atelier` puis `cd atelier`.",
+      "bravo": "Le dossier du projet est prêt.",
+      "robot": [
+        "On commence par poser les fondations : un dossier pour le projet. 📁",
+        "C'est comme choisir le **nom de la salle** avant la réception : tout ce qu'on y installera portera ce nom sur l'étiquette.",
+        "👀 Pas de message en retour : regarde seulement ton invite, elle doit se terminer par `atelier`."
+      ]
+    },
+    {
+      "titre": "Écrire le plan",
+      "pourquoi": "Le fichier `compose.yaml` décrit l'application voulue : deux services, `web` (un serveur nginx publié sur ton poste) et `outil` (une petite Alpine qui reste allumée pour faire des tests). On le décrit une fois, Compose s'occupe du reste.",
+      "consigne": "Écris le fichier `compose.yaml` avec ses deux services.",
+      "commande": "cat > compose.yaml <<'EOF'\nservices:\n  web:\n    image: nginx:stable\n    ports:\n      - \"127.0.0.1:${WEB_PORT:-8080}:80\"\n  outil:\n    image: alpine:3.22\n    command: sleep infinity\nEOF",
+      "options": [
+        [
+          "cat > compose.yaml",
+          "écrit dans le fichier compose.yaml tout ce qu'on lui envoie"
+        ],
+        [
+          "<<'EOF'",
+          "envoie les lignes qui suivent, jusqu'à la ligne EOF ; les guillemets empêchent le terminal de remplacer `${...}`"
+        ],
+        [
+          "services:",
+          "la liste des services : un service = un rôle dans l'application"
+        ],
+        [
+          "web: / image: nginx:stable",
+          "premier service, un serveur web nginx"
+        ],
+        [
+          "\"127.0.0.1:${WEB_PORT:-8080}:80\"",
+          "publie le port 80 du conteneur sur le port 8080 de ton poste, ou sur celui donné par la variable WEB_PORT"
+        ],
+        [
+          "outil: / image: alpine:3.22",
+          "second service, une petite image Linux pour tester depuis l'intérieur"
+        ],
+        [
+          "command: sleep infinity",
+          "remplace la commande de l'image : « dormir pour toujours », pour rester allumé"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est écrit. Attention au **décalage** : deux espaces par niveau, jamais de tabulation.",
+      "attendu": "^cat > compose\\.yaml <<",
+      "indice": "le bloc commence par `cat > compose.yaml <<'EOF'` et se termine par une ligne `EOF` seule.",
+      "bravo": "Le plan est écrit.",
+      "robot": [
+        "Place au plan ! On écrit le fichier qui décrit toute l'application. ✍️",
+        "C'est le **plan de salle** remis au traiteur : deux tables (`web` et `outil`), et une fenêtre ouverte sur le port 8080.",
+        "👀 Le terminal ne dit rien : un fichier écrit en silence, c'est un fichier écrit."
+      ]
+    },
+    {
+      "titre": "Lister les services",
+      "pourquoi": "Avant de lancer quoi que ce soit, on demande à Compose ce qu'il a compris du fichier. S'il y a une erreur de YAML, c'est ici qu'elle apparaît.",
+      "consigne": "Demande à Compose la liste des services qu'il a trouvés.",
+      "commande": "docker compose config --services",
+      "options": [
+        [
+          "docker compose",
+          "la commande Compose (avec un espace, pas l'ancien docker-compose)"
+        ],
+        [
+          "config",
+          "lit le fichier et le montre tel que Compose l'a compris, sans rien lancer"
+        ],
+        [
+          "--services",
+          "n'affiche que les noms des services"
+        ]
+      ],
+      "sortie": "outil\nweb",
+      "remarque": "Les deux services sont là, rangés par ordre alphabétique. Le fichier est **bien écrit**, mais ça ne dit encore rien sur le bon fonctionnement de l'application.",
+      "attendu": "^docker compose config --services$",
+      "bravo": "Compose a trouvé tes deux services.",
+      "robot": [
+        "Avant d'appeler le traiteur, on relit le plan avec lui. 🔍",
+        "`config`, c'est la **relecture à voix haute** : Compose te répète ce qu'il a compris, sans rien installer.",
+        "👀 Tu dois lire deux noms : `outil` et `web`."
+      ]
+    },
+    {
+      "titre": "Voir la publication détaillée",
+      "pourquoi": "La ligne `ports` du fichier est une forme courte. Compose la détaille : adresse, port du conteneur, port publié. C'est aussi là qu'on voit la variable `${WEB_PORT:-8080}` remplacée par sa valeur.",
+      "consigne": "Affiche la partie `ports` telle que Compose l'a comprise.",
+      "commande": "docker compose config | grep -A5 \"ports:\"",
+      "options": [
+        [
+          "docker compose config",
+          "affiche tout le fichier, normalisé par Compose"
+        ],
+        [
+          "|",
+          "envoie ce résultat à la commande suivante"
+        ],
+        [
+          "grep -A5 \"ports:\"",
+          "ne garde que la ligne « ports: » et les 5 lignes qui la suivent (-A5 : after 5)"
+        ]
+      ],
+      "sortie": "    ports:\n      - mode: ingress\n        host_ip: 127.0.0.1\n        target: 80\n        published: \"8080\"\n        protocol: tcp",
+      "remarque": "`host_ip: 127.0.0.1` (joignable depuis ton poste seulement), `target: 80` (le port du conteneur) et `published: \"8080\"` : `WEB_PORT` n'est pas définie, donc Compose a pris la valeur par défaut.",
+      "attendu": "^docker compose config \\| grep (?=.*-A ?5).*ports:",
+      "indice": "la commande `docker compose config`, puis `| grep -A5 \"ports:\"`.",
+      "bravo": "La publication est bien comprise.",
+      "robot": [
+        "Zoom sur la fenêtre du plan : le port publié. 🪟",
+        "Une adresse écrite en abrégé sur une enveloppe, que la Poste réécrit en entier : rue, numéro, ville. Compose fait pareil avec `ports`.",
+        "👀 Cherche `published: \"8080\"` : c'est la valeur par défaut de `${WEB_PORT:-8080}`."
+      ]
+    },
+    {
+      "titre": "Lancer le projet",
+      "pourquoi": "`up` met la réalité en accord avec le fichier : il crée ce qui manque (ici tout : un réseau et deux conteneurs) et les démarre. Avec `-d`, le tout part en arrière-plan.",
+      "consigne": "Lance le projet en arrière-plan.",
+      "commande": "docker compose up -d",
+      "options": [
+        [
+          "up",
+          "crée ce qui manque et démarre les services"
+        ],
+        [
+          "-d",
+          "en arrière-plan (detached) : le terminal te rend la main"
+        ]
+      ],
+      "sortie": " Network atelier_default Creating\n Network atelier_default Creating\n Network atelier_default Created\n Network atelier_default Created\n Container atelier-web-1 Creating\n Container atelier-outil-1 Creating\n Container atelier-outil-1 Created\n Container atelier-web-1 Created\n Container atelier-web-1 Starting\n Container atelier-outil-1 Starting\n Container atelier-web-1 Started\n Container atelier-outil-1 Started",
+      "remarque": "Compose crée d'abord le **réseau** `atelier_default` (tu n'en as déclaré aucun), puis les deux conteneurs. Dans un vrai terminal, ces lignes se mettent à jour sur place.",
+      "attendu": "^docker compose up (?=.*(-d|--detach)\\b)",
+      "indice": "il faut `docker compose up` suivi de `-d`.",
+      "bravo": "Le projet tourne.",
+      "robot": [
+        "Le grand moment : on lance tout d'un coup ! 🚀",
+        "Le traiteur arrive, compare le plan à la salle vide et **installe tout ce qui manque** : un réseau, puis deux conteneurs.",
+        "👀 Repère le réseau `atelier_default` créé en premier, puis les deux `Started`."
+      ]
+    },
+    {
+      "titre": "Regarder l'état",
+      "pourquoi": "`docker compose ps` est le `docker ps` du projet : il ne montre que les conteneurs de ce projet, avec leur service.",
+      "consigne": "Affiche les conteneurs du projet.",
+      "commande": "docker compose ps",
+      "options": [
+        [
+          "docker compose ps",
+          "liste les conteneurs du projet courant, avec leur service, leur état et leurs ports"
+        ]
+      ],
+      "sortie": "NAME              IMAGE          COMMAND                  SERVICE   CREATED        STATUS                  PORTS\natelier-outil-1   alpine:3.22    \"sleep infinity\"         outil     1 second ago   Up Less than a second\natelier-web-1     nginx:stable   \"/docker-entrypoint.…\"   web       1 second ago   Up 1 second             127.0.0.1:8080->80/tcp",
+      "remarque": "Compose a construit les noms tout seul, `<dossier>-<service>-1`. Seul `web` a un port publié : `127.0.0.1:8080->80/tcp`.",
+      "bravo": "Les deux conteneurs sont Up.",
+      "robot": [
+        "Faisons le tour de la salle. 👣",
+        "Chaque conteneur porte une **étiquette** composée du nom du projet, du service et d'un numéro, comme les places numérotées d'un théâtre.",
+        "👀 Lis la colonne **NAME** : `atelier-outil-1` et `atelier-web-1`, tous deux `Up`."
+      ]
+    },
+    {
+      "titre": "Joindre web par son nom",
+      "pourquoi": "Dans le réseau du projet, Compose fournit un **annuaire** (DNS) : chaque service est joignable par son nom. Depuis `outil`, on demande la page de `web` sans connaître son adresse IP.",
+      "consigne": "Depuis le conteneur `outil`, demande la page de `web` par son nom.",
+      "commande": "docker compose exec outil wget -qO- http://web | grep '<title>'",
+      "options": [
+        [
+          "docker compose exec outil",
+          "lance une commande dans le conteneur du service outil"
+        ],
+        [
+          "wget -qO- http://web",
+          "télécharge la page de l'adresse « web » et l'affiche (-q : silencieux, -O- : vers l'écran)"
+        ],
+        [
+          "| grep '<title>'",
+          "ne garde que la ligne du titre de la page"
+        ]
+      ],
+      "sortie": "<title>Welcome to nginx!</title>",
+      "remarque": "Tu as écrit `http://web`, le **nom du service**, et ça marche. Jamais besoin d'adresse IP entre services.",
+      "attendu": "^docker compose exec outil wget .*http://web",
+      "indice": "la commande commence par `docker compose exec outil`, puis `wget -qO- http://web`.",
+      "bravo": "outil a trouvé web par son nom.",
+      "robot": [
+        "On passe de l'autre côté : à l'intérieur du réseau du projet. 🕵️",
+        "Dans un immeuble, on sonne chez « Dupont » sans connaître le numéro de l'appartement : l'**interphone** fait le lien. Le DNS de Compose joue ce rôle.",
+        "👀 Si tu lis « Welcome to nginx! », `outil` a bien trouvé `web` par son nom."
+      ]
+    },
+    {
+      "titre": "Joindre web depuis ton poste",
+      "pourquoi": "De ton poste, tu n'es pas dans le réseau du projet : le nom `web` ne t'est pas connu. Tu passes par la **porte publiée**, le port 8080.",
+      "consigne": "Demande la page sur le port 8080 de ton poste.",
+      "commande": "curl -s http://127.0.0.1:8080/ | grep '<title>'",
+      "options": [
+        [
+          "curl -s",
+          "télécharge une page web sans afficher la barre de progression"
+        ],
+        [
+          "http://127.0.0.1:8080/",
+          "le port publié par web sur ton poste"
+        ],
+        [
+          "| grep '<title>'",
+          "ne garde que le titre"
+        ]
+      ],
+      "sortie": "<title>Welcome to nginx!</title>",
+      "remarque": "Même page, autre chemin. De l'intérieur, on passe par le **nom** ; de l'extérieur, par le **port publié**.",
+      "attendu": "^curl .*127\\.0\\.0\\.1:8080",
+      "indice": "vise `http://127.0.0.1:8080/`.",
+      "bravo": "La porte publiée fonctionne.",
+      "robot": [
+        "Retour dehors : on frappe à la porte d'entrée. 🚪",
+        "Les invités de la réception n'ont pas l'interphone intérieur : ils entrent par la **porte principale**, le port 8080.",
+        "👀 Le même titre doit s'afficher une seconde fois."
+      ]
+    },
+    {
+      "titre": "Voir le réseau du projet",
+      "pourquoi": "Tu n'as déclaré aucun réseau dans le fichier, et pourtant `outil` et `web` se parlent. C'est que Compose en a créé un pour le projet. On le vérifie.",
+      "consigne": "Affiche les réseaux dont le nom contient `atelier`.",
+      "commande": "docker network ls --filter name=atelier --format \"{{.Name}}\"",
+      "options": [
+        [
+          "docker network ls",
+          "liste les réseaux Docker"
+        ],
+        [
+          "--filter name=atelier",
+          "ne garde que ceux dont le nom contient « atelier »"
+        ],
+        [
+          "--format \"{{.Name}}\"",
+          "n'affiche que leur nom"
+        ]
+      ],
+      "sortie": "atelier_default",
+      "remarque": "Le réseau s'appelle `<dossier>_default`. C'est lui qui porte l'annuaire utilisé à l'étape précédente.",
+      "attendu": "^docker network ls (?=.*--filter[ =]name=atelier)",
+      "indice": "il faut `--filter name=atelier`.",
+      "bravo": "Le réseau du projet est là.",
+      "robot": [
+        "Qui a tiré les câbles entre nos deux conteneurs ? 🔌",
+        "Le traiteur a installé une **ligne téléphonique interne** sans qu'on la demande : un réseau par défaut pour le projet.",
+        "👀 Une seule ligne : `atelier_default`."
+      ]
+    },
+    {
+      "titre": "Changer de port",
+      "pourquoi": "On relance `up` avec une variable `WEB_PORT=8081`. Le fichier n'a pas changé, mais le résultat attendu, si : `web` doit publier un autre port. Compose compare, et ne refait que ce qui diffère.",
+      "consigne": "Relance le projet avec `WEB_PORT` à 8081.",
+      "commande": "WEB_PORT=8081 docker compose up -d",
+      "options": [
+        [
+          "WEB_PORT=8081",
+          "définit la variable pour cette commande seulement ; Compose s'en sert pour remplir `${WEB_PORT:-8080}`"
+        ],
+        [
+          "docker compose up -d",
+          "fait converger le projet vers le fichier"
+        ]
+      ],
+      "sortie": " Container atelier-outil-1 Running\n Container atelier-web-1 Recreate\n Container atelier-web-1 Recreated\n Container atelier-web-1 Starting\n Container atelier-web-1 Started",
+      "remarque": "`outil` reste `Running`, intact. Seul `web` est **recréé**, parce que son port a changé. C'est la **convergence**.",
+      "attendu": "^WEB_PORT=8081 docker compose up (?=.*(-d|--detach)\\b)",
+      "indice": "la variable se place **avant** la commande : `WEB_PORT=8081 docker compose up -d`.",
+      "bravo": "Seul web a été recréé.",
+      "robot": [
+        "Petit changement sur le plan : on déplace une fenêtre. 🔧",
+        "Le traiteur compare le nouveau plan à la salle : il ne déplace **que la table qui a changé** et ne touche pas au reste.",
+        "👀 Compare les deux services : `Running` pour `outil`, `Recreate` pour `web`."
+      ]
+    },
+    {
+      "titre": "Vérifier la nouvelle porte",
+      "pourquoi": "On regarde l'état des services pour confirmer : `outil` tourne depuis plus longtemps, `web` vient de naître, avec sa nouvelle porte.",
+      "consigne": "Affiche seulement le service, l'état et les ports.",
+      "commande": "docker compose ps --format \"table {{.Service}}\\t{{.Status}}\\t{{.Ports}}\"",
+      "options": [
+        [
+          "--format \"table ...\"",
+          "affiche un tableau avec seulement les colonnes choisies"
+        ],
+        [
+          "{{.Service}} {{.Status}} {{.Ports}}",
+          "le service, l'état et les ports"
+        ],
+        [
+          "\\t",
+          "une tabulation entre les colonnes"
+        ]
+      ],
+      "sortie": "SERVICE   STATUS                  PORTS\noutil     Up 3 seconds\nweb       Up Less than a second   127.0.0.1:8081->80/tcp",
+      "remarque": "`outil` a quelques secondes d'avance (il n'a pas été touché), `web` vient de démarrer et publie maintenant `127.0.0.1:8081`.",
+      "attendu": "^docker compose ps --format",
+      "indice": "`docker compose ps --format` suivi du modèle de tableau entre guillemets.",
+      "bravo": "La nouvelle porte est en place.",
+      "robot": [
+        "Inspection après travaux. 🧐",
+        "Comme comparer les **âges** de deux voisins : celui qui vient d'emménager est forcément le plus jeune.",
+        "👀 Regarde la colonne **PORTS** : `8081` a remplacé `8080`."
+      ]
+    },
+    {
+      "titre": "Tout ranger",
+      "pourquoi": "`down` est l'inverse de `up` : il arrête et supprime les conteneurs, puis le réseau du projet. Il ne touche pas aux images.",
+      "consigne": "Arrête et supprime le projet.",
+      "commande": "docker compose down",
+      "options": [
+        [
+          "down",
+          "arrête et supprime les conteneurs et les réseaux du projet (les volumes seulement avec -v)"
+        ]
+      ],
+      "sortie": " Container atelier-web-1 Stopping\n Container atelier-outil-1 Stopping\n Container atelier-web-1 Stopped\n Container atelier-web-1 Removing\n Container atelier-web-1 Removed\n Container atelier-outil-1 Stopped\n Container atelier-outil-1 Removing\n Container atelier-outil-1 Removed\n Network atelier_default Removing\n Network atelier_default Removed",
+      "remarque": "Les conteneurs partent d'abord, le réseau ensuite. Un projet avec une base garderait son **volume** ; seul `down -v` l'effacerait.",
+      "attendu": "^docker compose down$",
+      "bravo": "Le projet est rangé.",
+      "robot": [
+        "La fête est finie, on range la salle. 🧹",
+        "Le traiteur replie tables et chaises, puis débranche la ligne interne. Il ne jette pas la vaisselle : les **images** restent sur l'étagère.",
+        "👀 Suis l'ordre : `Removed` pour les deux conteneurs, puis pour `atelier_default`."
+      ]
+    },
+    {
+      "titre": "Vérifier qu'il ne reste rien",
+      "pourquoi": "Avec `-a`, `ps` montre aussi les conteneurs arrêtés. S'il n'y a vraiment plus rien, le tableau est vide.",
+      "consigne": "Liste tous les conteneurs du projet, même arrêtés.",
+      "commande": "docker compose ps -a",
+      "options": [
+        [
+          "-a",
+          "tous les conteneurs du projet, y compris les arrêtés (all)"
+        ]
+      ],
+      "sortie": "NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS",
+      "remarque": "Seule la ligne de titres s'affiche : il ne reste **aucun** conteneur du projet.",
+      "attendu": "^docker compose ps (-a|--all)$",
+      "bravo": "Plus aucun conteneur.",
+      "robot": [
+        "Dernier coup d'œil avant d'éteindre la lumière. 💡",
+        "On vérifie qu'aucun invité n'est resté caché sous une table : `-a` regarde même les conteneurs arrêtés.",
+        "👀 Un tableau sans aucune ligne sous les titres : c'est gagné."
+      ]
+    },
+    {
+      "titre": "Supprimer le dossier",
+      "pourquoi": "Le projet est rangé, il reste le dossier et son fichier. On sort du dossier, puis on le supprime.",
+      "consigne": "Remonte d'un dossier et supprime `atelier`.",
+      "commande": "cd .. && rm -r atelier",
+      "options": [
+        [
+          "cd ..",
+          "remonte au dossier parent"
+        ],
+        [
+          "rm -r atelier",
+          "supprime le dossier et tout son contenu (-r : récursif)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier a disparu. Ton invite est revenue à `~`.",
+      "attendu": "^cd \\.\\. && rm -(r|rf|fr) atelier$",
+      "indice": "d'abord `cd ..`, puis `rm -r atelier`.",
+      "bravo": "Machine propre.",
+      "robot": [
+        "Dernier geste : on rend les clés de la salle. 🔑",
+        "Le plan a servi, on le passe à la déchiqueteuse : sans dossier, plus de projet `atelier`.",
+        "👀 Aucun message : vérifie juste que ton invite est revenue à `~`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Coucou, ici **Conti** ! Aujourd'hui je joue les chefs de chantier. 👷",
+    "Ta mission : remplacer une pile de commandes par **un seul plan**, le `compose.yaml`, puis regarder Compose installer la salle, la modifier et la ranger.",
+    "Le terminal est un bac à sable : écris ce que tu veux, rien ne casse. On attaque ?"
+  ],
+  "robotFin": [
+    "Bravo, ton premier projet Compose a vécu toute sa vie ! 🎉",
+    "Tu as vu un **fichier déclaratif**, le **réseau par défaut** et son **DNS par nom de service**, la **convergence** (seul `web` recréé) et le **ménage** avec `down`.",
+    "Voici ton badge de chef de salle. À la prochaine !"
+  ],
+  "badge": "Maître du plan de salle"
+}

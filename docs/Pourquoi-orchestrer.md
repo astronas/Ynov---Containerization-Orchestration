@@ -153,6 +153,14 @@ Tous ces mots sont repris un par un dans les pages suivantes ; ils sont aussi da
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/orchestrer.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Quatre étapes, environ 5 minutes, avec Docker seulement. Tu vas constater toi-même les trois limites de cette page. La partie Kubernetes viendra au mini-lab de la page suivante, une fois le cluster installé.
 
 **Étape 1 · Le moteur relance… sur place**

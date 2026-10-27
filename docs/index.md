@@ -19,6 +19,12 @@ Chaque notion part d'une question simple et s'appuie sur des commandes réelles,
 
     [Bien démarrer :material-arrow-right:](Bien-demarrer.md){ .md-button .md-button--primary } [Glossaire](Glossaire.md){ .md-button }
 
+!!! example "Pratiquer sans rien installer"
+
+    **22 labs interactifs** : un terminal simulé (Docker, Compose, Kubernetes) à côté d'un tutoriel pas à pas, avec Conti, le robot du lab, qui t'explique quoi observer avant chaque commande.
+
+    [:material-console: Voir les labs](Labs.md){ .md-button .md-button--primary }
+
 ## Le parcours
 
 <div class="grid cards" markdown>

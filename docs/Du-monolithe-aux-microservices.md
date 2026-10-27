@@ -206,6 +206,14 @@ Chaque service doit avoir ce dont il a besoin, parler aux autres et partager la 
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/microservices.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Cinq étapes, environ 5 minutes. Tu vas jouer la boutique avec deux « services » : un serveur web Apache dans le rôle du paiement, un serveur nginx dans le rôle du catalogue. Puis tu provoques une panne. Tape les commandes une par une et compare avec ce que tu dois voir.
 
 **Étape 1 · Créer un réseau pour la boutique**

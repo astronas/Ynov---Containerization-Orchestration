@@ -1,0 +1,503 @@
+{
+  "titre": "Pourquoi orchestrer ?",
+  "duree": "10 min",
+  "intro": "Avec Docker seulement, tu vas constater trois limites : un moteur qui relance un conteneur sur place puis abandonne, un conteneur malade qui continue de servir, et deux copies qui se disputent le même port. À chaque étape : clique sur « Insérer dans le terminal », appuie sur **Entrée**, et compare.",
+  "conclusion": "Docker a relancé `crash` trois fois sur place puis l'a laissé arrêté, a gardé `malade` en service malgré son `unhealthy`, et a refusé la seconde copie de `web` faute de port libre. Replanifier, réparer, répartir : c'est le travail d'un orchestrateur.",
+  "retour": {
+    "texte": "Retour au cours : Pourquoi orchestrer ?",
+    "lien": "../../Pourquoi-orchestrer/"
+  },
+  "etapes": [
+    {
+      "titre": "Lancer un conteneur qui plante",
+      "pourquoi": "Ce conteneur affiche « démarrage », attend 2 secondes, puis s'arrête en erreur. Avec la consigne `--restart on-failure:3`, Docker doit le relancer, trois fois au plus.",
+      "consigne": "Lance le conteneur `crash` avec une politique de redémarrage limitée à 3 relances.",
+      "commande": "docker run -d --name crash --restart on-failure:3 alpine:3.22 sh -c 'echo démarrage; sleep 2; exit 1'",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan : le terminal te rend la main"
+        ],
+        [
+          "--name crash",
+          "le nom du conteneur"
+        ],
+        [
+          "--restart on-failure:3",
+          "si le programme s'arrête en erreur, Docker le relance, 3 fois au plus"
+        ],
+        [
+          "alpine:3.22",
+          "une toute petite image Linux"
+        ],
+        [
+          "sh -c 'echo démarrage; sleep 2; exit 1'",
+          "affiche « démarrage », attend 2 s, puis s'arrête avec le code d'erreur 1"
+        ]
+      ],
+      "sortie": "4db336c4f32de540bb816c48f283944a357c5e714f7f743bc6c132ea96ecaf33",
+      "remarque": "La longue suite de caractères est l'**identifiant** du conteneur : le tien sera différent. Le conteneur va planter dans 2 secondes.",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]crash\\b)(?=.*--restart[ =]on-failure:3).*alpine.*exit 1",
+      "indice": "il faut `-d`, `--name crash` et `--restart on-failure:3`, puis l'image `alpine:3.22` et le `sh -c '...'`.",
+      "bravo": "crash est lancé, et va planter.",
+      "robot": [
+        "On commence par un cobaye fragile : un conteneur qui plante exprès. 💥",
+        "C'est une **lampe** avec un faux contact : elle s'éteint toutes les 2 secondes, et Docker a le droit de la rallumer trois fois.",
+        "👀 Pour l'instant, juste un identifiant : le spectacle commence dans 2 secondes."
+      ]
+    },
+    {
+      "titre": "Laisser Docker s'acharner",
+      "pourquoi": "Chaque vie du conteneur dure environ 2 secondes, et Docker attend un peu plus longtemps avant chaque nouvelle relance. En 25 secondes, il aura épuisé ses trois tentatives.",
+      "consigne": "Attends 25 secondes.",
+      "commande": "sleep 25",
+      "options": [
+        [
+          "sleep 25",
+          "ne fait rien pendant 25 secondes"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le terminal te rend la main après 25 secondes. Pendant ce temps, Docker relance `crash`.",
+      "attendu": "^sleep (2[5-9]|[3-9]\\d|\\d{3,})$",
+      "indice": "attends au moins 25 secondes : `sleep 25`.",
+      "bravo": "25 secondes écoulées.",
+      "robot": [
+        "On laisse Docker jouer les électriciens. ⏳",
+        "Il **rallume la lampe** à chaque coupure, en patientant un peu plus à chaque fois.",
+        "👀 Rien à l'écran pendant 25 secondes : tout se passe en coulisses."
+      ]
+    },
+    {
+      "titre": "Compter les relances",
+      "pourquoi": "Docker garde le nombre de relances et l'état du conteneur. On lit les deux d'un coup, dans une phrase.",
+      "consigne": "Lis le nombre de relances et l'état du conteneur `crash`.",
+      "commande": "docker inspect -f '{{.RestartCount}} relances, état {{.State.Status}}' crash",
+      "options": [
+        [
+          "docker inspect",
+          "affiche la fiche technique du conteneur"
+        ],
+        [
+          "-f '...'",
+          "un modèle de phrase rempli avec les champs choisis"
+        ],
+        [
+          "{{.RestartCount}}",
+          "le nombre de relances"
+        ],
+        [
+          "{{.State.Status}}",
+          "l'état actuel : running, exited…"
+        ]
+      ],
+      "sortie": "3 relances, état exited",
+      "remarque": "3 relances**, puis Docker abandonne : le conteneur reste `exited`. Et c'est toujours **le même moteur, sur la même machine**, qui a relancé.",
+      "attendu": "^docker (container )?inspect (?=.*RestartCount).*crash$",
+      "indice": "il faut `-f` avec `{{.RestartCount}}` et `{{.State.Status}}`, puis le nom `crash`.",
+      "bravo": "Trois relances, puis abandon.",
+      "robot": [
+        "L'heure du bilan : combien de fois Docker a-t-il insisté ? 🔢",
+        "Comme un **réparateur** qui a droit à trois déplacements : au quatrième appel, il ne vient plus.",
+        "👀 Tu dois lire `3 relances` et l'état `exited` : la lampe est restée éteinte."
+      ]
+    },
+    {
+      "titre": "Lire ses quatre vies",
+      "pourquoi": "À chaque démarrage, le programme écrit « démarrage ». Le journal du conteneur garde toutes ces lignes, d'une vie à l'autre.",
+      "consigne": "Affiche le journal du conteneur `crash`.",
+      "commande": "docker logs crash",
+      "options": [
+        [
+          "docker logs",
+          "affiche tout ce que le conteneur a écrit, toutes vies confondues"
+        ]
+      ],
+      "sortie": "démarrage\ndémarrage\ndémarrage\ndémarrage",
+      "remarque": "Quatre lignes : le **premier** démarrage plus les **trois** relances. Si la machine elle-même était tombée, il n'y en aurait eu aucune : redémarrer n'est pas replanifier.",
+      "attendu": "^docker (container )?logs crash$",
+      "bravo": "Quatre démarrages, sur la même machine.",
+      "robot": [
+        "Feuilletons le carnet de bord de notre lampe. 📒",
+        "Chaque allumage laisse une **trace dans le carnet** : on va les compter.",
+        "👀 Compte les lignes « démarrage » : il doit y en avoir **quatre**."
+      ]
+    },
+    {
+      "titre": "Lancer un serveur malade",
+      "pourquoi": "Ce serveur nginx a un healthcheck qui échoue **toujours** (`exit 1`). Il sera vite déclaré malade. La question : Docker va-t-il le remplacer, ou l'écarter des visiteurs ?",
+      "consigne": "Lance nginx, nommé `malade`, avec un healthcheck qui échoue toujours, publié sur le port 18510.",
+      "commande": "docker run -d --name malade --health-cmd 'exit 1' --health-interval 2s --health-retries 2 -p 127.0.0.1:18510:80 nginx:stable",
+      "options": [
+        [
+          "--name malade",
+          "le nom du conteneur"
+        ],
+        [
+          "--health-cmd 'exit 1'",
+          "la sonde de santé : une commande qui échoue toujours"
+        ],
+        [
+          "--health-interval 2s",
+          "un test toutes les 2 secondes"
+        ],
+        [
+          "--health-retries 2",
+          "deux échecs de suite pour être déclaré malade"
+        ],
+        [
+          "-p 127.0.0.1:18510:80",
+          "le port 18510 de ta machine mène au port 80 du conteneur"
+        ],
+        [
+          "nginx:stable",
+          "l'image du serveur web"
+        ]
+      ],
+      "sortie": "7d0c5ac35c460730807b50565230e7728859846facb7e1cfb11f96f9431edbe9",
+      "remarque": "L'identifiant du conteneur s'affiche (le tien sera différent). Le serveur tourne, et sa sonde va échouer dès les premiers tests.",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]malade\\b)(?=.*--health-cmd[ =]'?exit 1)(?=.*--health-interval[ =]2s)(?=.*--health-retries[ =]2)(?=.*-p[ =]?\\S*:80\\b).*nginx",
+      "indice": "vérifie `-d`, `--name malade`, `--health-cmd 'exit 1'`, `--health-interval 2s`, `--health-retries 2` et `-p 127.0.0.1:18510:80`, puis l'image `nginx:stable` en dernier.",
+      "bravo": "malade est lancé.",
+      "robot": [
+        "Deuxième cobaye : un serveur web avec un thermomètre truqué. 🌡️",
+        "Imagine un **guichetier** qui répond parfaitement aux clients, mais dont le badge affiche « en arrêt maladie » en permanence.",
+        "👀 Un identifiant pour l'instant : le diagnostic tombera dans quelques secondes."
+      ]
+    },
+    {
+      "titre": "Laisser la sonde échouer",
+      "pourquoi": "Un test toutes les 2 secondes, deux échecs pour être déclaré malade : 12 secondes suffisent largement.",
+      "consigne": "Attends 12 secondes.",
+      "commande": "sleep 12",
+      "options": [
+        [
+          "sleep 12",
+          "ne fait rien pendant 12 secondes"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le terminal te rend la main après 12 secondes.",
+      "attendu": "^sleep (1[2-9]|[2-9]\\d|\\d{3,})$",
+      "indice": "attends au moins 12 secondes : `sleep 12`.",
+      "bravo": "12 secondes écoulées.",
+      "robot": [
+        "On laisse le thermomètre faire son œuvre. ⌛",
+        "Le **médecin du travail** passe deux fois, voit la fièvre deux fois, et note « malade ».",
+        "👀 Silence radio pendant 12 secondes."
+      ]
+    },
+    {
+      "titre": "Malade, mais Up",
+      "pourquoi": "On regarde l'état du conteneur dans la liste de ceux qui tournent : la santé apparaît entre parenthèses.",
+      "consigne": "Affiche le nom et l'état du conteneur `malade`.",
+      "commande": "docker ps --filter name=malade --format '{{.Names}}  {{.Status}}'",
+      "options": [
+        [
+          "--filter name=malade",
+          "ne garde que le conteneur malade"
+        ],
+        [
+          "--format '{{.Names}}  {{.Status}}'",
+          "n'affiche que son nom et son état"
+        ]
+      ],
+      "sortie": "malade  Up 13 seconds (unhealthy)",
+      "remarque": "`(unhealthy)`, et pourtant toujours `Up`. Docker a **détecté** le problème, rien de plus.",
+      "attendu": "^docker (container )?(ps|ls) (?=.*--filter[ =]name=malade)",
+      "indice": "il faut `--filter name=malade`.",
+      "bravo": "malade est unhealthy, et toujours Up.",
+      "robot": [
+        "Que dit le tableau de bord ? 📋",
+        "Le badge du guichetier affiche « malade »… mais il est **toujours à son poste**.",
+        "👀 Repère `(unhealthy)` juste après `Up`."
+      ]
+    },
+    {
+      "titre": "Personne ne le remplace",
+      "pourquoi": "Si Docker réparait les conteneurs malades, le compteur de redémarrages aurait bougé. On lit la santé et ce compteur.",
+      "consigne": "Lis l'état de santé et le nombre de redémarrages de `malade`.",
+      "commande": "docker inspect -f '{{.State.Health.Status}}, {{.RestartCount}} redémarrage' malade",
+      "options": [
+        [
+          "{{.State.Health.Status}}",
+          "l'état de santé : starting, healthy ou unhealthy"
+        ],
+        [
+          "{{.RestartCount}}",
+          "le nombre de redémarrages"
+        ]
+      ],
+      "sortie": "unhealthy, 0 redémarrage",
+      "remarque": "0 redémarrage**. Le healthcheck a signalé, mais personne n'a remplacé le conteneur.",
+      "attendu": "^docker (container )?inspect (?=.*Health\\.Status).*malade$",
+      "indice": "il faut `-f` avec `{{.State.Health.Status}}` et `{{.RestartCount}}`, puis le nom `malade`.",
+      "bravo": "Zéro redémarrage.",
+      "robot": [
+        "Vérifions le dossier médical du guichetier. 🗂️",
+        "Malade depuis plusieurs passages du médecin, et **aucun remplaçant** n'a été envoyé.",
+        "👀 Lis bien les deux valeurs : `unhealthy` et `0 redémarrage`."
+      ]
+    },
+    {
+      "titre": "Il sert toujours les visiteurs",
+      "pourquoi": "Dernière question : le conteneur malade reçoit-il encore des requêtes ? On interroge le site et on n'affiche que le code de réponse HTTP.",
+      "consigne": "Interroge le site sur le port 18510 et affiche seulement le code HTTP.",
+      "commande": "curl -s -o /dev/null -w 'HTTP %{http_code}\\n' http://127.0.0.1:18510/",
+      "options": [
+        [
+          "-s",
+          "silencieux : pas de barre de progression"
+        ],
+        [
+          "-o /dev/null",
+          "jette le contenu de la page"
+        ],
+        [
+          "-w 'HTTP %{http_code}\\n'",
+          "affiche seulement le code de réponse HTTP"
+        ],
+        [
+          "http://127.0.0.1:18510/",
+          "le port publié par malade"
+        ]
+      ],
+      "sortie": "HTTP 200",
+      "remarque": "200**, « OK ». Le conteneur déclaré malade sert toujours les visiteurs : Docker ne le retire pas du trafic. Un orchestrateur, lui, peut le faire.",
+      "attendu": "^curl .*127\\.0\\.0\\.1:18510",
+      "indice": "vise `http://127.0.0.1:18510/`.",
+      "bravo": "HTTP 200 : le malade sert toujours.",
+      "robot": [
+        "Le test final : on se présente au guichet. 🎫",
+        "Le guichetier « malade » te sert **comme si de rien n'était** : personne ne l'a fait sortir de la file.",
+        "👀 Un seul résultat compte : le code `200`."
+      ]
+    },
+    {
+      "titre": "Créer le dossier du projet",
+      "pourquoi": "Troisième limite : multiplier les copies. On prépare un petit projet Compose dans son propre dossier ; le nom du dossier devient le nom du projet.",
+      "consigne": "Crée le dossier `lab-scale` et entre dedans.",
+      "commande": "mkdir lab-scale && cd lab-scale",
+      "options": [
+        [
+          "mkdir lab-scale",
+          "crée le dossier du projet"
+        ],
+        [
+          "&&",
+          "enchaîne la suite si la première commande a réussi"
+        ],
+        [
+          "cd lab-scale",
+          "entre dans le dossier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : c'est normal. Ton invite se termine maintenant par `lab-scale`.",
+      "attendu": "^mkdir (-p )?lab-scale && cd lab-scale$",
+      "indice": "`mkdir lab-scale`, puis `&&`, puis `cd lab-scale`.",
+      "bravo": "Le dossier est prêt.",
+      "robot": [
+        "Changement de décor : place aux copies ! 📁",
+        "On réserve une **salle de réunion** au nom du projet : tout ce qui y sera créé portera ce nom.",
+        "👀 Pas de message : vérifie juste ton invite."
+      ]
+    },
+    {
+      "titre": "Écrire le fichier",
+      "pourquoi": "Un seul service `web`, qui publie un **port fixe** de ta machine : 18511. C'est ce détail qui va poser problème quand on voudra deux copies.",
+      "consigne": "Écris le fichier `compose.yaml` avec le service `web` publié sur le port 18511.",
+      "commande": "cat > compose.yaml <<'EOF'\nservices:\n  web:\n    image: nginx:stable\n    ports:\n      - \"127.0.0.1:18511:80\"\nEOF",
+      "options": [
+        [
+          "cat > compose.yaml",
+          "écrit dans compose.yaml tout ce qui suit"
+        ],
+        [
+          "<<'EOF'",
+          "envoie les lignes suivantes, jusqu'à la ligne EOF"
+        ],
+        [
+          "web: / image: nginx:stable",
+          "un service web, un serveur nginx"
+        ],
+        [
+          "\"127.0.0.1:18511:80\"",
+          "le port 18511 de ta machine, écrit en dur, mène au port 80 du conteneur"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le fichier est écrit. Note le port écrit **en dur** : une seule porte pour tout le service.",
+      "attendu": "^cat > compose\\.yaml <<",
+      "indice": "le bloc commence par `cat > compose.yaml <<'EOF'` et finit par une ligne `EOF` seule.",
+      "bravo": "Le fichier est écrit.",
+      "robot": [
+        "On écrit un plan tout simple : un seul serveur web. ✍️",
+        "Une boutique avec **une seule porte** donnant sur la rue : le numéro 18511.",
+        "👀 Rien à voir : le fichier s'écrit en silence."
+      ]
+    },
+    {
+      "titre": "Démarrer une copie",
+      "pourquoi": "On lance le projet : Compose crée le réseau et une copie de `web`, qui prend le port 18511.",
+      "consigne": "Lance le projet en arrière-plan.",
+      "commande": "docker compose up -d",
+      "options": [
+        [
+          "up",
+          "crée ce qui manque et démarre"
+        ],
+        [
+          "-d",
+          "en arrière-plan"
+        ]
+      ],
+      "sortie": " Network lab-scale_default Creating\n Network lab-scale_default Creating\n Network lab-scale_default Created\n Network lab-scale_default Created\n Container lab-scale-web-1 Creating\n Container lab-scale-web-1 Created\n Container lab-scale-web-1 Starting\n Container lab-scale-web-1 Started",
+      "remarque": "Une seule copie, `lab-scale-web-1`, démarrée. Elle occupe maintenant le port 18511.",
+      "attendu": "^docker compose up (?=.*(-d|--detach)\\b)(?!.*--scale)",
+      "indice": "`docker compose up -d`, sans `--scale` pour l'instant.",
+      "bravo": "Une copie tourne.",
+      "robot": [
+        "On ouvre la boutique avec un premier vendeur. 🏪",
+        "Le vendeur n° 1 s'installe **devant la seule porte** : le port 18511 est à lui.",
+        "👀 Cherche `lab-scale-web-1 Started`."
+      ]
+    },
+    {
+      "titre": "Demander deux copies",
+      "pourquoi": "On demande à Compose une seconde copie du même service. Mais elle veut, elle aussi, le port 18511 de la machine.",
+      "consigne": "Demande deux copies du service `web`.",
+      "commande": "docker compose up -d --scale web=2",
+      "options": [
+        [
+          "--scale web=2",
+          "demande deux copies du service web"
+        ]
+      ],
+      "sortie": " Container lab-scale-web-1 Running\n Container lab-scale-web-2 Creating\n Container lab-scale-web-2 Created\n Container lab-scale-web-2 Starting\nError response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint lab-scale-web-2 (5c3349591b3d1aff4b7ae8e50bba716d89a965944b6ca9feae027aebc21ab44b): Bind for 127.0.0.1:18511 failed: port is already allocated",
+      "remarque": "La fin du message, `port is already allocated`. Un port ne peut appartenir qu'à **un seul** programme : la seconde copie est refusée.",
+      "attendu": "^docker compose up (?=.*(-d|--detach)\\b)(?=.*--scale[ =]web=2)",
+      "indice": "ajoute `--scale web=2` à `docker compose up -d`.",
+      "bravo": "Refusé : le port est déjà pris.",
+      "robot": [
+        "On embauche un second vendeur ! 🧑‍🤝‍🧑",
+        "Problème : il veut se poster **devant la même porte** que le premier. Deux personnes dans un seul encadrement, ça coince.",
+        "👀 Lis la fin du message d'erreur : `port is already allocated`."
+      ]
+    },
+    {
+      "titre": "Une copie qui ne démarre pas",
+      "pourquoi": "On liste tous les conteneurs du projet, même ceux qui ne tournent pas, pour voir ce qu'est devenue la seconde copie.",
+      "consigne": "Liste tous les conteneurs du projet avec leur état.",
+      "commande": "docker compose ps -a --format 'table {{.Name}}\\t{{.Status}}'",
+      "options": [
+        [
+          "-a",
+          "tous les conteneurs, même ceux qui ne tournent pas"
+        ],
+        [
+          "--format 'table ...'",
+          "un tableau avec seulement le nom et l'état"
+        ],
+        [
+          "\\t",
+          "une tabulation entre les colonnes"
+        ]
+      ],
+      "sortie": "NAME              STATUS\nlab-scale-web-1   Up 3 seconds\nlab-scale-web-2   Created",
+      "remarque": "`web-2` est `Created`, jamais démarré. Pour multiplier les copies, il faut **une adresse stable devant elles** qui répartit les visiteurs : dans Kubernetes, c'est le **Service**.",
+      "attendu": "^docker compose ps (?=.*(-a|--all)\\b)",
+      "indice": "n'oublie pas `-a` pour voir aussi les conteneurs qui ne tournent pas.",
+      "bravo": "La seconde copie reste à Created.",
+      "robot": [
+        "Où est passé notre second vendeur ? 🤔",
+        "Il a bien été **embauché** (créé), mais il attend dans le couloir sans pouvoir prendre son poste.",
+        "👀 Compare les deux états : `Up` pour `web-1`, `Created` pour `web-2`."
+      ]
+    },
+    {
+      "titre": "Supprimer les cobayes",
+      "pourquoi": "On supprime les deux conteneurs lancés à la main aux étapes précédentes. `malade` tourne encore, d'où `-f`.",
+      "consigne": "Supprime les conteneurs `crash` et `malade`.",
+      "commande": "docker rm -f crash malade",
+      "options": [
+        [
+          "docker rm",
+          "supprime des conteneurs"
+        ],
+        [
+          "-f",
+          "force : arrête d'abord ceux qui tournent encore (malade)"
+        ]
+      ],
+      "sortie": "crash\nmalade",
+      "remarque": "Docker répète le nom de chaque conteneur supprimé.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b)(?=.*\\bcrash\\b)(?=.*\\bmalade\\b)",
+      "indice": "`docker rm -f` suivi des deux noms, `crash` et `malade`.",
+      "bravo": "crash et malade sont supprimés.",
+      "robot": [
+        "L'heure du rangement a sonné. 🧹",
+        "On débranche la lampe capricieuse et on renvoie le guichetier à la maison.",
+        "👀 Docker te répondra les deux noms, un par ligne."
+      ]
+    },
+    {
+      "titre": "Ranger le projet",
+      "pourquoi": "`down` arrête et supprime les deux copies de `web`, la démarrée comme celle restée à `Created`, puis le réseau du projet.",
+      "consigne": "Arrête et supprime le projet `lab-scale`.",
+      "commande": "docker compose down",
+      "options": [
+        [
+          "down",
+          "arrête et supprime les conteneurs et le réseau du projet"
+        ]
+      ],
+      "sortie": " Container lab-scale-web-1 Stopping\n Container lab-scale-web-2 Stopping\n Container lab-scale-web-2 Stopped\n Container lab-scale-web-2 Removing\n Container lab-scale-web-2 Removed\n Container lab-scale-web-1 Stopped\n Container lab-scale-web-1 Removing\n Container lab-scale-web-1 Removed\n Network lab-scale_default Removing\n Network lab-scale_default Removed",
+      "remarque": "Les **deux** copies sont supprimées, y compris `web-2` qui n'avait jamais démarré, puis le réseau.",
+      "attendu": "^docker compose down$",
+      "bravo": "Le projet est rangé.",
+      "robot": [
+        "On ferme la boutique. 🔒",
+        "Les deux vendeurs rentrent chez eux, celui qui travaillait comme celui qui attendait dans le couloir.",
+        "👀 Repère `Removed` pour `web-1`, `web-2`, puis le réseau."
+      ]
+    },
+    {
+      "titre": "Supprimer le dossier",
+      "pourquoi": "Il ne reste que le dossier du lab et son fichier. On revient au dossier parent et on le supprime.",
+      "consigne": "Remonte d'un dossier et supprime `lab-scale`.",
+      "commande": "cd .. && rm -r lab-scale",
+      "options": [
+        [
+          "cd ..",
+          "remonte au dossier parent"
+        ],
+        [
+          "rm -r lab-scale",
+          "supprime le dossier et son contenu (-r : récursif)"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le dossier a disparu et ton invite est revenue à `~`.",
+      "attendu": "^cd \\.\\. && rm -(r|rf|fr) lab-scale$",
+      "indice": "d'abord `cd ..`, puis `rm -r lab-scale`.",
+      "bravo": "Machine propre.",
+      "robot": [
+        "Dernier geste : on rend la salle de réunion. 🗝️",
+        "Plus de dossier, plus de projet : la machine est comme au début.",
+        "👀 Pas de message : ton invite doit être revenue à `~`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Hello ! **Conti** au rapport, ton guide du jour. 👋",
+    "Mission : pousser Docker dans ses retranchements. Une lampe qui grille, un guichetier malade, deux vendeurs pour une seule porte : on va voir ce qu'il sait faire… et ce qu'il ne sait pas faire.",
+    "Le terminal est un bac à sable : fais planter tout ce que tu veux. On y va ?"
+  ],
+  "robotFin": [
+    "Enquête bouclée, chapeau ! 🎉",
+    "Tu as vu que **redémarrer n'est pas replanifier** (3 relances sur place, puis abandon), qu'un **healthcheck ne répare rien** (malade et toujours servi), et qu'il faut **une adresse stable** devant plusieurs copies.",
+    "Voici ton badge : tu sais maintenant pourquoi on a besoin d'un orchestrateur."
+  ],
+  "badge": "Détective des limites"
+}

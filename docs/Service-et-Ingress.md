@@ -301,6 +301,14 @@ kubectl port-forward pod/demo-web 8080:80   # (1)!
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine simulée avec Minikube et kubectl** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/k8s-service.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 10 minutes. Il te faut un cluster qui tourne : `minikube start --driver=docker`, puis `kubectl get nodes` doit afficher `Ready`. Tu vas lancer trois pods nginx, les mettre derrière un Service et regarder la liste de pods suivre tes changements. Pas de cluster ? Fais la variante Docker en bas de section.
 
 **Étape 1 · Lancer trois pods et leur Service**

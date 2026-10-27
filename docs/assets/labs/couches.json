@@ -1,0 +1,364 @@
+{
+  "titre": "Les couches d'une image",
+  "duree": "10 min",
+  "intro": "Tu vas ouvrir une vraie image, `python:3.12-alpine`, pour voir de quoi elle est faite : ses **couches**, sa **fiche de réglages**, son **tag** et son **digest**. Puis tu vérifieras qu'un conteneur écrit au-dessus sans jamais abîmer l'image.",
+  "conclusion": "Tu as lu 11 lignes d'historique pour seulement 4 couches de fichiers, relevé le digest de l'image, vu `docker diff` marquer `A /note.txt` sans que l'image bouge, et posé un deuxième nom qui partage le même identifiant.",
+  "retour": {
+    "texte": "Retour au cours : Les couches d'une image",
+    "lien": "../../Couches-d-une-image/"
+  },
+  "etapes": [
+    {
+      "titre": "Télécharger une image",
+      "pourquoi": "Avant d'ouvrir une image, il faut l'avoir sur sa machine. `docker pull` la télécharge depuis Docker Hub sans rien lancer : on va pouvoir l'examiner à froid.",
+      "consigne": "Télécharge l'image `python:3.12-alpine`.",
+      "commande": "docker pull python:3.12-alpine",
+      "options": [
+        [
+          "docker pull",
+          "télécharge une image depuis un registre (Docker Hub par défaut), sans créer de conteneur"
+        ],
+        [
+          "python",
+          "le nom de l'image (son dépôt)"
+        ],
+        [
+          "3.12-alpine",
+          "le tag : Python 3.12 sur une base Alpine Linux, très légère"
+        ]
+      ],
+      "sortie": "3.12-alpine: Pulling from library/python\nDigest: sha256:5789aa194f757888f41fa3d48e14b6feaa1b57c0af0b56fcb1372d6474d3bff0\nStatus: Image is up to date for python:3.12-alpine\ndocker.io/library/python:3.12-alpine",
+      "remarque": "La ligne **Digest** est l'empreinte exacte du contenu reçu, et la dernière ligne le nom complet (registre `docker.io`, dépôt `library/python`, tag `3.12-alpine`). Si l'image n'était pas encore là, des lignes `Pull complete` s'affichent avant, une par couche.",
+      "attendu": "^docker (image )?pull python:3\\.12-alpine$",
+      "indice": "le nom et le tag sont collés par deux-points : `python:3.12-alpine`.",
+      "bravo": "L'image est dans ton stockage local.",
+      "robot": [
+        "On commence par aller chercher une image toute prête : **Python 3.12** sur Alpine.",
+        "C'est comme commander un livre : le **tag** est le titre sur la couverture, le **digest** le numéro unique imprimé à l'intérieur.",
+        "👀 Repère la ligne `Digest: sha256:…`, puis le nom complet `docker.io/library/python:3.12-alpine`."
+      ]
+    },
+    {
+      "titre": "Lire l'historique",
+      "pourquoi": "Chaque image garde la trace de sa fabrication, étape par étape. En affichant seulement l'instruction et le poids ajouté, on voit d'un coup d'œil ce qui produit des fichiers et ce qui n'est qu'un réglage.",
+      "consigne": "Affiche l'historique de `python:3.12-alpine`, réduit à deux colonnes.",
+      "commande": "docker image history --format 'table {{.CreatedBy}}\\t{{.Size}}' python:3.12-alpine",
+      "options": [
+        [
+          "docker image history",
+          "liste les étapes de fabrication de l'image, la plus récente en haut"
+        ],
+        [
+          "--format 'table …'",
+          "choisit les colonnes à afficher, sous forme de tableau"
+        ],
+        [
+          "{{.CreatedBy}}",
+          "l'instruction qui a produit la ligne"
+        ],
+        [
+          "{{.Size}}",
+          "le poids de fichiers ajouté par cette ligne"
+        ],
+        [
+          "\\t",
+          "une tabulation entre les deux colonnes"
+        ]
+      ],
+      "sortie": "CREATED BY                                      SIZE\nCMD [\"python3\"]                                 0B\nRUN /bin/sh -c set -eux;  for src in idle3 p…   16.4kB\nRUN /bin/sh -c set -eux;   apk add --no-cach…   44.1MB\nENV PYTHON_SHA256=b5796915dc45ff745cfb4e990a…   0B\nENV PYTHON_VERSION=3.12.16                      0B\nENV GPG_KEY=7169605F62C751356D054A26A821E680…   0B\nRUN /bin/sh -c set -eux;  apk add --no-cache…   2.81MB\nENV LANG=C.UTF-8                                0B\nENV PATH=/usr/local/bin:/usr/local/sbin:/usr…   0B\nCMD [\"/bin/sh\"]                                 0B\nADD alpine-minirootfs-3.24.3-x86_64.tar.gz /…   9.08MB",
+      "remarque": "Sur 11 lignes, seules **4** pèsent plus que `0B` (les trois `RUN` et l'`ADD`). Les `ENV` et `CMD` ne sont que des réglages. La plus lourde, 44,1 Mo, installe Python ; tout en bas, l'`ADD` pose le système Alpine.",
+      "attendu": "^docker (image )?history (?=.*--format).*python:3\\.12-alpine$",
+      "indice": "recopie le `--format` entre apostrophes tel quel, puis le nom de l'image en dernier.",
+      "bravo": "Tu as lu la pile de haut en bas.",
+      "robot": [
+        "On ouvre le carnet de fabrication de l'image. 📖",
+        "Pense à des **calques transparents** empilés : chaque ligne est un calque, avec seulement ce qu'il ajoute.",
+        "👀 Regarde la colonne **SIZE** : beaucoup de `0B`, et une seule ligne vraiment lourde."
+      ]
+    },
+    {
+      "titre": "Compter les couches",
+      "pourquoi": "L'historique a 11 lignes, mais combien de vraies couches de fichiers ? `docker image inspect` lit la description complète de l'image, et `-f` permet d'en extraire un seul chiffre.",
+      "consigne": "Affiche le nombre de couches de fichiers de `python:3.12-alpine`.",
+      "commande": "docker image inspect -f '{{len .RootFS.Layers}} couches' python:3.12-alpine",
+      "options": [
+        [
+          "docker image inspect",
+          "affiche la description complète d'une image"
+        ],
+        [
+          "-f '…'",
+          "n'en garde qu'un morceau, choisi par un modèle entre accolades"
+        ],
+        [
+          "{{len .RootFS.Layers}}",
+          "compte les couches de fichiers de l'image"
+        ]
+      ],
+      "sortie": "4 couches",
+      "remarque": "4**, autant que de lignes non nulles à l'étape précédente. Une ligne d'historique n'est donc pas forcément une couche.",
+      "attendu": "^docker (image )?inspect (?=.*(-f|--format)).*RootFS\\.Layers.*python:3\\.12-alpine$",
+      "indice": "garde `-f` suivi du modèle entre apostrophes, puis le nom de l'image.",
+      "bravo": "4 couches de fichiers, pas 11.",
+      "robot": [
+        "Maintenant, on compte les calques qui contiennent vraiment des fichiers.",
+        "C'est comme compter les étages d'un immeuble, pas les panneaux accrochés dans l'escalier : les réglages ne sont pas des étages.",
+        "👀 Compare ce chiffre avec les lignes différentes de `0B` de l'étape 2."
+      ]
+    },
+    {
+      "titre": "Lire la fiche de réglages",
+      "pourquoi": "À côté des couches, l'image porte une fiche de configuration : la commande lancée par défaut, l'utilisateur, les variables. On en lit deux champs.",
+      "consigne": "Affiche la commande par défaut et l'utilisateur de l'image.",
+      "commande": "docker image inspect -f 'Cmd={{.Config.Cmd}} User=\"{{.Config.User}}\"' python:3.12-alpine",
+      "options": [
+        [
+          "{{.Config.Cmd}}",
+          "la commande lancée par défaut au démarrage d'un conteneur"
+        ],
+        [
+          "{{.Config.User}}",
+          "l'utilisateur sous lequel tourne le programme"
+        ],
+        [
+          "User=\"…\"",
+          "les guillemets rendent visible une valeur vide"
+        ]
+      ],
+      "sortie": "Cmd=[python3] User=\"\"",
+      "remarque": "Un `User` vide veut dire **root**, l'administrateur. Ces réglages ne pèsent aucun octet de fichiers : ils sont dans la fiche, pas dans les couches.",
+      "attendu": "^docker (image )?inspect (?=.*Config\\.Cmd)(?=.*Config\\.User).*python:3\\.12-alpine$",
+      "indice": "recopie tout le modèle entre apostrophes, guillemets compris, puis le nom de l'image.",
+      "bravo": "Tu sais lire la fiche de réglages.",
+      "robot": [
+        "Après les calques, la **fiche de réglages** de l'image.",
+        "C'est la notice collée sur le carton : « à l'ouverture, lancer python3 », « qui s'en sert ».",
+        "👀 Regarde ce qu'il y a entre les guillemets après `User=` : rien du tout."
+      ]
+    },
+    {
+      "titre": "Relever le digest",
+      "pourquoi": "Le digest est l'empreinte calculée sur le contenu de l'image. C'est lui, et non le tag, qui permet de vérifier que deux personnes ont exactement la même image.",
+      "consigne": "Affiche le premier digest connu pour `python:3.12-alpine`.",
+      "commande": "docker image inspect -f '{{index .RepoDigests 0}}' python:3.12-alpine",
+      "options": [
+        [
+          "{{index .RepoDigests 0}}",
+          "le premier élément de la liste des digests de l'image"
+        ]
+      ],
+      "sortie": "python@sha256:5789aa194f757888f41fa3d48e14b6feaa1b57c0af0b56fcb1372d6474d3bff0",
+      "remarque": "C'est le même `sha256:5789aa19…` qu'à l'étape 1. Cette empreinte est **fixe** : un seul octet changé, et elle change. Le tag, lui, peut être déplacé vers un autre contenu.",
+      "attendu": "^docker (image )?inspect (?=.*RepoDigests).*python:3\\.12-alpine$",
+      "indice": "le modèle s'écrit `'{{index .RepoDigests 0}}'`, entre apostrophes.",
+      "bravo": "Tu as l'empreinte exacte de l'image.",
+      "robot": [
+        "Dernier détail d'identité : l'**empreinte digitale** de l'image. 🔍",
+        "Le tag est une étiquette qu'on peut décoller ; le digest est l'empreinte de ce qu'il y a dans le carton.",
+        "👀 Vérifie qu'il est identique au digest affiché par `docker pull`."
+      ]
+    },
+    {
+      "titre": "Écrire dans un conteneur",
+      "pourquoi": "Un conteneur peut écrire des fichiers, mais où vont-ils ? On lance un conteneur `demo` qui crée `/note.txt`, puis on regardera si l'image a changé.",
+      "consigne": "Lance un conteneur `demo` qui écrit « bonjour » dans `/note.txt`.",
+      "commande": "docker run --name demo python:3.12-alpine sh -c 'echo bonjour > /note.txt'",
+      "options": [
+        [
+          "docker run",
+          "crée un conteneur à partir de l'image et le démarre"
+        ],
+        [
+          "--name demo",
+          "un nom facile à retenir, pour le retrouver ensuite"
+        ],
+        [
+          "python:3.12-alpine",
+          "l'image de départ"
+        ],
+        [
+          "sh -c '…'",
+          "remplace la commande par défaut par un petit script"
+        ],
+        [
+          "echo bonjour > /note.txt",
+          "écrit le mot « bonjour » dans un nouveau fichier"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le conteneur a écrit son fichier, puis s'est arrêté. Il existe toujours, à l'arrêt, avec sa propre **couche inscriptible**.",
+      "attendu": "^docker run (?=.*--name[ =]demo\\b).*python:3\\.12-alpine sh -c .*note\\.txt",
+      "indice": "il faut `--name demo` avant l'image, puis `sh -c '…'` après.",
+      "bravo": "Le conteneur a écrit son fichier.",
+      "robot": [
+        "Place à l'expérience : un conteneur va **écrire** un fichier.",
+        "Le conteneur reçoit une feuille de papier calque vierge posée sur le dessin : il ne dessine **que** dessus.",
+        "👀 Le terminal te rend la main sans rien dire : c'est normal, le conteneur a fini son travail."
+      ]
+    },
+    {
+      "titre": "Ce que le conteneur a changé",
+      "pourquoi": "`docker diff` compare la couche du conteneur à son image et liste les différences. C'est le moyen le plus direct de voir où sont passées ses écritures.",
+      "consigne": "Liste les changements faits par le conteneur `demo`.",
+      "commande": "docker diff demo",
+      "options": [
+        [
+          "docker diff",
+          "liste les fichiers ajoutés (`A`), modifiés (`C`) ou supprimés (`D`) dans la couche du conteneur"
+        ],
+        [
+          "demo",
+          "le conteneur à examiner"
+        ]
+      ],
+      "sortie": "A /note.txt",
+      "remarque": "`A` veut dire ajouté. Ce fichier n'existe que dans la couche du conteneur `demo`, pas dans l'image.",
+      "attendu": "^docker (container )?diff demo$",
+      "bravo": "Un seul fichier ajouté, dans sa couche à lui.",
+      "robot": [
+        "Voyons ce que `demo` a griffonné sur son calque.",
+        "`docker diff`, c'est comparer le cahier d'un élève avec le manuel : on ne voit que ce qu'il a ajouté à la main.",
+        "👀 La lettre devant le chemin dit ce qui s'est passé : `A` pour ajouté."
+      ]
+    },
+    {
+      "titre": "L'image n'a pas bougé",
+      "pourquoi": "Si l'image avait été modifiée, un nouveau conteneur trouverait `note.txt`. On en lance un, jetable, qui essaie de le lire.",
+      "consigne": "Lance un conteneur jetable qui lit `/note.txt`.",
+      "commande": "docker run --rm python:3.12-alpine cat /note.txt",
+      "options": [
+        [
+          "--rm",
+          "supprime ce conteneur dès qu'il a fini"
+        ],
+        [
+          "cat /note.txt",
+          "essaie d'afficher le contenu du fichier"
+        ]
+      ],
+      "sortie": "cat: can't open '/note.txt': No such file or directory",
+      "remarque": "Le nouveau conteneur part de l'image **intacte**, le fichier de `demo` n'y est pas. Chaque conteneur écrit chez lui : c'est la **copie à l'écriture**.",
+      "attendu": "^docker run (?=.*--rm\\b).*python:3\\.12-alpine cat /note\\.txt$",
+      "indice": "l'option `--rm` se place avant le nom de l'image, la commande `cat /note.txt` après.",
+      "bravo": "L'image est restée intacte.",
+      "robot": [
+        "Et maintenant, un **nouveau** conteneur cherche ce fameux fichier.",
+        "Comme une photocopie neuve du manuel : les notes de l'élève précédent n'y figurent pas.",
+        "👀 Attends-toi à une erreur « No such file » : c'est justement la preuve qu'on cherche."
+      ]
+    },
+    {
+      "titre": "Donner un deuxième nom",
+      "pourquoi": "Un tag n'est qu'une étiquette. `docker image tag` en ajoute une sur une image existante, sans rien copier ni reconstruire.",
+      "consigne": "Ajoute le nom `demo:essai` à l'image `python:3.12-alpine`.",
+      "commande": "docker image tag python:3.12-alpine demo:essai",
+      "options": [
+        [
+          "docker image tag",
+          "ajoute un nom à une image existante"
+        ],
+        [
+          "python:3.12-alpine",
+          "l'image source"
+        ],
+        [
+          "demo:essai",
+          "le nouveau nom : dépôt `demo`, tag `essai`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : aucun fichier n'a été copié, Docker a seulement ajouté une étiquette.",
+      "attendu": "^docker (image )?tag python:3\\.12-alpine demo:essai$",
+      "indice": "d'abord le nom existant, puis le nouveau : `python:3.12-alpine demo:essai`.",
+      "bravo": "Nouvelle étiquette posée.",
+      "robot": [
+        "On colle une deuxième étiquette sur la même image. 🏷️",
+        "C'est comme donner un surnom à un ami : la personne ne change pas, elle a juste deux noms.",
+        "👀 Silence total : pas de téléchargement, pas de copie."
+      ]
+    },
+    {
+      "titre": "Deux noms, une image",
+      "pourquoi": "On liste les deux noms côte à côte pour vérifier qu'ils désignent bien la même image.",
+      "consigne": "Liste seulement les images nommées `python:3.12-alpine` ou `demo:essai`.",
+      "commande": "docker image ls --filter reference=python:3.12-alpine --filter reference=demo:essai",
+      "options": [
+        [
+          "docker image ls",
+          "liste les images présentes sur la machine"
+        ],
+        [
+          "--filter reference=…",
+          "ne garde que les images qui portent ce nom ; deux filtres : l'un ou l'autre"
+        ]
+      ],
+      "sortie": "IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA\npython:3.12-alpine   5789aa194f75       74.7MB         18.7MB   U\ndemo:essai           5789aa194f75       74.7MB         18.7MB   U",
+      "remarque": "Le **même ID** sur les deux lignes, qui commence comme le digest de l'étape 5. Une seule image, deux étiquettes : elle ne pèse pas deux fois 74,7 Mo. Le `U` signale qu'un conteneur (`demo`) l'utilise.",
+      "attendu": "^docker (image ls|images) (?=.*reference=python:3\\.12-alpine)(?=.*reference=demo:essai)",
+      "indice": "il faut deux `--filter reference=…`, un pour chaque nom.",
+      "bravo": "Deux noms, un seul identifiant.",
+      "robot": [
+        "Vérifions que nos deux noms désignent bien la même chose.",
+        "Deux étiquettes sur un seul carton : ouvrir l'un, c'est ouvrir l'autre.",
+        "👀 Compare la colonne **ID** des deux lignes."
+      ]
+    },
+    {
+      "titre": "Supprimer le conteneur",
+      "pourquoi": "Le conteneur `demo` est arrêté mais existe encore, avec sa couche inscriptible. On le supprime.",
+      "consigne": "Supprime le conteneur `demo`.",
+      "commande": "docker rm demo",
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur arrêté"
+        ]
+      ],
+      "sortie": "demo",
+      "remarque": "La couche du conteneur disparaît avec lui, `note.txt` compris. L'image, elle, n'a pas bougé.",
+      "attendu": "^docker (container )?rm (-f )?demo$",
+      "bravo": "Conteneur supprimé.",
+      "robot": [
+        "On range le labo, en commençant par le conteneur. 🧹",
+        "On jette la feuille de calque griffonnée : le dessin du dessous reste intact.",
+        "👀 Docker te répond simplement le nom du conteneur supprimé."
+      ]
+    },
+    {
+      "titre": "Retirer le deuxième nom",
+      "pourquoi": "Retirer un nom n'efface les fichiers que si c'était le dernier. Ici, `python:3.12-alpine` reste : on le garde pour la suite du parcours.",
+      "consigne": "Retire l'étiquette `demo:essai`.",
+      "commande": "docker image rm demo:essai",
+      "options": [
+        [
+          "docker image rm",
+          "retire un nom ; l'image n'est supprimée qu'au dernier nom retiré"
+        ],
+        [
+          "demo:essai",
+          "le nom à retirer"
+        ]
+      ],
+      "sortie": "Untagged: demo:essai",
+      "remarque": "Seulement `Untagged`, pas de `Deleted`. Les fichiers restent, puisque `python:3.12-alpine` les utilise encore.",
+      "attendu": "^docker (image rm|rmi) demo:essai$",
+      "bravo": "Étiquette retirée, image conservée.",
+      "robot": [
+        "Dernier geste : on décolle l'étiquette `demo:essai`.",
+        "Décoller une étiquette ne vide pas le carton, tant qu'il en porte une autre.",
+        "👀 Cherche le mot `Untagged`, et remarque l'absence de `Deleted`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Coucou, c'est **Conti** ! Aujourd'hui, je t'emmène en fouilles. 🔎",
+    "Notre site de fouilles : l'image `python:3.12-alpine`. On va dégager ses **couches** une à une, lire sa fiche d'identité et relever son **empreinte**.",
+    "Le terminal de gauche est un bac à sable : creuse autant que tu veux, rien ne s'effondre."
+  ],
+  "robotFin": [
+    "Bravo, tu as démonté une image pièce par pièce ! 🎉",
+    "Tu as vu les **couches** en lecture seule, la **fiche de réglages** à 0 octet, le **tag** qui se déplace, le **digest** qui ne bouge jamais et la **copie à l'écriture** du conteneur.",
+    "Voici ton badge d'archéologue. Garde `python:3.12-alpine` sous le coude, on s'en ressert bientôt !"
+  ],
+  "badge": "Archéologue des couches"
+}

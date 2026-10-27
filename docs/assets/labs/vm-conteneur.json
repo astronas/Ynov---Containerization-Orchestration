@@ -1,0 +1,312 @@
+{
+  "titre": "Un noyau pour tous",
+  "duree": "10 min",
+  "intro": "Tu vas vérifier par toi-même qu'un conteneur ne démarre aucun noyau : il emprunte celui de ton ordinateur. Puis tu verras qu'un conteneur, vu depuis l'hôte, n'est qu'un programme de plus dans la liste.",
+  "conclusion": "Le conteneur Alpine affiche ses propres fichiers (`Alpine Linux v3.22`) mais le même noyau que l'hôte, il démarre et disparaît en moins d'une seconde, et nginx apparaît côté hôte comme un programme ordinaire avec son PID.",
+  "retour": {
+    "texte": "Retour au cours : Machine virtuelle ou conteneur",
+    "lien": "../../Machine-virtuelle-ou-conteneur/"
+  },
+  "etapes": [
+    {
+      "titre": "Quelle distribution ?",
+      "pourquoi": "Le fichier `/etc/os-release` décrit la distribution installée (Ubuntu, Debian, Alpine…). On commence par regarder celle de ton ordinateur, pour avoir un point de comparaison.",
+      "consigne": "Affiche la ligne `PRETTY_NAME` du fichier `/etc/os-release` de ton ordinateur.",
+      "commande": "grep PRETTY /etc/os-release",
+      "options": [
+        [
+          "grep PRETTY",
+          "ne garde que les lignes qui contiennent « PRETTY »"
+        ],
+        [
+          "/etc/os-release",
+          "le fichier qui décrit la distribution : son nom lisible est sur la ligne `PRETTY_NAME`"
+        ]
+      ],
+      "sortie": "PRETTY_NAME=\"Ubuntu 26.04 LTS\"",
+      "remarque": "Ici l'ordinateur hôte est un **Ubuntu 26.04** (le tien peut être différent). Ce fichier dit d'où viennent les fichiers du système, pas quel noyau tourne.",
+      "attendu": "^grep PRETTY /etc/os-release",
+      "bravo": "Tu connais la distribution de ton ordinateur.",
+      "robot": [
+        "On commence l'enquête par chez toi : quel système fait tourner ton ordinateur ?",
+        "`/etc/os-release`, c'est l'**étiquette sur la boîte** : elle dit de quelle marque sont les outils rangés dedans.",
+        "👀 Note bien le nom entre guillemets, on va le comparer tout à l'heure."
+      ]
+    },
+    {
+      "titre": "Quel noyau ?",
+      "pourquoi": "Le noyau est le cœur du système, celui qui pilote le processeur et la mémoire. `uname -r` donne la version de celui qui tourne **vraiment** en ce moment.",
+      "consigne": "Affiche la version du noyau de ton ordinateur.",
+      "commande": "uname -r",
+      "options": [
+        [
+          "uname",
+          "affiche des informations sur le noyau en marche"
+        ],
+        [
+          "-r",
+          "seulement sa version (release)"
+        ]
+      ],
+      "sortie": "6.18.33.2-microsoft-standard-WSL2",
+      "remarque": "Ce noyau est celui de **WSL 2**, le Linux intégré à Windows. Retiens bien cette valeur : c'est elle qu'on va traquer dans le conteneur.",
+      "bravo": "Tu as noté la version de ton noyau.",
+      "robot": [
+        "Deuxième indice : le **noyau** qui tourne sous ton système.",
+        "Si les distributions sont des ouvriers avec leurs outils, le noyau est le **chef d'atelier** : c'est lui qui fait tourner les machines.",
+        "👀 Recopie mentalement cette longue version : elle va réapparaître."
+      ]
+    },
+    {
+      "titre": "Même question dans Alpine",
+      "pourquoi": "On pose exactement les deux mêmes questions, mais **dans** un conteneur fait avec l'image Alpine. Si l'image apportait son noyau, la version changerait.",
+      "consigne": "Lance un conteneur jetable `alpine:3.22` qui affiche sa distribution puis son noyau.",
+      "commande": "docker run --rm alpine:3.22 sh -c 'grep PRETTY /etc/os-release; uname -r'",
+      "options": [
+        [
+          "docker run --rm",
+          "crée et lance un conteneur, supprimé dès qu'il a fini"
+        ],
+        [
+          "alpine:3.22",
+          "une image Linux très légère"
+        ],
+        [
+          "sh -c '…'",
+          "fait exécuter la phrase entre apostrophes par le shell du conteneur"
+        ],
+        [
+          "grep PRETTY /etc/os-release; uname -r",
+          "les deux commandes de tout à l'heure, l'une après l'autre (le `;` les sépare)"
+        ]
+      ],
+      "sortie": "PRETTY_NAME=\"Alpine Linux v3.22\"\n6.18.33.2-microsoft-standard-WSL2",
+      "remarque": "La distribution devient **Alpine**, mais le noyau est **exactement le même** que sur ton ordinateur. Une image apporte des fichiers, jamais de noyau.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b).*alpine:3\\.22 sh -c .*os-release.*uname -r",
+      "indice": "les deux commandes doivent être entre apostrophes après `sh -c`, séparées par `;`.",
+      "bravo": "Autre distribution, même noyau.",
+      "robot": [
+        "Et maintenant, le tour de passe-passe : on pose les mêmes questions dans un conteneur. 🎩",
+        "C'est un **appartement** dans ton immeuble : la déco est différente, mais la **chaudière** est celle de tout le bâtiment.",
+        "👀 Compare la deuxième ligne avec l'étape précédente : elle doit être identique au caractère près."
+      ]
+    },
+    {
+      "titre": "Où tourne le moteur ?",
+      "pourquoi": "La commande `docker` n'est qu'une télécommande : elle pilote un moteur. On lui demande sur quel système et quel noyau ce moteur tourne.",
+      "consigne": "Affiche le système et le noyau du moteur Docker.",
+      "commande": "docker info --format '{{.OperatingSystem}} / {{.KernelVersion}}'",
+      "options": [
+        [
+          "docker info",
+          "décrit le moteur Docker"
+        ],
+        [
+          "--format '{{.OperatingSystem}} / {{.KernelVersion}}'",
+          "ne garde que son système et la version de son noyau"
+        ]
+      ],
+      "sortie": "Ubuntu 26.04 LTS / 6.18.33.2-microsoft-standard-WSL2",
+      "remarque": "Le moteur tourne dans Ubuntu, sur le noyau de WSL 2. C'est **ce noyau-là** que partagent tous les conteneurs, pas celui de Windows.",
+      "attendu": "^docker (system )?info (?=.*--format).*(OperatingSystem|KernelVersion)",
+      "indice": "il faut `--format` suivi du modèle entre apostrophes : `'{{.OperatingSystem}} / {{.KernelVersion}}'`.",
+      "bravo": "Tu sais où tourne le moteur.",
+      "robot": [
+        "On remonte à la source : où vit le **moteur** Docker ?",
+        "La commande `docker` est une **télécommande** ; on regarde au dos de la télé pour lire son modèle.",
+        "👀 Le noyau affiché après le `/` doit être, encore une fois, le même que le tien."
+      ]
+    },
+    {
+      "titre": "Pour quel processeur ?",
+      "pourquoi": "Une image dépend aussi du type de processeur (l'architecture). On regarde pour quel système et quelle architecture est faite l'image Alpine téléchargée.",
+      "consigne": "Affiche le système et l'architecture de l'image `alpine:3.22`.",
+      "commande": "docker image inspect --format '{{.Os}}/{{.Architecture}}' alpine:3.22",
+      "options": [
+        [
+          "docker image inspect",
+          "lit la fiche technique d'une image"
+        ],
+        [
+          "--format '{{.Os}}/{{.Architecture}}'",
+          "n'en garde que le système et l'architecture du processeur"
+        ],
+        [
+          "alpine:3.22",
+          "l'image à examiner"
+        ]
+      ],
+      "sortie": "linux/amd64",
+      "remarque": "`linux/amd64`, une image Linux pour les processeurs de la plupart des PC. Sur un Mac à puce ARM, Docker aurait téléchargé la version `arm64` du même nom.",
+      "attendu": "^docker (image )?inspect (?=.*--format|.*-f\\b).*Architecture.*alpine:3\\.22",
+      "indice": "pense à `--format '{{.Os}}/{{.Architecture}}'`, puis le nom de l'image `alpine:3.22` en dernier.",
+      "bravo": "Image Linux pour processeur amd64.",
+      "robot": [
+        "Petit détour par la fiche technique de l'image. 🔧",
+        "Une image, c'est comme une **prise électrique** : elle doit correspondre au pays, ici au type de processeur.",
+        "👀 Lis les deux mots séparés par `/` : le système, puis l'architecture."
+      ]
+    },
+    {
+      "titre": "Chronométrer un conteneur",
+      "pourquoi": "Sans système à démarrer, un conteneur est très rapide. `time` chronomètre un conteneur complet : créé, démarré, arrêté et supprimé. `true` est un programme qui ne fait rien et s'arrête aussitôt.",
+      "consigne": "Chronomètre un conteneur jetable `alpine:3.22` qui lance `true`.",
+      "commande": "time docker run --rm alpine:3.22 true",
+      "options": [
+        [
+          "time",
+          "chronomètre la commande qui suit"
+        ],
+        [
+          "docker run --rm",
+          "crée, lance puis supprime un conteneur"
+        ],
+        [
+          "true",
+          "un programme qui ne fait rien et s'arrête tout de suite"
+        ]
+      ],
+      "sortie": "\nreal\t0m0.669s\nuser\t0m0.036s\nsys\t0m0.023s",
+      "remarque": "Regarde la ligne `real`, le temps réel écoulé : **moins d'une seconde** pour toute la vie d'un conteneur (le tien sera différent). Une VM met des dizaines de secondes rien que pour démarrer.",
+      "attendu": "^time docker (container )?run (?=.*--rm\\b).*alpine:3\\.22 true",
+      "indice": "commence par `time`, puis la commande `docker run --rm alpine:3.22 true`.",
+      "bravo": "Moins d'une seconde, chrono en main.",
+      "robot": [
+        "À vos marques, prêts… chronométrez ! ⏱️",
+        "Une VM, c'est construire une **maison** avant d'y entrer ; un conteneur, c'est pousser la porte d'un appartement déjà chauffé.",
+        "👀 Seule la ligne **real** compte : c'est le temps que tu as réellement attendu."
+      ]
+    },
+    {
+      "titre": "Lancer un témoin",
+      "pourquoi": "Pour voir un conteneur depuis l'hôte, il en faut un qui reste en marche. Un serveur web nginx fait l'affaire : il tourne sans fin.",
+      "consigne": "Lance nginx en arrière-plan, dans un conteneur nommé `temoin`.",
+      "commande": "docker run -d --name temoin nginx:stable",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan : le terminal te rend la main"
+        ],
+        [
+          "--name temoin",
+          "le nom du conteneur"
+        ],
+        [
+          "nginx:stable",
+          "l'image du serveur web nginx"
+        ]
+      ],
+      "sortie": "d9c9f81c873fc5357ca6f693ec9ab541f2373be90ee3c59fe9355c7383317830",
+      "remarque": "Docker répond par l'identifiant du conteneur (le tien sera différent). Si l'image n'est pas encore là, des lignes « Pull complete » s'affichent d'abord.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]temoin\\b).*nginx",
+      "indice": "vérifie `-d` et `--name temoin`, puis l'image `nginx:stable` en dernier.",
+      "bravo": "Le témoin tourne.",
+      "robot": [
+        "On a besoin d'un cobaye qui reste éveillé : place à **nginx** !",
+        "C'est notre **témoin**, comme le bâton d'un relais : on va le suivre du conteneur jusqu'à l'hôte.",
+        "👀 Un long identifiant doit s'afficher : le témoin est en piste."
+      ]
+    },
+    {
+      "titre": "Son numéro côté hôte",
+      "pourquoi": "Sur l'ordinateur, chaque programme a un numéro, son PID. On demande à Docker le numéro du programme principal du conteneur, **vu depuis l'hôte**.",
+      "consigne": "Affiche le PID du conteneur `temoin`.",
+      "commande": "docker inspect --format '{{.State.Pid}}' temoin",
+      "options": [
+        [
+          "docker inspect",
+          "lit la fiche technique d'un conteneur"
+        ],
+        [
+          "--format '{{.State.Pid}}'",
+          "n'en garde que le numéro de son programme principal sur l'hôte"
+        ],
+        [
+          "temoin",
+          "le conteneur à examiner"
+        ]
+      ],
+      "sortie": "258268",
+      "remarque": "Un simple nombre (le tien sera différent) : c'est le numéro sous lequel ton ordinateur connaît ce programme. Dans le conteneur, ce même programme se croit n° 1.",
+      "attendu": "^docker (container )?inspect (?=.*(--format|-f)\\b).*State\\.Pid.*temoin",
+      "indice": "il faut `--format '{{.State.Pid}}'`, puis le nom `temoin`.",
+      "bravo": "Tu as le PID du conteneur sur l'hôte.",
+      "robot": [
+        "Le conteneur a un nom pour Docker. Mais quel est son numéro pour ton ordinateur ?",
+        "C'est comme un employé qui a un surnom dans son équipe et un **numéro de badge** à l'accueil de l'immeuble. 🪪",
+        "👀 Note ce nombre : on va le chercher dans la liste des programmes de l'hôte."
+      ]
+    },
+    {
+      "titre": "Un programme comme un autre",
+      "pourquoi": "`ps` liste les programmes de l'ordinateur. On ne lui demande que celui dont le numéro vient de Docker : s'il apparaît, c'est que le conteneur n'est qu'un programme ordinaire de l'hôte.",
+      "consigne": "Affiche, avec `ps`, le programme dont le PID est celui du conteneur `temoin`.",
+      "commande": "ps -o pid,cmd -p $(docker inspect --format '{{.State.Pid}}' temoin)",
+      "options": [
+        [
+          "ps",
+          "liste des programmes de l'ordinateur"
+        ],
+        [
+          "-o pid,cmd",
+          "afficher le numéro et la ligne de commande"
+        ],
+        [
+          "-p …",
+          "seulement le programme dont on donne le numéro"
+        ],
+        [
+          "$( … )",
+          "remplace ce morceau par la réponse de la commande qu'il contient : le PID du conteneur"
+        ]
+      ],
+      "sortie": "    PID CMD\n 258268 nginx: master process nginx -g daemon off;",
+      "remarque": "Nginx est là, parmi les programmes de ton ordinateur, avec le même numéro. **Un conteneur n'est pas une machine** : c'est un programme de l'hôte, isolé.",
+      "attendu": "^ps (?=.*-o ?pid,cmd)(?=.*-p).*State\\.Pid.*temoin",
+      "indice": "vérifie `-o pid,cmd` et `-p $(docker inspect --format '{{.State.Pid}}' temoin)`.",
+      "bravo": "Le conteneur est un simple programme de l'hôte.",
+      "robot": [
+        "Dernière pièce du puzzle : on cherche le témoin dans la foule des programmes de l'hôte. 🔎",
+        "C'est l'**annuaire de l'immeuble** : notre locataire y figure comme tous les autres, avec son numéro.",
+        "👀 Lis la colonne **CMD** : c'est bien nginx, sous le numéro de l'étape précédente."
+      ]
+    },
+    {
+      "titre": "Faire le ménage",
+      "pourquoi": "Le témoin tourne toujours : on le supprime. Les conteneurs des étapes précédentes sont déjà partis tout seuls grâce à `--rm`.",
+      "consigne": "Supprime le conteneur `temoin`.",
+      "commande": "docker rm -f temoin",
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur"
+        ],
+        [
+          "-f",
+          "l'arrête d'abord s'il tourne"
+        ]
+      ],
+      "sortie": "temoin",
+      "remarque": "Docker répète le nom du conteneur supprimé : il ne reste rien de ce lab.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b).*temoin",
+      "indice": "le conteneur tourne : ajoute `-f`.",
+      "bravo": "Machine propre.",
+      "robot": [
+        "Le témoin a bien travaillé, on le libère. 🧹",
+        "On rend les clés de l'appartement : l'immeuble et sa chaudière, eux, restent en place.",
+        "👀 Docker te répondra `temoin`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Hello ! Je suis **Conti**, et aujourd'hui je joue les détectives avec toi. 🕵️",
+    "Notre mission : démasquer le **noyau** caché derrière un conteneur, et prouver qu'un conteneur n'est qu'un programme de ton ordinateur.",
+    "Pas de stress : ce terminal est un bac à sable, tu peux tout essayer."
+  ],
+  "robotFin": [
+    "Affaire résolue, bravo ! 🎉",
+    "Tu as prouvé qu'une image apporte ses **fichiers** mais jamais de **noyau**, qu'un conteneur démarre en **moins d'une seconde**, et qu'il n'est qu'un **processus** de l'hôte.",
+    "Voici ton badge de fin d'enquête !"
+  ],
+  "badge": "Chasseur de noyau"
+}

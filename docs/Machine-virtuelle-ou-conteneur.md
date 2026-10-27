@@ -205,6 +205,14 @@ Mais une image ne contient pas tout. Pour tourner, elle dépend aussi d'un **noy
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/vm-conteneur.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Cinq étapes, environ 5 minutes. Tu vas vérifier par toi-même que tes conteneurs utilisent le noyau de ton ordinateur, et qu'un conteneur n'est qu'un programme de plus. Tape les commandes dans le terminal où tu utilises `docker` (Ubuntu sous Windows).
 
 **Étape 1 · Regarder ton ordinateur**

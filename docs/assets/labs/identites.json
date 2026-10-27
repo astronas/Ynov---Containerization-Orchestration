@@ -1,0 +1,355 @@
+{
+  "titre": "Identités et capabilities",
+  "duree": "10 min",
+  "intro": "Tu vas regarder sous quel utilisateur tournent vraiment les programmes d'Apache, lire les pouvoirs (capabilities) que Docker laisse à root, tomber dans le piège du « tout retirer », puis trouver le réglage juste : seulement les deux clés utiles, et aucun gain de droits possible.",
+  "conclusion": "Par défaut, le maître Apache est root avec 14 capabilities (`a80425fb`). Avec `--cap-drop ALL`, tous ses programmes sont restés root ; avec `SETUID`, `SETGID` et `no-new-privileges`, les workers sont repassés en `www-data`, le maître ne garde que `c0` et `NoNewPrivs` vaut 1.",
+  "retour": {
+    "texte": "Retour au cours : Identités, privilèges et capabilities",
+    "lien": "../../Identites-et-privileges/"
+  },
+  "etapes": [
+    {
+      "titre": "Lancer Apache tel quel",
+      "pourquoi": "On part de l'image officielle PHP + Apache, sans aucun réglage de sécurité. C'est notre point de comparaison.",
+      "consigne": "Lance `php:8.4-apache` en arrière-plan, dans un conteneur nommé `web`.",
+      "commande": "docker run -d --name web php:8.4-apache",
+      "options": [
+        [
+          "-d",
+          "en arrière-plan"
+        ],
+        [
+          "--name web",
+          "le nom du conteneur"
+        ],
+        [
+          "php:8.4-apache",
+          "l'image officielle PHP avec le serveur web Apache"
+        ]
+      ],
+      "sortie": "9bdddfca5304fc5f01b21c91eca8e62a193c17c6ec2df663316ade4549dca633",
+      "remarque": "L'identifiant du conteneur (le tien sera différent). Attends 2 ou 3 secondes qu'Apache finisse de démarrer avant l'étape suivante.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]web\\b).*php:8\\.4-apache",
+      "indice": "il faut `-d` et `--name web`, puis l'image `php:8.4-apache`.",
+      "bravo": "Apache tourne, réglages par défaut.",
+      "robot": [
+        "On ouvre le bureau d'Apache, sans aucune précaution pour l'instant. 🏢",
+        "Imagine un employé qui arrive avec le **passe-partout du directeur** dans la poche : c'est root, qui ouvre toutes les portes.",
+        "👀 Un long identifiant s'affiche : Apache est en place."
+      ]
+    },
+    {
+      "titre": "Qui tourne vraiment ?",
+      "pourquoi": "`docker top` liste **tous** les programmes du conteneur, pas seulement le premier. On choisit les colonnes : numéro d'utilisateur, nom, numéro de programme, commande.",
+      "consigne": "Liste les programmes du conteneur `web`, avec les colonnes `uid,user,pid,cmd`.",
+      "commande": "docker top web -o uid,user,pid,cmd",
+      "options": [
+        [
+          "docker top web",
+          "liste les programmes qui tournent dans le conteneur `web`"
+        ],
+        [
+          "-o uid,user,pid,cmd",
+          "les colonnes à afficher : n° d'utilisateur, nom, n° de programme, commande"
+        ]
+      ],
+      "sortie": "UID                 USER                PID                 CMD\n0                   root                271059              apache2 -DFOREGROUND\n33                  www-data            271086              apache2 -DFOREGROUND\n33                  www-data            271087              apache2 -DFOREGROUND\n33                  www-data            271088              apache2 -DFOREGROUND\n33                  www-data            271089              apache2 -DFOREGROUND\n33                  www-data            271090              apache2 -DFOREGROUND",
+      "remarque": "Un **maître** en root (UID 0) et cinq **workers** en `www-data` (UID 33). Ce sont les workers qui exécutent le PHP. Les PID seront différents chez toi.",
+      "attendu": "^docker (container )?top web (?=.*-o ?\\S*\\bpid\\b).*",
+      "indice": "garde `-o uid,user,pid,cmd` : sans la colonne `pid`, `docker top` refuse.",
+      "bravo": "Un maître root, des workers `www-data`.",
+      "robot": [
+        "Qui travaille dans ce bureau, et avec quel badge ? 🪪",
+        "Apache, c'est un **chef d'équipe** et ses employés : le chef garde le passe-partout, les employés n'ont qu'un badge ordinaire.",
+        "👀 Lis la colonne **USER** : une ligne `root`, puis des lignes `www-data`."
+      ]
+    },
+    {
+      "titre": "Lire les pouvoirs du maître",
+      "pourquoi": "La fiche `/proc/1/status` du programme n° 1 dit quelles capabilities il garde (`CapEff`), si les gains de droits sont interdits (`NoNewPrivs`) et si seccomp filtre ses appels au noyau.",
+      "consigne": "Dans `web`, lis les lignes `CapEff`, `NoNewPrivs` et `Seccomp:` de `/proc/1/status`.",
+      "commande": "docker exec web grep -E 'CapEff|NoNewPrivs|Seccomp:' /proc/1/status",
+      "options": [
+        [
+          "docker exec web",
+          "exécute une commande dans le conteneur"
+        ],
+        [
+          "grep -E 'CapEff|NoNewPrivs|Seccomp:'",
+          "ne garde que les lignes qui contiennent l'un de ces trois mots (`|` veut dire « ou »)"
+        ],
+        [
+          "/proc/1/status",
+          "la fiche d'identité du programme n° 1, le maître Apache"
+        ]
+      ],
+      "sortie": "CapEff:\t00000000a80425fb\nNoNewPrivs:\t0\nSeccomp:\t2",
+      "remarque": "`a80425fb` code les **14 capabilities** par défaut, `NoNewPrivs: 0` veut dire que les gains de droits sont permis, `Seccomp: 2` que le filtre seccomp est actif.",
+      "attendu": "^docker exec web grep (?=.*CapEff)(?=.*NoNewPrivs).*/proc/1/status",
+      "indice": "les trois mots entre apostrophes, séparés par `|`, après `grep -E`.",
+      "bravo": "Tu as lu le trousseau du maître.",
+      "robot": [
+        "On ouvre la poche du chef pour compter ses clés. 🔑",
+        "Le pouvoir de root est un **trousseau** d'une quarantaine de clés ; Docker n'en laisse qu'une partie.",
+        "👀 Note la valeur de **CapEff** : c'est le trousseau, codé en hexadécimal."
+      ]
+    },
+    {
+      "titre": "Traduire le code",
+      "pourquoi": "Le code `a80425fb` n'est pas lisible tel quel. `capsh`, sur ta machine (pas dans le conteneur), le traduit en noms de capabilities.",
+      "consigne": "Traduis le code `00000000a80425fb` avec `capsh`.",
+      "commande": "capsh --decode=00000000a80425fb",
+      "options": [
+        [
+          "capsh",
+          "un outil de ta machine qui sait lire les capabilities"
+        ],
+        [
+          "--decode=…",
+          "traduit un code hexadécimal en liste de noms"
+        ]
+      ],
+      "sortie": "0x00000000a80425fb=cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap",
+      "remarque": "14 noms, dont `cap_setuid` et `cap_setgid` (changer d'utilisateur) et `cap_dac_override` (ignorer toutes les permissions de fichiers). Si `capsh` est introuvable : `sudo apt install libcap2-bin`.",
+      "attendu": "^capsh --decode=(0x)?0*a80425fb",
+      "indice": "écris `capsh --decode=` suivi du code, sans espace.",
+      "bravo": "14 capabilities, en toutes lettres.",
+      "robot": [
+        "On passe le code au décodeur ! 🔍",
+        "C'est comme lire l'**étiquette de chaque clé** du trousseau : salle serveur, caisse, archives…",
+        "👀 Compte les noms séparés par des virgules : il y en a **14**."
+      ]
+    },
+    {
+      "titre": "Le piège : tout retirer",
+      "pourquoi": "Idée qui semble excellente : retirer **toutes** les capabilities. On lance un second Apache avec `--cap-drop ALL` pour voir ce que ça donne.",
+      "consigne": "Lance `php:8.4-apache` en arrière-plan, nommé `piege`, sans aucune capability.",
+      "commande": "docker run -d --name piege --cap-drop ALL php:8.4-apache",
+      "options": [
+        [
+          "-d --name piege",
+          "en arrière-plan, nommé `piege`"
+        ],
+        [
+          "--cap-drop ALL",
+          "retire les 14 capabilities"
+        ],
+        [
+          "php:8.4-apache",
+          "la même image"
+        ]
+      ],
+      "sortie": "5882f6d7c9cc33517fe70708744b8046920952afac719673c0d553dcc73db68a",
+      "remarque": "Le conteneur démarre sans erreur visible (le tien aura un autre identifiant). Mais démarrer ne veut pas dire bien fonctionner : on va lire ses journaux.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]piege\\b)(?=.*--cap-drop[ =](ALL|all)\\b).*php:8\\.4-apache",
+      "indice": "il faut `--cap-drop ALL`, avec `-d` et `--name piege`.",
+      "bravo": "Apache démarré sans aucune capability.",
+      "robot": [
+        "On tente le grand ménage : **toutes** les clés à la poubelle ! 🗑️",
+        "C'est le directeur qui reprend tout le trousseau du chef d'équipe, sans lui demander ce dont il a besoin.",
+        "👀 Un identifiant s'affiche, tout a l'air normal… méfie-toi."
+      ]
+    },
+    {
+      "titre": "Lire les plaintes",
+      "pourquoi": "Les journaux d'Apache racontent ce qui s'est passé au démarrage. On ne garde que les messages qui parlent de `setgid`, l'opération qui sert à changer de groupe.",
+      "consigne": "Affiche les journaux de `piege`, erreurs comprises, et garde les lignes qui contiennent `setgid`.",
+      "commande": "docker logs piege 2>&1 | grep -i setgid",
+      "options": [
+        [
+          "docker logs piege",
+          "affiche ce que le programme du conteneur a écrit"
+        ],
+        [
+          "2>&1",
+          "inclut aussi les messages d'erreur dans ce qu'on filtre"
+        ],
+        [
+          "| grep -i setgid",
+          "ne garde que les lignes qui contiennent « setgid », sans tenir compte des majuscules"
+        ]
+      ],
+      "sortie": "[Tue Oct 27 15:45:17.649427 2026] [unixd:alert] [pid 17:tid 17] (1)Operation not permitted: AH02156: setgid: unable to set group id to Group 33\n[Tue Oct 27 15:45:17.650707 2026] [unixd:alert] [pid 18:tid 18] (1)Operation not permitted: AH02156: setgid: unable to set group id to Group 33\n…\n[Tue Oct 27 15:45:17.655709 2026] [unixd:alert] [pid 21:tid 21] (1)Operation not permitted: AH02156: setgid: unable to set group id to Group 33",
+      "remarque": "« Operation not permitted… unable to set group id to Group 33 ». Apache voulait passer ses workers dans le groupe 33 (`www-data`) et n'en a plus le droit.",
+      "attendu": "^docker (container )?logs piege (?=.*2>&1).*\\| ?grep (-i )?setgid",
+      "indice": "sans `2>&1`, les messages d'erreur échappent au `grep`.",
+      "bravo": "Apache se plaint : il ne peut plus changer de groupe.",
+      "robot": [
+        "Allons écouter ce que le chef d'équipe marmonne dans son coin. 📜",
+        "Il voulait **rendre son passe-partout** et enfiler un badge ordinaire… mais il faut une clé pour ouvrir le vestiaire des badges !",
+        "👀 Cherche « Operation not permitted » dans chaque ligne."
+      ]
+    },
+    {
+      "titre": "Tous restés root",
+      "pourquoi": "Si Apache n'a pas pu changer d'utilisateur, ses workers sont restés… sous l'utilisateur de départ. On vérifie avec `docker top`.",
+      "consigne": "Liste les programmes du conteneur `piege`, avec les colonnes `uid,user,pid,cmd`.",
+      "commande": "docker top piege -o uid,user,pid,cmd",
+      "options": [
+        [
+          "docker top piege",
+          "liste les programmes du conteneur `piege`"
+        ],
+        [
+          "-o uid,user,pid,cmd",
+          "les mêmes colonnes que tout à l'heure"
+        ]
+      ],
+      "sortie": "UID                 USER                PID                 CMD\n0                   root                271241              apache2 -DFOREGROUND\n0                   root                271292              apache2 -DFOREGROUND\n0                   root                271293              apache2 -DFOREGROUND\n0                   root                271294              apache2 -DFOREGROUND\n0                   root                271295              apache2 -DFOREGROUND\n0                   root                271296              apache2 -DFOREGROUND",
+      "remarque": "Tous** les programmes sont root, workers compris. Pour abandonner ses droits, Apache a besoin… d'un droit. La « mesure de sécurité » a aggravé la situation.",
+      "attendu": "^docker (container )?top piege (?=.*-o ?\\S*\\bpid\\b).*",
+      "indice": "garde `-o uid,user,pid,cmd`.",
+      "bravo": "Piège démontré : tout le monde est root.",
+      "robot": [
+        "Le moment de vérité : qui porte quel badge maintenant ? 😬",
+        "Faute de vestiaire, tous les employés gardent la **tenue du directeur** : chacun a le passe-partout sur lui.",
+        "👀 Regarde la colonne **USER** : plus aucun `www-data`, que du `root`."
+      ]
+    },
+    {
+      "titre": "Rendre seulement deux clés",
+      "pourquoi": "La bonne méthode : tout retirer, puis rendre **seulement** ce qui manque, ici `SETUID` et `SETGID` (changer d'utilisateur et de groupe). On ajoute `no-new-privileges` : aucun programme ne pourra gagner de droits en route.",
+      "consigne": "Lance `php:8.4-apache` nommé `durci`, sans capability sauf `SETUID` et `SETGID`, avec `no-new-privileges`.",
+      "commande": "docker run -d --name durci --cap-drop ALL --cap-add SETUID --cap-add SETGID \\\n  --security-opt no-new-privileges php:8.4-apache",
+      "options": [
+        [
+          "--cap-drop ALL",
+          "retire les 14 capabilities"
+        ],
+        [
+          "--cap-add SETUID --cap-add SETGID",
+          "rend seulement les deux clés qui servent à changer d'utilisateur et de groupe"
+        ],
+        [
+          "--security-opt no-new-privileges",
+          "interdit tout gain de droits, par exemple via un programme setuid"
+        ],
+        [
+          "\\",
+          "en fin de ligne : la commande continue sur la ligne suivante"
+        ]
+      ],
+      "sortie": "e6c6b328fcacf02f68e871695e1a6577c8d2c97c0de4338a9a5c44af6d5b7a5d",
+      "remarque": "L'identifiant du conteneur (le tien sera différent). On vérifie tout de suite si le réglage est le bon.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]durci\\b)(?=.*--cap-drop[ =](ALL|all)\\b)(?=.*--cap-add[ =](CAP_)?(SETUID|setuid)\\b)(?=.*--cap-add[ =](CAP_)?(SETGID|setgid)\\b)(?=.*--security-opt[ =]no-new-privileges).*php:8\\.4-apache",
+      "indice": "il faut `--cap-drop ALL`, deux `--cap-add` (`SETUID` et `SETGID`) et `--security-opt no-new-privileges`, puis l'image.",
+      "bravo": "Apache lancé avec le strict nécessaire.",
+      "robot": [
+        "Deuxième essai, cette fois avec méthode. 🛠️",
+        "On reprend tout le trousseau, puis on ne rend que **la clé du vestiaire** : de quoi changer de badge, rien de plus.",
+        "👀 Un identifiant s'affiche ; la preuve viendra avec `docker top`."
+      ]
+    },
+    {
+      "titre": "Les workers en www-data",
+      "pourquoi": "Avec `SETUID` et `SETGID`, Apache doit de nouveau pouvoir faire passer ses workers en `www-data`. On vérifie.",
+      "consigne": "Liste les programmes du conteneur `durci`, avec les colonnes `uid,user,pid,cmd`.",
+      "commande": "docker top durci -o uid,user,pid,cmd",
+      "options": [
+        [
+          "docker top durci",
+          "liste les programmes du conteneur `durci`"
+        ],
+        [
+          "-o uid,user,pid,cmd",
+          "les mêmes colonnes"
+        ]
+      ],
+      "sortie": "UID                 USER                PID                 CMD\n0                   root                271552              apache2 -DFOREGROUND\n33                  www-data            271604              apache2 -DFOREGROUND\n33                  www-data            271605              apache2 -DFOREGROUND\n33                  www-data            271606              apache2 -DFOREGROUND\n33                  www-data            271607              apache2 -DFOREGROUND\n33                  www-data            271608              apache2 -DFOREGROUND",
+      "remarque": "Les workers sont revenus en `www-data` (UID 33). Seul le maître reste root, et on va voir qu'il n'a presque plus de pouvoirs.",
+      "attendu": "^docker (container )?top durci (?=.*-o ?\\S*\\bpid\\b).*",
+      "indice": "garde `-o uid,user,pid,cmd`.",
+      "bravo": "Les workers ont retrouvé leur badge ordinaire.",
+      "robot": [
+        "Alors, chacun a-t-il retrouvé le bon badge ?",
+        "Le vestiaire est de nouveau ouvert : les employés ont enfilé leur **badge ordinaire**. 👔",
+        "👀 Dans la colonne **USER**, les `www-data` doivent être revenus."
+      ]
+    },
+    {
+      "titre": "Relire les pouvoirs",
+      "pourquoi": "On relit la fiche du maître : il ne devrait garder que deux capabilities, et `NoNewPrivs` doit valoir 1.",
+      "consigne": "Dans `durci`, lis les lignes `CapEff`, `NoNewPrivs` et `Seccomp:` de `/proc/1/status`.",
+      "commande": "docker exec durci grep -E 'CapEff|NoNewPrivs|Seccomp:' /proc/1/status",
+      "options": [
+        [
+          "docker exec durci",
+          "exécute la commande dans le conteneur durci"
+        ],
+        [
+          "grep -E '…' /proc/1/status",
+          "les trois mêmes lignes de la fiche du maître"
+        ]
+      ],
+      "sortie": "CapEff:\t00000000000000c0\nNoNewPrivs:\t1\nSeccomp:\t2",
+      "remarque": "`CapEff` est passé de `a80425fb` à `c0`, et `NoNewPrivs` vaut maintenant **1** : plus aucun gain de droits possible.",
+      "attendu": "^docker exec durci grep (?=.*CapEff)(?=.*NoNewPrivs).*/proc/1/status",
+      "indice": "même commande qu'à la troisième étape, sur `durci`.",
+      "bravo": "Un trousseau minuscule et aucune promotion possible.",
+      "robot": [
+        "On recompte les clés du chef d'équipe. 🔑",
+        "Son trousseau a fondu, et le règlement interdit désormais toute **promotion en cours de journée**.",
+        "👀 Compare **CapEff** avec tout à l'heure, et regarde **NoNewPrivs** passer à 1."
+      ]
+    },
+    {
+      "titre": "Traduire le nouveau code",
+      "pourquoi": "On traduit le nouveau code avec `capsh` pour vérifier qu'il ne reste que les deux capabilities voulues.",
+      "consigne": "Traduis le code `00000000000000c0` avec `capsh`.",
+      "commande": "capsh --decode=00000000000000c0",
+      "options": [
+        [
+          "capsh --decode=…",
+          "traduit le code en noms de capabilities"
+        ]
+      ],
+      "sortie": "0x00000000000000c0=cap_setgid,cap_setuid",
+      "remarque": "Deux noms seulement, `cap_setgid` et `cap_setuid`. Le maître garde juste ce qu'il faut pour faire descendre ses workers en `www-data`.",
+      "attendu": "^capsh --decode=(0x)?0*c0$",
+      "indice": "écris `capsh --decode=00000000000000c0`, sans espace après le `=`.",
+      "bravo": "Deux clés, ni plus ni moins.",
+      "robot": [
+        "Dernière vérification au décodeur. 🧮",
+        "Il ne reste que **deux clés** sur l'anneau : celles du vestiaire des badges.",
+        "👀 Tu dois lire exactement `cap_setgid` et `cap_setuid`."
+      ]
+    },
+    {
+      "titre": "Faire le ménage",
+      "pourquoi": "On supprime les trois conteneurs du lab, en les arrêtant d'abord.",
+      "consigne": "Supprime les conteneurs `web`, `piege` et `durci`.",
+      "commande": "docker rm -f web piege durci",
+      "options": [
+        [
+          "docker rm",
+          "supprime des conteneurs"
+        ],
+        [
+          "-f",
+          "les arrête d'abord"
+        ]
+      ],
+      "sortie": "web\npiege\ndurci",
+      "remarque": "Docker répète le nom de chaque conteneur supprimé.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b)(?=.*\\bweb\\b)(?=.*\\bpiege\\b)(?=.*\\bdurci\\b)",
+      "indice": "les trois noms, avec `-f`.",
+      "bravo": "Labo propre.",
+      "robot": [
+        "On ferme les trois bureaux. 🧹",
+        "Tous les trousseaux reviennent au directeur, et on éteint la lumière.",
+        "👀 Docker te répondra les trois noms, l'un sous l'autre."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Hey ! **Conti** ici, responsable des clés pour aujourd'hui. 🔐",
+    "Mission : découvrir qui tourne vraiment dans Apache, puis découper le **passe-partout de root** pour ne lui laisser que les clés utiles.",
+    "Tout se passe dans un terminal d'entraînement : tu peux retirer toutes les clés, rien ne casse."
+  ],
+  "robotFin": [
+    "Bravo, tu as trouvé le réglage juste ! 🎉",
+    "Tu as vu le **maître root** et ses **workers www-data**, les **14 capabilities** par défaut, le piège de `--cap-drop ALL`, et le bon dosage : `SETUID`, `SETGID` et **no-new-privileges**.",
+    "Tu repars avec ton badge, et avec le bon nombre de clés !"
+  ],
+  "badge": "Serrurier des privilèges"
+}

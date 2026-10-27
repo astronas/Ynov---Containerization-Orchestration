@@ -1,0 +1,488 @@
+{
+  "titre": "La vie d'un conteneur",
+  "duree": "10 min",
+  "intro": "Tu vas faire vivre un conteneur nommé `cycle` de sa naissance à sa disparition : le créer, le démarrer, y écrire un fichier, l'arrêter, le supprimer, et regarder à chaque fois ce que devient ce fichier. Pour finir, tu rangeras un fichier dans un **volume** pour qu'il survive.",
+  "conclusion": "Tu as vu les états `Created`, `Up` et `Exited (137)`, et la règle des fichiers : `docker stop` n'efface rien, `docker rm` efface la couche inscriptible, et seul le fichier rangé dans le volume `notes` a survécu à ses conteneurs.",
+  "retour": {
+    "texte": "Retour au cours : Image et cycle de vie du conteneur",
+    "lien": "../../Image-et-cycle-de-vie/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer sans démarrer",
+      "pourquoi": "Un conteneur peut exister sans que son programme tourne. `docker create` le fabrique à partir de l'image et s'arrête là : c'est la toute première étape de sa vie.",
+      "consigne": "Crée un conteneur `cycle` à partir de l'image `alpine:3.22`, avec `sleep 300` comme programme principal.",
+      "commande": "docker create --name cycle alpine:3.22 sleep 300",
+      "options": [
+        [
+          "docker create",
+          "fabrique le conteneur à partir de l'image, sans lancer son programme"
+        ],
+        [
+          "--name cycle",
+          "le nom du conteneur, pour le retrouver facilement"
+        ],
+        [
+          "alpine:3.22",
+          "l'image : une toute petite distribution Linux"
+        ],
+        [
+          "sleep 300",
+          "le programme principal : attendre 300 secondes, puis s'arrêter"
+        ]
+      ],
+      "sortie": "776f00d92e6f0997067099f5c2e0f17893263355aa63fd5ec8318ecf46711537",
+      "remarque": "Docker répond par l'**identifiant** du nouveau conteneur (le tien sera différent). Rien d'autre ne se passe : le programme `sleep` n'est pas encore lancé.",
+      "attendu": "^docker (container )?create (?=.*--name[ =]cycle\\b).*alpine:3\\.22 sleep 300",
+      "indice": "vérifie `--name cycle`, puis l'image `alpine:3.22` et enfin `sleep 300`.",
+      "bravo": "Le conteneur existe, mais il ne tourne pas encore.",
+      "robot": [
+        "On commence par la naissance de notre conteneur, en douceur !",
+        "Avec l'image comme **moule à gâteau**, `docker create` démoule un gâteau… mais ne le met pas encore au four.",
+        "👀 Docker va te répondre par un long **identifiant** : c'est l'acte de naissance du conteneur."
+      ]
+    },
+    {
+      "titre": "Lire son état",
+      "pourquoi": "`docker ps` seul ne montre que les conteneurs en marche. Avec `-a`, on voit **tous** les conteneurs, même ceux qui ne tournent pas, et on peut lire leur état.",
+      "consigne": "Affiche le nom et l'état du conteneur `cycle`.",
+      "commande": "docker ps -a --filter name=cycle --format '{{.Names}}  {{.Status}}'",
+      "options": [
+        [
+          "docker ps -a",
+          "liste **tous** les conteneurs, même arrêtés ou jamais démarrés"
+        ],
+        [
+          "--filter name=cycle",
+          "ne garde que le nôtre"
+        ],
+        [
+          "--format '{{.Names}}  {{.Status}}'",
+          "n'affiche que son nom et son état"
+        ]
+      ],
+      "sortie": "cycle  Created",
+      "remarque": "L'état est `Created`. Le conteneur existe (il a un nom, des réglages, une couche à lui), mais son programme principal ne tourne pas.",
+      "attendu": "^docker (container )?(ps|ls) (?=.*(-a|--all)\\b)(?=.*name=cycle\\b).*Status",
+      "indice": "il faut `-a` (sinon il n'apparaît pas), `--filter name=cycle` et le `--format` avec `{{.Status}}`.",
+      "bravo": "État lu : `Created`.",
+      "robot": [
+        "Petit point de contrôle : où en est notre conteneur ?",
+        "`docker ps -a`, c'est le registre de l'état civil : tous les conteneurs y figurent, même ceux qui dorment.",
+        "👀 Lis le mot après le nom : **Created** veut dire « créé, mais pas lancé »."
+      ]
+    },
+    {
+      "titre": "Le démarrer",
+      "pourquoi": "`docker start` lance enfin le programme principal du conteneur (`sleep 300`). Tant que ce programme tourne, le conteneur est en marche.",
+      "consigne": "Démarre le conteneur `cycle`.",
+      "commande": "docker start cycle",
+      "options": [
+        [
+          "docker start",
+          "lance le programme principal d'un conteneur qui existe déjà"
+        ],
+        [
+          "cycle",
+          "le conteneur à démarrer"
+        ]
+      ],
+      "sortie": "cycle",
+      "remarque": "Docker répète simplement le nom du conteneur. Son état est maintenant `Up` : il tourne pour 300 secondes.",
+      "bravo": "Le conteneur est en marche.",
+      "robot": [
+        "Allez, on lui donne vie ! ⚡",
+        "C'est le moment où le gâteau entre au four : le **programme principal** se met en route.",
+        "👀 Docker te répondra juste le nom `cycle` : c'est sa façon de dire « c'est parti »."
+      ]
+    },
+    {
+      "titre": "Écrire un fichier dedans",
+      "pourquoi": "Un conteneur en marche peut recevoir des commandes en plus de son programme principal. On s'en sert pour écrire un petit fichier, dont on suivra le sort jusqu'au bout.",
+      "consigne": "Écris « bonjour » dans le fichier `/note.txt` du conteneur `cycle`.",
+      "commande": "docker exec cycle sh -c 'echo bonjour > /note.txt'",
+      "options": [
+        [
+          "docker exec cycle",
+          "exécute une commande **dans** le conteneur en marche"
+        ],
+        [
+          "sh -c '…'",
+          "fait exécuter la phrase entre apostrophes par le shell du conteneur"
+        ],
+        [
+          "echo bonjour > /note.txt",
+          "écrit « bonjour » dans le fichier `/note.txt`"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : c'est normal, la commande a juste écrit le fichier. Le fichier est dans le conteneur, pas sur ton ordinateur.",
+      "attendu": "^docker exec cycle sh -c .*echo bonjour > ?/note\\.txt",
+      "indice": "tout ce qui suit `sh -c` doit être entre apostrophes : `'echo bonjour > /note.txt'`.",
+      "bravo": "Le fichier est écrit dans le conteneur.",
+      "robot": [
+        "On laisse une petite trace dans le conteneur. ✍️",
+        "C'est comme glisser un mot doux dans le tiroir d'une chambre d'hôtel : il restera là… tant que la chambre existe.",
+        "👀 Aucun message en retour : pas de nouvelles, bonnes nouvelles."
+      ]
+    },
+    {
+      "titre": "Voir ce qui a changé",
+      "pourquoi": "Chaque conteneur a sa **couche inscriptible**, posée sur les fichiers de l'image. `docker diff` liste ce qu'elle contient : tout ce qui a changé par rapport à l'image.",
+      "consigne": "Affiche les différences entre le conteneur `cycle` et son image.",
+      "commande": "docker diff cycle",
+      "options": [
+        [
+          "docker diff",
+          "liste les fichiers ajoutés (A), modifiés (C) ou supprimés (D) par rapport à l'image"
+        ],
+        [
+          "cycle",
+          "le conteneur à examiner"
+        ]
+      ],
+      "sortie": "A /note.txt",
+      "remarque": "`A /note.txt`, A pour ajouté. Le fichier est dans la couche du conteneur ; l'image `alpine:3.22`, elle, n'a pas bougé.",
+      "bravo": "Ton fichier est bien dans la couche inscriptible.",
+      "robot": [
+        "Où est passé notre fichier, exactement ?",
+        "La couche inscriptible, c'est un **calque transparent** posé sur l'image : le conteneur écrit sur le calque, jamais sur l'image.",
+        "👀 Cherche la lettre **A** devant `/note.txt` : c'est ce qui a été ajouté sur le calque."
+      ]
+    },
+    {
+      "titre": "L'arrêter",
+      "pourquoi": "Arrêter un conteneur, c'est arrêter son programme principal. Ici, `sleep` ignore la demande polie d'arrêt (`SIGTERM`), donc Docker attend 10 secondes puis le force (`SIGKILL`).",
+      "consigne": "Arrête le conteneur `cycle`, et patiente une dizaine de secondes.",
+      "commande": "docker stop cycle",
+      "options": [
+        [
+          "docker stop",
+          "envoie `SIGTERM` (« arrête-toi proprement »), attend 10 s, puis `SIGKILL` (arrêt forcé)"
+        ],
+        [
+          "cycle",
+          "le conteneur à arrêter"
+        ]
+      ],
+      "sortie": "cycle",
+      "remarque": "La réponse met une dizaine de secondes à venir : c'est normal, Docker a attendu avant de forcer l'arrêt. `docker stop -t 2 cycle` raccourcirait l'attente.",
+      "attendu": "^docker (container )?stop (-t \\d+ )?cycle",
+      "bravo": "Le conteneur est arrêté.",
+      "robot": [
+        "Fin de la récré : on arrête le conteneur. ⏱️",
+        "Docker frappe d'abord poliment à la porte ; si personne ne répond au bout de **10 secondes**, il entre avec le passe.",
+        "👀 Compte les secondes avant que `cycle` s'affiche : cette attente est le signe de l'arrêt forcé."
+      ]
+    },
+    {
+      "titre": "Lire le code de sortie",
+      "pourquoi": "Un conteneur arrêté existe toujours. Son état indique un **code de sortie**, qui dit comment son programme s'est terminé.",
+      "consigne": "Affiche de nouveau le nom et l'état du conteneur `cycle`.",
+      "commande": "docker ps -a --filter name=cycle --format '{{.Names}}  {{.Status}}'",
+      "options": [
+        [
+          "docker ps -a",
+          "liste tous les conteneurs, y compris les arrêtés"
+        ],
+        [
+          "--filter name=cycle",
+          "ne garde que le nôtre"
+        ],
+        [
+          "--format '{{.Names}}  {{.Status}}'",
+          "n'affiche que son nom et son état"
+        ]
+      ],
+      "sortie": "cycle  Exited (137) Less than a second ago",
+      "remarque": "`Exited (137)`, le code des programmes tués par `SIGKILL`. Le conteneur est toujours là (la durée affichée variera chez toi).",
+      "attendu": "^docker (container )?(ps|ls) (?=.*(-a|--all)\\b)(?=.*name=cycle\\b).*Status",
+      "indice": "sans `-a`, un conteneur arrêté n'apparaît pas.",
+      "bravo": "Arrêté de force, mais toujours présent.",
+      "robot": [
+        "Le conteneur dort. Mais de quel sommeil ?",
+        "Le code de sortie, c'est la petite fiche laissée sur la porte : « parti normalement » (0), « erreur » ou « mis dehors » (**137**).",
+        "👀 Repère le nombre entre parenthèses après `Exited` : **137** veut dire arrêt forcé."
+      ]
+    },
+    {
+      "titre": "Le redémarrer",
+      "pourquoi": "`docker start` relance **le même** conteneur, avec sa couche inscriptible. Son programme repart de zéro, mais ses fichiers sont toujours là.",
+      "consigne": "Redémarre le conteneur `cycle`.",
+      "commande": "docker start cycle",
+      "options": [
+        [
+          "docker start",
+          "relance le programme principal d'un conteneur arrêté"
+        ]
+      ],
+      "sortie": "cycle",
+      "remarque": "C'est bien l'ancien conteneur qui repart, pas un nouveau : même identifiant, même couche.",
+      "bravo": "Le même conteneur repart.",
+      "robot": [
+        "Debout là-dedans, on le réveille ! ☀️",
+        "C'est comme rallumer un ordinateur portable : le programme repart à zéro, mais les fichiers du disque n'ont pas bougé.",
+        "👀 Encore un simple `cycle` en réponse : le même conteneur est de nouveau en marche."
+      ]
+    },
+    {
+      "titre": "Le fichier a survécu",
+      "pourquoi": "On vérifie que l'arrêt n'a rien effacé : le fichier écrit avant le `docker stop` doit toujours être là.",
+      "consigne": "Affiche le contenu de `/note.txt` dans le conteneur `cycle`.",
+      "commande": "docker exec cycle cat /note.txt",
+      "options": [
+        [
+          "docker exec cycle",
+          "exécute une commande dans le conteneur en marche"
+        ],
+        [
+          "cat /note.txt",
+          "affiche le contenu du fichier"
+        ]
+      ],
+      "sortie": "bonjour",
+      "remarque": "« bonjour » est intact. **Arrêter n'efface rien** : la couche inscriptible reste en place tant que le conteneur existe.",
+      "attendu": "^docker exec cycle cat /note\\.txt",
+      "bravo": "Le fichier a survécu à l'arrêt.",
+      "robot": [
+        "Moment de vérité : notre mot doux est-il toujours dans le tiroir ?",
+        "On a fermé la chambre d'hôtel puis on l'a rouverte, sans changer de chambre.",
+        "👀 Si tu lis **bonjour**, la couche inscriptible a bien tenu bon."
+      ]
+    },
+    {
+      "titre": "Le supprimer",
+      "pourquoi": "Supprimer un conteneur, c'est jeter aussi sa couche inscriptible, et donc tous les fichiers qu'il y a écrits.",
+      "consigne": "Supprime le conteneur `cycle`, en l'arrêtant d'abord.",
+      "commande": "docker rm -f cycle",
+      "options": [
+        [
+          "docker rm",
+          "supprime un conteneur, et sa couche inscriptible avec lui"
+        ],
+        [
+          "-f",
+          "force : l'arrête d'abord s'il tourne"
+        ]
+      ],
+      "sortie": "cycle",
+      "remarque": "Docker répète le nom du conteneur supprimé. Le fichier `/note.txt` est parti avec lui.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b).*cycle",
+      "indice": "le conteneur tourne : il faut `-f` pour le supprimer quand même.",
+      "bravo": "Conteneur et couche supprimés.",
+      "robot": [
+        "On passe à la grande démolition. 🗑️",
+        "Cette fois, on ne ferme pas la chambre : on **démolit** la chambre, tiroir et mot doux compris.",
+        "👀 Docker te répondra le nom `cycle` : il n'existe plus."
+      ]
+    },
+    {
+      "titre": "Le recréer du même nom",
+      "pourquoi": "On recrée un conteneur avec la même image et le même nom. On va voir si l'ancien revient… ou pas.",
+      "consigne": "Lance un nouveau conteneur `cycle` en arrière-plan, avec la même image et le même programme.",
+      "commande": "docker run -d --name cycle alpine:3.22 sleep 300",
+      "options": [
+        [
+          "docker run",
+          "crée **et** démarre un conteneur (create + start)"
+        ],
+        [
+          "-d",
+          "en arrière-plan : le terminal te rend la main"
+        ],
+        [
+          "--name cycle",
+          "le même nom qu'avant"
+        ],
+        [
+          "alpine:3.22 sleep 300",
+          "la même image et le même programme principal"
+        ]
+      ],
+      "sortie": "a3f31f68eb20d9502b73ca25b31d5062b057ac7eb0eecfd2164378bd8cb94d5b",
+      "remarque": "L'**identifiant est différent** de celui de la première étape. Même nom, mais c'est un tout nouveau conteneur.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]cycle\\b).*alpine:3\\.22 sleep 300",
+      "indice": "vérifie `-d` et `--name cycle`, puis `alpine:3.22 sleep 300`.",
+      "bravo": "Un nouveau conteneur `cycle` tourne.",
+      "robot": [
+        "On reconstruit une chambre au même endroit, avec la même plaque sur la porte.",
+        "Même moule, même nom… mais c'est un **gâteau neuf**, sans aucune décoration.",
+        "👀 Compare l'identifiant avec celui de la toute première étape : il a changé."
+      ]
+    },
+    {
+      "titre": "Le fichier a disparu",
+      "pourquoi": "Le nouveau conteneur repart d'une couche vide, posée sur une image qui n'a jamais contenu `/note.txt`. Le fichier ne peut donc pas y être.",
+      "consigne": "Cherche de nouveau `/note.txt` dans le conteneur `cycle`.",
+      "commande": "docker exec cycle cat /note.txt",
+      "options": [
+        [
+          "docker exec cycle",
+          "exécute une commande dans le nouveau conteneur"
+        ],
+        [
+          "cat /note.txt",
+          "essaie d'afficher le fichier"
+        ]
+      ],
+      "sortie": "cat: can't open '/note.txt': No such file or directory",
+      "remarque": "« No such file or directory ». **Supprimer efface tout ce qui n'est pas rangé dans un volume**, et recréer le même nom ne fait pas revenir l'ancien.",
+      "attendu": "^docker exec cycle cat /note\\.txt",
+      "bravo": "Preuve faite : le fichier est parti avec l'ancienne couche.",
+      "robot": [
+        "Allez, on cherche notre mot doux dans la chambre neuve. 🔍",
+        "Le calque de l'ancien conteneur est parti à la poubelle ; le nouveau a un calque tout blanc.",
+        "👀 Le message d'erreur « No such file » est exactement ce qu'on attend ici."
+      ]
+    },
+    {
+      "titre": "Créer un volume",
+      "pourquoi": "Ce qui doit durer ne va pas dans la couche du conteneur mais dans un **volume** : un espace de stockage géré par Docker, indépendant des conteneurs.",
+      "consigne": "Crée un volume nommé `notes`.",
+      "commande": "docker volume create notes",
+      "options": [
+        [
+          "docker volume create",
+          "crée un volume, un espace de stockage géré par Docker"
+        ],
+        [
+          "notes",
+          "le nom du volume"
+        ]
+      ],
+      "sortie": "notes",
+      "remarque": "Docker répond par le nom du volume. Il est vide pour l'instant, et il ne dépend d'aucun conteneur.",
+      "bravo": "Le volume `notes` est prêt.",
+      "robot": [
+        "Place à la solution pour garder nos fichiers ! 🗄️",
+        "Un volume, c'est un **classeur rangé à part** : on le branche sur un conteneur, puis sur le suivant.",
+        "👀 Docker te répondra simplement `notes`, le nom du classeur."
+      ]
+    },
+    {
+      "titre": "Écrire dans le volume",
+      "pourquoi": "Un conteneur jetable branche le volume sur son dossier `/donnees`, y écrit un fichier, puis disparaît. Le fichier, lui, est dans le volume.",
+      "consigne": "Lance un conteneur jetable qui branche `notes` sur `/donnees` et y écrit « garde ».",
+      "commande": "docker run --rm -v notes:/donnees alpine:3.22 sh -c 'echo garde > /donnees/note.txt'",
+      "options": [
+        [
+          "--rm",
+          "le conteneur est supprimé dès qu'il a fini"
+        ],
+        [
+          "-v notes:/donnees",
+          "branche le volume `notes` sur le dossier `/donnees` du conteneur"
+        ],
+        [
+          "alpine:3.22",
+          "la même petite image"
+        ],
+        [
+          "sh -c 'echo garde > /donnees/note.txt'",
+          "écrit « garde » dans un fichier du volume"
+        ]
+      ],
+      "sortie": "",
+      "remarque": "Rien ne s'affiche : le conteneur a écrit son fichier, puis il a été supprimé grâce à `--rm`. Le fichier, lui, est resté dans le volume.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(-v|--volume|--mount)[ =]\\S*notes\\S*/donnees).*echo garde",
+      "indice": "il faut `--rm` et `-v notes:/donnees`, puis l'image et le `sh -c '…'` entre apostrophes.",
+      "bravo": "Le fichier est rangé dans le volume.",
+      "robot": [
+        "On range enfin notre trace au bon endroit.",
+        "Le conteneur jetable est un **déménageur** : il dépose le carton dans le classeur, puis il s'en va pour de bon.",
+        "👀 Aucun message : le conteneur a fini son travail et s'est effacé tout seul."
+      ]
+    },
+    {
+      "titre": "Relire avec un autre conteneur",
+      "pourquoi": "Un **autre** conteneur jetable, branché sur le même volume, relit le fichier. Si on le retrouve, c'est que le volume a survécu au premier conteneur.",
+      "consigne": "Lance un conteneur jetable branché sur `notes` qui affiche `/donnees/note.txt`.",
+      "commande": "docker run --rm -v notes:/donnees alpine:3.22 cat /donnees/note.txt",
+      "options": [
+        [
+          "--rm",
+          "supprimé dès qu'il a fini"
+        ],
+        [
+          "-v notes:/donnees",
+          "branche le même volume, au même endroit"
+        ],
+        [
+          "cat /donnees/note.txt",
+          "affiche le fichier écrit par le conteneur précédent"
+        ]
+      ],
+      "sortie": "garde",
+      "remarque": "« garde » s'affiche alors que le conteneur qui l'a écrit n'existe plus. **Le conteneur se remplace, les données restent dans le volume.**",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(-v|--volume|--mount)[ =]\\S*notes\\S*/donnees).*cat /donnees/note\\.txt",
+      "indice": "branche bien le même volume : `-v notes:/donnees`.",
+      "bravo": "Le fichier a survécu à son conteneur.",
+      "robot": [
+        "Le premier déménageur est parti. Un second va ouvrir le classeur.",
+        "C'est comme retrouver ses affaires au garde-meuble après avoir quitté son ancien appartement. 📦",
+        "👀 Si tu lis **garde**, le volume a fait son travail."
+      ]
+    },
+    {
+      "titre": "Supprimer le conteneur",
+      "pourquoi": "On range le labo : le conteneur `cycle` de tout à l'heure tourne encore.",
+      "consigne": "Supprime le conteneur `cycle`.",
+      "commande": "docker rm -f cycle",
+      "options": [
+        [
+          "docker rm",
+          "supprime le conteneur"
+        ],
+        [
+          "-f",
+          "l'arrête d'abord s'il tourne"
+        ]
+      ],
+      "sortie": "cycle",
+      "remarque": "Docker répète le nom du conteneur supprimé.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b).*cycle",
+      "indice": "il tourne encore : ajoute `-f`.",
+      "bravo": "Conteneur supprimé.",
+      "robot": [
+        "C'est l'heure du grand rangement. 🧹",
+        "Un bon admin ne laisse pas traîner ses conteneurs de test, comme on débarrasse la table après le repas.",
+        "👀 Docker te répondra le nom `cycle`."
+      ]
+    },
+    {
+      "titre": "Supprimer le volume",
+      "pourquoi": "Un volume survit aux conteneurs : il faut donc le supprimer lui-même. Attention, c'est **définitif**, les données qu'il contient sont perdues.",
+      "consigne": "Supprime le volume `notes`.",
+      "commande": "docker volume rm notes",
+      "options": [
+        [
+          "docker volume rm",
+          "supprime un volume et tout son contenu, pour de bon"
+        ],
+        [
+          "notes",
+          "le volume à supprimer"
+        ]
+      ],
+      "sortie": "notes",
+      "remarque": "Docker répète le nom du volume supprimé. Si un conteneur l'utilisait encore, il refuserait (`volume is in use`).",
+      "bravo": "Labo propre.",
+      "robot": [
+        "Dernier geste : on vide le classeur. 🗂️",
+        "Le volume ne part jamais tout seul : c'est comme un garde-meuble, il faut résilier le contrat soi-même.",
+        "👀 Docker te répondra `notes` : le volume et son fichier ont disparu."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Coucou ! Ici **Conti**, ton guide pour ce lab. 🤖",
+    "Aujourd'hui, on suit un conteneur de la naissance à la tombe, avec un petit fichier dans la poche : on va voir quand il survit et quand il disparaît.",
+    "Le terminal est un bac à sable : crée, arrête, supprime, rien ne casse pour de vrai."
+  ],
+  "robotFin": [
+    "Bravo, tu as accompagné un conteneur toute sa vie ! 🎉",
+    "Tu as vu les états **Created**, **Up** et **Exited**, la **couche inscriptible** qui survit au `stop` mais pas au `rm`, et le **volume** qui garde ce qui doit durer.",
+    "Tiens, voici ton badge : tu l'as bien gagné !"
+  ],
+  "badge": "Biographe des conteneurs"
+}

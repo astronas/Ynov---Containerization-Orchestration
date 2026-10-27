@@ -222,6 +222,14 @@ Un service managé (EKS, GKE, AKS…) peut prendre en charge le plan de contrôl
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine simulée avec Minikube et kubectl** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/k8s-virtualisation.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 10 minutes. Tu vas descendre les couches de ton propre cluster, du poste jusqu'aux pods. Ces commandes ne font que **lire** : rien à casser. Il te faut Minikube démarré avec le driver Docker (`minikube start --driver=docker`).
 
 **Étape 1 · La couche virtualisation**

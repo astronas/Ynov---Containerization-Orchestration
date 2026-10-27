@@ -470,6 +470,14 @@ Tant que `pg_isready` échoue, le pod db est `0/1` et le Service `db` n'a aucune
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine simulée avec Minikube et kubectl** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/compose-vers-k8s.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Six étapes, environ 15 minutes. Tu vas rejouer la traduction de la base : configuration, Secret, Deployment, correction, puis passage sur une PVC. Il te faut un cluster qui tourne (`minikube start --driver=docker`, puis `kubectl get nodes` doit afficher `Ready`) et un accès Internet pour que le nœud télécharge `postgres:15`.
 
 **Étape 1 · Créer l'espace de travail et ranger la configuration**

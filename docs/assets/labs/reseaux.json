@@ -1,0 +1,443 @@
+{
+  "titre": "Réseaux et ports",
+  "duree": "15 min",
+  "intro": "Tu vas créer un réseau, y lancer un site web et lui ouvrir une porte sur ton poste. Puis tu verras que les conteneurs se trouvent **par leur nom** grâce au DNS interne, et que l'adresse IP d'un conteneur peut changer alors que son nom, lui, reste.",
+  "conclusion": "Le site a répondu `200 OK` par la porte publiée sur `127.0.0.1:8080`, son nom a été résolu par le DNS interne `127.0.0.11` sur `atelier-net` mais pas sur le réseau par défaut, et après recréation il est passé de `172.23.0.2` à `172.23.0.3` sans que son nom cesse de marcher.",
+  "retour": {
+    "texte": "Retour au cours : Réseaux et ports",
+    "lien": "../../Reseaux-et-ports/"
+  },
+  "etapes": [
+    {
+      "titre": "Créer un réseau",
+      "pourquoi": "Sur un réseau que tu crées toi-même, Docker fournit un **DNS interne** : les conteneurs branchés dessus se trouvent par leur nom. Le réseau par défaut ne le fait pas.",
+      "consigne": "Crée un réseau nommé `atelier-net`.",
+      "commande": "docker network create atelier-net",
+      "options": [
+        [
+          "docker network create",
+          "crée un réseau privé (un bridge), avec son DNS interne"
+        ],
+        [
+          "atelier-net",
+          "le nom du réseau"
+        ]
+      ],
+      "sortie": "7b24d65d35d1d5f09827e358bb5ee82784ee09cd0a516a06205682de2b9843da",
+      "remarque": "Docker répond par l'identifiant du réseau (le tien sera différent).",
+      "bravo": "Le réseau `atelier-net` existe.",
+      "robot": [
+        "On construit notre **immeuble de bureaux** ! 🏢",
+        "Un réseau créé, c'est un immeuble avec son **standard téléphonique** : chacun y est joignable par son nom.",
+        "👀 Un long identifiant va s'afficher : celui du réseau."
+      ]
+    },
+    {
+      "titre": "Lancer le site",
+      "pourquoi": "On lance nginx sur ce réseau, et on **publie** son port 80 sur le port 8080 de ton poste, uniquement sur `127.0.0.1` (ta propre machine). Sans `-p`, personne hors du réseau ne pourrait le joindre.",
+      "consigne": "Lance `nginx:stable` en arrière-plan, nommé `site`, sur `atelier-net`, publié sur `127.0.0.1:8080`.",
+      "commande": "docker run -d --name site --network atelier-net -p 127.0.0.1:8080:80 nginx:stable",
+      "options": [
+        [
+          "-d --name site",
+          "en arrière-plan, nommé `site` (ce sera aussi son nom sur le réseau)"
+        ],
+        [
+          "--network atelier-net",
+          "le brancher sur notre réseau"
+        ],
+        [
+          "-p 127.0.0.1:8080:80",
+          "la porte 8080 de ton poste, ouverte seulement sur `127.0.0.1`, mène au port 80 du conteneur"
+        ],
+        [
+          "nginx:stable",
+          "l'image du serveur web"
+        ]
+      ],
+      "sortie": "5577e58186f1a5c7f37e3f58b3cc334dbd3c15b614c85e256c833f31eac20d6b",
+      "remarque": "L'identifiant du conteneur (le tien sera différent). Si le port 8080 est déjà pris, Docker affiche `port is already allocated`.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]site\\b)(?=.*(--network|--net)[ =]atelier-net\\b)(?=.*-p[ =]?\\S*\\d+:80\\b).*nginx",
+      "indice": "il faut `-d`, `--name site`, `--network atelier-net` et `-p 127.0.0.1:8080:80`, puis l'image en dernier.",
+      "bravo": "Le site tourne, sa porte est publiée.",
+      "robot": [
+        "On installe un premier occupant dans l'immeuble : le **site** web. 🌐",
+        "Publier un port, c'est percer une **porte dans la façade** et la relier au bureau du site.",
+        "👀 Docker va répondre par l'identifiant du conteneur : il est installé."
+      ]
+    },
+    {
+      "titre": "Voir la publication",
+      "pourquoi": "`docker port` affiche les portes publiées d'un conteneur : quel port du conteneur mène à quelle adresse de ton poste.",
+      "consigne": "Affiche les ports publiés du conteneur `site`.",
+      "commande": "docker port site",
+      "options": [
+        [
+          "docker port",
+          "liste les ports publiés d'un conteneur"
+        ],
+        [
+          "site",
+          "le conteneur à examiner"
+        ]
+      ],
+      "sortie": "80/tcp -> 127.0.0.1:8080",
+      "remarque": "Le port **80** du conteneur mène à `127.0.0.1:8080` sur ton poste. Seule ta machine peut passer par cette porte.",
+      "bravo": "La porte 8080 mène au port 80.",
+      "robot": [
+        "Vérifions la porte qu'on vient de percer. 🚪",
+        "C'est la **plaque de l'accueil** : « pour joindre le site, passez par la porte 8080 ».",
+        "👀 Lis la flèche : à gauche le port du conteneur, à droite celui de ton poste."
+      ]
+    },
+    {
+      "titre": "Passer par la porte",
+      "pourquoi": "`curl` joue le navigateur. On demande seulement les en-têtes de la réponse, et on ne garde que la première ligne : celle du code de réponse.",
+      "consigne": "Demande les en-têtes de `http://127.0.0.1:8080/` et garde la première ligne.",
+      "commande": "curl -sI http://127.0.0.1:8080/ | head -1",
+      "options": [
+        [
+          "curl",
+          "un petit navigateur en ligne de commande"
+        ],
+        [
+          "-sI",
+          "silencieux (`-s`), en-têtes seulement (`-I`)"
+        ],
+        [
+          "| head -1",
+          "ne garde que la première ligne"
+        ]
+      ],
+      "sortie": "HTTP/1.1 200 OK",
+      "remarque": "`200 OK`, la requête est entrée par la porte 8080 et nginx a répondu depuis le conteneur.",
+      "attendu": "^curl (?=.*-s?I\\b|.*--head\\b).*127\\.0\\.0\\.1:\\d+.*\\| ?head -(n ?)?1",
+      "indice": "il faut `-sI` (en-têtes seulement), l'adresse, puis `| head -1`.",
+      "bravo": "Le site répond : `200 OK`.",
+      "robot": [
+        "On sonne à la porte, pour voir si quelqu'un répond. 🔔",
+        "On ne demande pas toute la page, juste le **« allô, oui ? »** du serveur.",
+        "👀 Cherche le code **200** : c'est « tout va bien »."
+      ]
+    },
+    {
+      "titre": "La porte côté hôte",
+      "pourquoi": "`ss -lnt` liste les portes réellement ouvertes sur ton poste. On ne garde que celle du 8080, pour voir sur quelle adresse elle écoute.",
+      "consigne": "Liste les ports en écoute de ton poste et garde la ligne du 8080.",
+      "commande": "ss -lnt | grep 8080",
+      "options": [
+        [
+          "ss -lnt",
+          "liste les ports de ton poste : en écoute (`-l`), en chiffres (`-n`), TCP (`-t`)"
+        ],
+        [
+          "| grep 8080",
+          "ne garde que la ligne qui contient 8080"
+        ]
+      ],
+      "sortie": "LISTEN 0      4096        127.0.0.1:8080       0.0.0.0:*",
+      "remarque": "La porte écoute sur `127.0.0.1` seulement, pas sur `0.0.0.0`. Le réseau local ne peut pas l'atteindre ; avec `-p 8080:80`, il le pourrait.",
+      "attendu": "^ss -(?=[a-z]*l)(?=[a-z]*n)(?=[a-z]*t)[a-z]+ \\| ?grep 8080",
+      "indice": "les options `-lnt` (dans n'importe quel ordre), puis `| grep 8080`.",
+      "bravo": "Une seule porte, sur ta machine seulement.",
+      "robot": [
+        "On fait le tour de la façade, côté rue. 🔦",
+        "On vérifie que la porte donne sur la **cour privée** (ta machine) et pas sur la rue entière.",
+        "👀 Repère l'adresse devant `:8080` : on veut lire `127.0.0.1`."
+      ]
+    },
+    {
+      "titre": "Trouver par le nom",
+      "pourquoi": "Un conteneur jetable, **sur le même réseau**, demande au DNS l'adresse de `site`. C'est ainsi qu'une application trouve sa base : par son nom, jamais par son adresse.",
+      "consigne": "Depuis un conteneur jetable `alpine:3.22` sur `atelier-net`, demande l'adresse de `site`.",
+      "commande": "docker run --rm --network atelier-net alpine:3.22 nslookup site",
+      "options": [
+        [
+          "--rm",
+          "supprimé dès qu'il a fini"
+        ],
+        [
+          "--network atelier-net",
+          "sur le même réseau que le site"
+        ],
+        [
+          "nslookup site",
+          "demande au DNS l'adresse correspondant au nom `site`"
+        ]
+      ],
+      "sortie": "Server:\t\t127.0.0.11\nAddress:\t127.0.0.11:53\n\nNon-authoritative answer:\n\nNon-authoritative answer:\nName:\tsite\nAddress: 172.23.0.2",
+      "remarque": "Le serveur qui répond est `127.0.0.11`, le **résolveur de Docker**. Il donne l'adresse actuelle de `site` (la tienne peut différer).",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(--network|--net)[ =]atelier-net\\b).*nslookup site",
+      "indice": "sans `--network atelier-net`, le nom `site` est inconnu.",
+      "bravo": "Le DNS interne connaît `site`.",
+      "robot": [
+        "Un nouveau venu dans l'immeuble cherche le bureau du site. 📞",
+        "Il appelle le **standard** : « passez-moi le site, s'il vous plaît », et le standard donne le bon poste.",
+        "👀 Regarde la ligne **Server** : `127.0.0.11`, c'est le standard de Docker."
+      ]
+    },
+    {
+      "titre": "Sur le réseau par défaut",
+      "pourquoi": "Même essai, mais sans `--network` : ce conteneur atterrit sur le réseau par défaut, qui n'a pas de DNS interne et ne connaît pas `atelier-net`.",
+      "consigne": "Depuis un conteneur jetable **sans** `--network`, essaie de joindre `http://site` en 3 secondes au plus.",
+      "commande": "docker run --rm alpine:3.22 wget -qO- -T 3 http://site",
+      "options": [
+        [
+          "--rm",
+          "supprimé dès qu'il a fini ; pas de `--network` : réseau par défaut"
+        ],
+        [
+          "wget -qO-",
+          "télécharge une page et l'affiche"
+        ],
+        [
+          "-T 3",
+          "abandonner au bout de 3 secondes"
+        ],
+        [
+          "http://site",
+          "on vise le site par son nom"
+        ]
+      ],
+      "sortie": "wget: bad address 'site'",
+      "remarque": "« bad address ». La résolution par nom est une propriété **du réseau** : hors de `atelier-net`, le nom `site` n'existe pas.",
+      "attendu": "^docker (container )?run (?!.*--net)(?=.*--rm\\b).*wget .*site",
+      "indice": "ici, justement, pas de `--network` : on teste le réseau par défaut.",
+      "bravo": "Hors du réseau, le nom est inconnu.",
+      "robot": [
+        "Et si on appelait depuis l'immeuble d'à côté ? 🏙️",
+        "Chaque immeuble a **son propre standard** : celui d'à côté n'a jamais entendu parler du site.",
+        "👀 Le message « bad address » est la réponse attendue."
+      ]
+    },
+    {
+      "titre": "Lire son adresse",
+      "pourquoi": "On lit l'adresse IP actuelle de `site` sur le réseau. On va voir qu'elle n'est pas gravée dans le marbre.",
+      "consigne": "Affiche l'adresse IP du conteneur `site`.",
+      "commande": "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' site",
+      "options": [
+        [
+          "docker inspect",
+          "lit la fiche technique d'un conteneur"
+        ],
+        [
+          "-f '{{range …}}{{.IPAddress}}{{end}}'",
+          "parcourt ses réseaux et n'affiche que son adresse IP"
+        ],
+        [
+          "site",
+          "le conteneur à examiner"
+        ]
+      ],
+      "sortie": "172.23.0.2",
+      "remarque": "Note cette adresse (la tienne peut différer) : on va la comparer après avoir recréé le conteneur.",
+      "attendu": "^docker (container )?inspect (?=.*(-f|--format)\\b).*IPAddress.*site",
+      "indice": "il faut `-f` suivi du modèle entre apostrophes, puis le nom `site`.",
+      "bravo": "Adresse notée.",
+      "robot": [
+        "Petite enquête sur le numéro de bureau du site. 🔢",
+        "L'adresse IP, c'est le **numéro de bureau** : pratique, mais il peut changer au prochain déménagement.",
+        "👀 Retiens bien ce numéro, il va bouger."
+      ]
+    },
+    {
+      "titre": "Supprimer le site",
+      "pourquoi": "On supprime `site` : son adresse est libérée et pourra être donnée à quelqu'un d'autre.",
+      "consigne": "Supprime le conteneur `site`.",
+      "commande": "docker rm -f site",
+      "options": [
+        [
+          "docker rm",
+          "supprime le conteneur"
+        ],
+        [
+          "-f",
+          "l'arrête d'abord, puisqu'il tourne"
+        ]
+      ],
+      "sortie": "site",
+      "remarque": "Docker répète le nom supprimé. L'adresse `172.23.0.2` est maintenant libre sur `atelier-net`.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b).*site$",
+      "indice": "il tourne : ajoute `-f`.",
+      "bravo": "Le bureau est libéré.",
+      "robot": [
+        "Le site déménage : il rend son bureau. 📦",
+        "Le bureau vide pourra être attribué au **prochain arrivant**.",
+        "👀 Docker te répondra `site`."
+      ]
+    },
+    {
+      "titre": "Un voisin arrive",
+      "pourquoi": "Un autre conteneur arrive sur le réseau pendant que `site` est absent. Il prend la première adresse libre.",
+      "consigne": "Lance en arrière-plan un conteneur `voisin` sur `atelier-net`, qui attend 600 secondes.",
+      "commande": "docker run -d --name voisin --network atelier-net alpine:3.22 sleep 600",
+      "options": [
+        [
+          "-d --name voisin",
+          "en arrière-plan, nommé `voisin`"
+        ],
+        [
+          "--network atelier-net",
+          "sur le même réseau"
+        ],
+        [
+          "sleep 600",
+          "il attend 10 minutes, juste pour occuper une adresse"
+        ]
+      ],
+      "sortie": "e1561acde29d7ec2e075c855dc78c9ff4bec07a16c8b2de8b5c2d27286cf0b92",
+      "remarque": "L'identifiant du voisin (le tien sera différent). Il vient de prendre l'adresse libérée par `site`.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]voisin\\b)(?=.*(--network|--net)[ =]atelier-net\\b).*sleep \\d+",
+      "indice": "il faut `-d`, `--name voisin` et `--network atelier-net`, puis `alpine:3.22 sleep 600`.",
+      "bravo": "Le voisin s'est installé.",
+      "robot": [
+        "Un nouveau voisin emménage dans l'immeuble ! 🧳",
+        "Il arrive pile au bon moment et prend le **bureau libre** de l'ancien site.",
+        "👀 Un identifiant s'affiche : le voisin occupe désormais l'ancienne adresse."
+      ]
+    },
+    {
+      "titre": "Recréer le site",
+      "pourquoi": "On recrée `site`, exactement comme au début : même nom, même réseau, même port publié.",
+      "consigne": "Relance `nginx:stable` en arrière-plan, nommé `site`, sur `atelier-net`, publié sur `127.0.0.1:8080`.",
+      "commande": "docker run -d --name site --network atelier-net -p 127.0.0.1:8080:80 nginx:stable",
+      "options": [
+        [
+          "-d --name site",
+          "même nom qu'avant"
+        ],
+        [
+          "--network atelier-net",
+          "même réseau"
+        ],
+        [
+          "-p 127.0.0.1:8080:80",
+          "même porte publiée"
+        ]
+      ],
+      "sortie": "fb2847c2b2a7c9a73cdc7652adc0d27b72e078c6791c762f6f1e5a8fa7603f77",
+      "remarque": "Un nouvel identifiant : c'est un nouveau conteneur, avec le même nom.",
+      "attendu": "^docker (container )?run (?=.*(-d|--detach)\\b)(?=.*--name[ =]site\\b)(?=.*(--network|--net)[ =]atelier-net\\b)(?=.*-p[ =]?\\S*\\d+:80\\b).*nginx",
+      "indice": "même commande qu'à la deuxième étape.",
+      "bravo": "Le site est de retour.",
+      "robot": [
+        "Le site revient dans l'immeuble, avec la même plaque sur la porte.",
+        "Mais son ancien bureau est pris : il s'installe **un peu plus loin** dans le couloir. 🚶",
+        "👀 Un nouvel identifiant : le site est revenu."
+      ]
+    },
+    {
+      "titre": "L'adresse a changé",
+      "pourquoi": "On relit l'adresse IP de `site`, pour la comparer à celle d'avant.",
+      "consigne": "Affiche de nouveau l'adresse IP du conteneur `site`.",
+      "commande": "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' site",
+      "options": [
+        [
+          "docker inspect -f '…'",
+          "n'affiche que l'adresse IP du conteneur"
+        ]
+      ],
+      "sortie": "172.23.0.3",
+      "remarque": "`172.23.0.3` au lieu de `172.23.0.2`. Le voisin a pris l'ancienne adresse : **l'IP change à la recréation**.",
+      "attendu": "^docker (container )?inspect (?=.*(-f|--format)\\b).*IPAddress.*site",
+      "indice": "même commande que tout à l'heure.",
+      "bravo": "Nouvelle adresse, même nom.",
+      "robot": [
+        "Alors, quel est le nouveau numéro de bureau ?",
+        "Si tu avais noté l'ancien numéro dans ton carnet, tu appellerais maintenant… **le voisin** ! 😅",
+        "👀 Compare avec l'adresse notée plus tôt : le dernier chiffre a changé."
+      ]
+    },
+    {
+      "titre": "Le nom marche toujours",
+      "pourquoi": "On joint `site` par son nom, comme le ferait une application. Le DNS interne donne l'adresse **du moment** : peu importe qu'elle ait changé.",
+      "consigne": "Depuis un conteneur jetable sur `atelier-net`, demande `http://site` et garde la ligne `<title>`.",
+      "commande": "docker run --rm --network atelier-net alpine:3.22 wget -qO- http://site | grep '<title>'",
+      "options": [
+        [
+          "--rm --network atelier-net",
+          "un client jetable sur le réseau du site"
+        ],
+        [
+          "wget -qO- http://site",
+          "télécharge la page en visant le **nom** `site`"
+        ],
+        [
+          "| grep '<title>'",
+          "ne garde que la ligne du titre"
+        ]
+      ],
+      "sortie": "<title>Welcome to nginx!</title>",
+      "remarque": "La page arrive malgré le changement d'adresse. C'est pour cela qu'on écrit `DB_HOST=db` et **jamais une adresse IP**.",
+      "attendu": "^docker (container )?run (?=.*--rm\\b)(?=.*(--network|--net)[ =]atelier-net\\b).*wget .*site.*\\| ?grep",
+      "indice": "n'oublie pas `--network atelier-net`, sinon le nom est inconnu.",
+      "bravo": "Le nom suit le conteneur, où qu'il soit.",
+      "robot": [
+        "Dernier test : on appelle le site par son **nom**. ☎️",
+        "Le standard sait toujours où est passé chacun : il te passe le nouveau bureau sans que tu aies rien à changer.",
+        "👀 Si tu lis « Welcome to nginx! », le nom a suffi."
+      ]
+    },
+    {
+      "titre": "Supprimer les conteneurs",
+      "pourquoi": "On fait le ménage : d'abord les conteneurs, branchés sur le réseau.",
+      "consigne": "Supprime les conteneurs `site` et `voisin`.",
+      "commande": "docker rm -f site voisin",
+      "options": [
+        [
+          "docker rm",
+          "supprime des conteneurs"
+        ],
+        [
+          "-f",
+          "les arrête d'abord"
+        ]
+      ],
+      "sortie": "site\nvoisin",
+      "remarque": "Docker répète le nom de chaque conteneur supprimé.",
+      "attendu": "^docker (container )?rm (?=.*(-f|--force)\\b)(?=.*\\bsite\\b)(?=.*\\bvoisin\\b)",
+      "indice": "les deux noms, avec `-f`.",
+      "bravo": "Conteneurs supprimés.",
+      "robot": [
+        "Fin de la journée de bureau, on ferme. 🧹",
+        "Tous les occupants quittent l'immeuble avant qu'on éteigne le standard.",
+        "👀 Docker te répondra les deux noms."
+      ]
+    },
+    {
+      "titre": "Supprimer le réseau",
+      "pourquoi": "Le réseau se supprime **après** les conteneurs : Docker refuse de retirer un réseau où des conteneurs sont encore branchés.",
+      "consigne": "Supprime le réseau `atelier-net`.",
+      "commande": "docker network rm atelier-net",
+      "options": [
+        [
+          "docker network rm",
+          "supprime un réseau vide"
+        ],
+        [
+          "atelier-net",
+          "le réseau à supprimer"
+        ]
+      ],
+      "sortie": "atelier-net",
+      "remarque": "Docker répète le nom du réseau. S'il restait un conteneur dessus, il refuserait avec `has active endpoints`.",
+      "bravo": "Labo propre.",
+      "robot": [
+        "On éteint le standard et on ferme l'immeuble. 🔑",
+        "Un immeuble vide se démonte sans souci ; un immeuble occupé, jamais.",
+        "👀 Docker te répondra `atelier-net`."
+      ]
+    }
+  ],
+  "robotIntro": [
+    "Bonjour ! **Conti** au standard, que puis-je pour toi ? ☎️",
+    "Aujourd'hui, on construit un immeuble de conteneurs : on perce une **porte** sur la façade, on installe un **standard** qui connaît chaque nom, et on regarde ce qui se passe quand quelqu'un déménage.",
+    "Le terminal est un bac à sable : branche, débranche, tu ne casses rien."
+  ],
+  "robotFin": [
+    "Bien joué, l'immeuble tourne comme une horloge ! 🎉",
+    "Tu as vu la **publication** `-p` sur `127.0.0.1`, le **DNS interne** qui n'existe que sur un réseau créé, et l'**adresse IP** qui change quand le **nom** reste.",
+    "Voici ton badge de standardiste en chef !"
+  ],
+  "badge": "Standardiste en chef"
+}

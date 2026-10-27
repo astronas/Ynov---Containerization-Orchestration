@@ -196,6 +196,14 @@ La méthode complète, appliquée à une erreur 503 : [Démarré n'est pas dispo
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Pratique sans rien installer : le lab interactif"
+
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite, et Conti, le robot du lab, pour te dire quoi observer avant chaque commande. Chaque option est expliquée, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
+
+    [:material-console: Ouvrir le lab interactif](labs/reseaux.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
+
+**Sur ton poste**, le même lab pas à pas :
+
 Cinq étapes, environ 10 minutes. Tape les commandes une par une et compare avec ce que tu dois voir.
 
 **Étape 1 · Créer un réseau et y lancer un site**
