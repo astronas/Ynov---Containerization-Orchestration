@@ -1,315 +1,143 @@
 # Pourquoi orchestrer ?
 
-> **En une phrase.** Docker et Compose savent **lancer** des conteneurs sur **une** machine ; dès qu'il faut répartir un service sur plusieurs machines, survivre à la perte de l'une d'elles et changer de version sans coupure, il faut un **orchestrateur** qui maintient en permanence un état désiré.
+<p class="lead">Docker et Compose savent <strong>lancer</strong> des conteneurs sur <strong>une</strong> machine. Dès qu'il faut répartir un service sur plusieurs machines, survivre à la perte de l'une d'elles et changer de version sans coupure, il faut un <strong>orchestrateur</strong> qui maintient en permanence un état désiré.</p>
 
----
+![Même panne, deux mondes : le moteur local ne fait rien, l'orchestrateur replanifie sur un autre nœud](assets/illustrations/orchestrer.png){ .hero }
 
-## 1. Synthèse
+## L'essentiel en 30 secondes
 
-### Le modèle mental
+<div class="grid cards" markdown>
 
-```
-   MOTEUR LOCAL (Docker, Compose)              ORCHESTRATEUR (Kubernetes)
-   « exécute ce que je te dis, ici »           « garantis ce que je veux, quelque part »
+-   :material-docker:{ .lg .middle } __Compose déclare déjà__
 
-   ┌──────────── hôte A ────────────┐          ┌──── plan de contrôle ────┐
-   │ web  web  db                   │          │ état désiré : web x3     │
-   │ restart: relance ICI, si l'hôte│          │ état observé : web x2    │
-   │ et le moteur sont vivants      │          │ => recréer 1 web sur B   │
-   └────────────────────────────────┘          └──────┬─────────┬─────────┘
-   hôte A tombe : tout s'arrête.                  hôte A      hôte B
-                                                (en panne)  web web web
-```
+    ---
 
-### Ce que Compose résout déjà
+    Images, réseaux, volumes, dépendances : c'est une première déclaration… pour **un seul moteur Docker**.
 
-| Compose décrit | Exemple de clé dans `compose.yaml` |
+-   :material-restart:{ .lg .middle } __Redémarrer ≠ replanifier__
+
+    ---
+
+    `restart:` relance **sur place**. Seul un orchestrateur recrée l'instance **sur un autre nœud**.
+
+-   :material-sync:{ .lg .middle } __Déclarer, puis réconcilier__
+
+    ---
+
+    On dit « je veux 3 réplicas ». Un contrôleur compare sans arrêt ce qui tourne à ce qui est voulu, et corrige.
+
+-   :material-alert-outline:{ .lg .middle } __Pas de magie__
+
+    ---
+
+    Données persistantes, sécurité et supervision se **conçoivent** toujours explicitement.
+
+</div>
+
+!!! warning "À retenir"
+
+    **Compose n'est pas un orchestrateur multi-hôtes**, un **healthcheck ne répare rien** avec Docker Engine seul, et **redémarrer n'est pas replanifier**. Il manque un composant qui voit tout le parc et agit quand la réalité s'écarte de ce qui est voulu.
+
+## :material-server-network: Ce que Compose ne fait pas
+
+Un fichier `compose.yaml` est déjà une **déclaration** : on décrit les services voulus, pas l'ordre des `docker run` (voir [Docker Compose](Docker-Compose.md)). Mais il pilote **un seul moteur**, et un cluster multi-hôtes (des machines gérées comme un tout) pose de nouvelles questions.
+
+| Compose sait… | … mais avec plusieurs hôtes, il faut aussi |
 |---|---|
-| les images, commandes et paramètres | `image:`, `build:`, `command:`, `environment:` |
-| les réseaux, volumes et secrets | `networks:`, `volumes:`, `secrets:` |
-| les dépendances et contrôles de santé | `depends_on:`, `healthcheck:` |
-| le démarrage et l'arrêt d'un projet | `docker compose up -d`, `docker compose down` |
+| décrire images, réseaux, volumes, secrets (`image:`, `networks:`, `volumes:`, `secrets:`) | **placer** chaque instance selon la place libre (CPU, mémoire) sur chaque hôte |
+| ordonner le démarrage (`depends_on:`, `healthcheck:`) | **joindre** des instances dont l'IP change à chaque recréation et d'un hôte à l'autre |
+| démarrer et arrêter un projet (`up -d`, `down`) | **réagir** quand un hôte disparaît : sur l'hôte mort, personne ne peut relancer quoi que ce soit |
 
-Compose simplifie le déploiement sur **un moteur Docker cible**. Ce fichier est déjà une **déclaration** d'infrastructure applicative : on décrit les services voulus, pas l'ordre des `docker run`. Détails dans [Docker Compose](Docker-Compose.md).
+???+ example "En vrai : Compose ne parle qu'à un moteur"
 
-### Ce que Compose ne fait pas
+    ![docker context ls : un seul moteur ; le projet Compose tourne sur cet hôte](assets/captures/k8s_contexte.png)
 
-Compose n'est pas, à lui seul, un orchestrateur : il n'assure ni la **disponibilité** ni le **placement automatique** sur un parc de machines. Quand le nombre de conteneurs augmente, il faut gérer leur cycle de vie, leur réseau et leur mise à jour, et Compose atteint ses limites dès qu'il s'agit d'un **cluster multi-hôtes** (un ensemble de machines gérées comme un tout).
+    Compose envoie ses ordres au moteur du contexte courant (ou de `DOCKER_HOST`), et à lui seul. Rien ne sait qu'un serveur B a de la place : si l'hôte tombe, le service reste arrêté jusqu'à une intervention humaine.
 
-### Les nouvelles questions posées par plusieurs hôtes
+## :material-restart: Redémarrer n'est pas replanifier
 
-| Question | Pourquoi « lancer plusieurs conteneurs » ne suffit pas |
-|---|---|
-| Où placer les instances ? | il faut connaître la place libre (CPU, mémoire) sur chaque hôte et choisir |
-| Comment les identifier à travers plusieurs hôtes ? | les adresses IP changent à chaque recréation et diffèrent d'un hôte à l'autre |
-| Que faire si un hôte disparaît ? | personne, sur l'hôte mort, ne peut relancer quoi que ce soit |
+Une **politique de redémarrage** (`restart: unless-stopped` dans Compose, `--restart` avec `docker run`) relance un conteneur **sur le même hôte**, à condition que le moteur et l'hôte fonctionnent. **Replanifier**, c'est recréer l'instance **ailleurs**.
 
-### Impératif ou déclaratif
+???+ example "En vrai : le moteur relance, puis abandonne"
 
-| Approche | On dit… | Qui agit ensuite ? |
-|---|---|---|
-| **Exécution impérative** | « démarre ce conteneur » | personne : la commande est exécutée une fois |
-| **Gestion déclarative** | « je veux trois instances disponibles de ce service » | un **contrôleur**, en continu |
+    ![on-failure:3 : trois relances par le même moteur, puis le conteneur reste arrêté](assets/captures/k8s_restart.png)
 
-Une **boucle de réconciliation** compare sans arrêt l'**état observé** (ce qui tourne réellement) à l'**état désiré** (ce qui est déclaré) et agit pour réduire l'écart. Le mécanisme est détaillé dans [Kubernetes : état désiré et réconciliation](Kubernetes-etat-desire.md).
+    Utile, mais local. Une politique de redémarrage ne traite ni une panne matérielle de l'hôte, ni une perte durable de connectivité, ni le choix d'un autre nœud, ni le rattachement des données sur ce nouveau nœud.
 
-### Redémarrer n'est pas replanifier
+???+ danger "En vrai : un healthcheck qui échoue ne répare rien"
 
-Une **politique de redémarrage** locale (`restart: unless-stopped` dans Compose, `--restart` avec `docker run`) relance un conteneur **sur le même hôte**, à condition que le moteur et l'hôte fonctionnent. Elle ne traite pas :
+    ![Conteneur unhealthy : toujours Up, zéro redémarrage, et il répond encore au trafic](assets/captures/k8s_sante.png)
 
-- une panne matérielle de l'hôte ;
-- une perte durable de connectivité ;
-- le choix d'un autre nœud (une machine du cluster) ;
-- le rattachement correct des données sur ce nouveau nœud.
+    Docker Engine **signale** `unhealthy`, Compose peut s'en servir pour l'ordre de démarrage (`depends_on` avec `condition: service_healthy`), mais aucun des deux ne remplace l'instance malade ni ne la retire du trafic. Détecter n'est pas agir : voir [Démarré n'est pas disponible](Demarre-n-est-pas-disponible.md).
 
-**Replanifier**, c'est recréer l'instance **ailleurs**. La tolérance aux pannes demande donc une coordination au-delà du conteneur.
+## :material-update: Changer de version, multiplier les instances
 
-### Déployer une nouvelle version sans coupure
+Avec Compose, mettre à jour, c'est **recréer le conteneur** : s'il est seul à servir, le service est coupé. En production, il faut des **réplicas** (copies identiques), des vérifications de disponibilité, une progression contrôlée, un retour arrière et un routage vers les seules instances saines.
 
-Avec Compose, une mise à jour consiste à **recréer le conteneur** : s'il est seul à servir le trafic, le service est interrompu pendant le remplacement. Une application en production peut nécessiter :
+???+ example "En vrai : une mise à jour coupe le site"
 
-- plusieurs **réplicas** (copies identiques d'une même instance) ;
-- des vérifications de disponibilité ;
-- une progression contrôlée de la mise à jour ;
-- une possibilité de retour arrière ;
-- un routage vers les seules instances saines.
+    ![Pendant la recréation du conteneur, la sonde reçoit 14 fois 000 : le site est coupé](assets/captures/k8s_coupure.png)
 
-L'orchestration formalise ces opérations de mise à jour et de remplacement **à l'échelle du service**, et non plus du conteneur.
+    Une sonde interroge le site toutes les 50 ms pendant `docker compose up -d`. Compose arrête l'ancien conteneur **avant** de démarrer le nouveau (les deux ne peuvent pas publier le même port) : 14 requêtes restent sans réponse. Un orchestrateur remplace les instances **une par une** : voir [Pod, Deployment, ReplicaSet](Pod-Deployment-ReplicaSet.md).
 
-### Ce que doit fournir un orchestrateur
+???+ example "En vrai : deux répliques, un seul port"
+
+    ![--scale web=2 : la seconde réplique veut le même port de l'hôte et ne démarre pas](assets/captures/k8s_scale.png)
+
+    Répliquer suppose un **point d'accès stable** qui répartit les requêtes entre instances, quel que soit leur nombre. Dans Kubernetes, c'est le rôle du **Service** : voir [Service et Ingress](Service-et-Ingress.md).
+
+## :material-kubernetes: Ce que doit fournir un orchestrateur
+
+On passe de l'**exécution impérative** (« démarre ce conteneur », exécuté une fois) à la **gestion déclarative** (« je veux trois instances disponibles », tenu en continu par un contrôleur). La plateforme de référence, **Kubernetes**, répond besoin par besoin :
 
 | Besoin | Fonction attendue | Réponse de Kubernetes |
 |---|---|---|
 | Placement | choisir les hôtes disponibles | le **scheduler** |
 | Réplicas | maintenir le nombre voulu | **Deployment** et **ReplicaSet** |
 | Réseau | découvrir et joindre les services | **Service** et DNS interne |
-| Mise à jour | remplacer progressivement les instances | stratégie **RollingUpdate** du Deployment |
+| Mise à jour | remplacer progressivement les instances | stratégie **RollingUpdate** |
 | Panne | détecter l'écart et agir | les **contrôleurs** (boucle de réconciliation) |
 | Configuration | distribuer paramètres et secrets | **ConfigMap** et **Secret** |
 
-Le stockage persistant, la sécurité et la supervision restent des sujets **à concevoir** : ils ne deviennent pas automatiques avec un orchestrateur.
+???+ example "En vrai : le même besoin, déclaré à Kubernetes"
 
-### Les orchestrateurs et la réponse de Kubernetes
+    ![Un pod supprimé à la main est aussitôt recréé par son ReplicaSet](assets/captures/k8s_reconciliation.png)
 
-Quand plusieurs conteneurs doivent coopérer, il faut automatiser les déploiements, gérer le réseau et les dépendances, assurer la tolérance aux pannes et monter en charge. Plusieurs orchestrateurs sont apparus pour cela : **Docker Swarm**, **Apache Mesos** et **Kubernetes**, devenu la référence.
+    On n'a pas demandé « lance un conteneur » mais déclaré « je veux un pod db ». Après la suppression, le cluster constate l'écart et recrée le pod sans intervention : c'est la boucle de réconciliation, détaillée dans [Kubernetes : état désiré et réconciliation](Kubernetes-etat-desire.md).
 
-Kubernetes introduit notamment :
+!!! tip "Ce qui reste à concevoir"
 
-- des **Pods** pour les unités d'exécution ;
-- des **Deployments** pour gérer des applications répliquées ;
-- des **Services** pour leur accès logique (un nom et une adresse stables) ;
-- des ressources de stockage, de configuration et de contrôle d'accès.
+    Le stockage persistant, la sécurité et la supervision ne deviennent **pas** automatiques avec un orchestrateur. Exemple : si un nœud tombe, ses données locales ne suivent pas toutes seules le pod recréé ailleurs.
 
-La plateforme repose sur des **contrôleurs** qui recherchent en permanence l'état désiré. Docker et Kubernetes ne sont pas au même niveau d'abstraction : on passe de la gestion de **conteneurs** à celle de **services répartis**. Kubernetes généralise et distribue ainsi les concepts de Compose à grande échelle : cluster multi-nœuds, haute disponibilité, auto-guérison.
+??? note "Swarm, Mesos, Kubernetes : un changement de niveau"
 
-### De l'image au service exploité
+    Quand plusieurs conteneurs doivent coopérer, il faut automatiser les déploiements, gérer le réseau et les dépendances, tolérer les pannes et monter en charge. Plusieurs orchestrateurs sont apparus : **Docker Swarm**, **Apache Mesos** et **Kubernetes**, devenu la référence. Kubernetes introduit des **Pods** (unités d'exécution), des **Deployments** (applications répliquées), des **Services** (un nom et une adresse stables) et des ressources de stockage, de configuration et de contrôle d'accès, le tout piloté par des **contrôleurs** qui recherchent en permanence l'état désiré.
 
-```
-Source  →  Image vérifiée  →  Exécution restreinte
-                                     ↓
-                             Réseaux et volumes
-                                     ↓
-                             Mesure et diagnostic
-                                     ↓
-                         Réconciliation multi-hôtes   ← l'orchestrateur
-```
+    Docker et Kubernetes ne sont pas au même niveau d'abstraction : on passe de la gestion de **conteneurs** à celle de **services répartis**. Kubernetes généralise les concepts de Compose à l'échelle d'un cluster : multi-nœuds, haute disponibilité, auto-guérison.
 
-Le cycle de vie d'une application conteneurisée englobe la construction, la distribution, l'exécution, la sécurité et l'exploitation. L'orchestrateur prend en charge la dernière marche.
+??? note "Le chemin parcouru jusqu'ici"
 
-> [!IMPORTANT]
-> **Les pièges à retenir**
-> 1. **Compose ≠ orchestrateur multi-hôtes.** Compose pilote un seul moteur Docker. Il ne déplace rien quand cet hôte tombe.
-> 2. **Healthcheck ≠ auto-réparation garantie.** Avec Docker Engine seul, un conteneur `unhealthy` est **signalé**, pas redémarré ni remplacé.
-> 3. **Redémarrer ≠ replanifier.** `restart:` relance sur place ; seul un orchestrateur recrée l'instance sur un autre nœud.
-> 4. **Orchestrer ne rend pas magique.** Données persistantes, sécurité et supervision se conçoivent toujours explicitement.
+    Un conteneur isole un processus dans un **noyau Linux partagé** ([Isolation d'un conteneur](Isolation-des-conteneurs.md)) grâce aux namespaces, aux cgroups et à OverlayFS. Docker Compose introduit une **première déclaration** d'infrastructure applicative. La montée en complexité des environnements distribués conduit naturellement à Kubernetes. Le cycle de vie complet :
 
-### À retenir
+    ```mermaid
+    flowchart LR
+        S["Source"] --> I["Image vérifiée"] --> E["Exécution restreinte"] --> R["Réseaux et volumes"] --> M["Mesure et diagnostic"] --> O["Réconciliation multi-hôtes"]
+        style O stroke-width:3px
+    ```
 
-- Un conteneur isole un processus dans un **noyau Linux partagé** ([Isolation d'un conteneur](Isolation-des-conteneurs.md)).
-- Docker et Podman exploitent des mécanismes du système : namespaces, cgroups, OverlayFS.
-- Docker Compose introduit une **première déclaration** d'infrastructure applicative.
-- La montée en complexité des environnements distribués conduit naturellement à **Kubernetes**, qui orchestre ces conteneurs à l'échelle du cluster.
+    L'orchestrateur prend en charge la dernière marche.
 
----
-
-## 2. Cas d'usage classiques
-
-### Cas 1 : un conteneur qui plante est relancé… sur place (politique de redémarrage)
-
-**Besoin.** Une application s'arrête en erreur de temps en temps ; on veut qu'elle reparte seule.
-
-```bash
-docker run -d --name crash --restart on-failure:3 alpine sh -c 'sleep 5; exit 1'
-sleep 30
-docker inspect -f '{{.RestartCount}} {{.State.Status}}' crash   # 3 exited
-docker rm -f crash
-```
-
-**Ce qu'on observe.** Le moteur relance le conteneur trois fois, puis abandonne. Tout se passe **sur le même hôte**, par le même démon Docker.
-**À retenir.** C'est utile, mais c'est un réflexe local. Si l'hôte s'éteint, il n'y a plus de démon pour relancer quoi que ce soit.
-
-### Cas 2 : l'hôte disparaît (Compose ne connaît qu'un moteur)
-
-**Besoin.** Le site tourne avec Compose sur le serveur A. Le serveur A tombe en panne.
-
-```bash
-docker context ls            # le contexte courant désigne UN moteur Docker
-docker compose ps            # n'interroge que ce moteur
-```
-
-**Ce qu'on observe.** Compose envoie ses ordres au moteur du contexte courant (ou de `DOCKER_HOST`), et à lui seul. Rien ne sait qu'un serveur B a de la place : le service reste arrêté jusqu'à une intervention humaine.
-**À retenir.** Il manque un composant qui **voit tout le parc**, constate l'absence des instances et les recrée ailleurs. C'est le cœur d'un orchestrateur.
-
-### Cas 3 : un healthcheck qui échoue ne répare rien (Docker Engine seul)
-
-```yaml
-services:
-  web:
-    image: nginx:1.27-alpine
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/n-existe-pas"]
-      interval: 5s
-      retries: 3
-```
-
-```bash
-docker compose up -d
-docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q web)   # starting, puis unhealthy
-```
-
-**Ce qu'on observe.** L'état passe à `unhealthy` et le conteneur **continue de tourner**. Docker Engine affiche le problème, Compose peut en tenir compte pour l'ordre de démarrage (`depends_on` avec `condition: service_healthy`), mais aucun des deux ne remplace l'instance malade.
-**À retenir.** Détecter n'est pas agir. Un orchestrateur relie la détection à une action : retirer l'instance du routage, la redémarrer, la remplacer. Voir [Démarré n'est pas disponible](Demarre-n-est-pas-disponible.md).
-
-### Cas 4 : mettre à jour un service unique provoque une coupure
-
-**Besoin.** Passer de `nginx:1.25` à `nginx:1.27`.
-
-```bash
-# terminal 1 : sonde qui interroge le site toutes les 0,2 s
-while true; do curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080; sleep 0.2; done
-# terminal 2 : on change le tag dans compose.yaml, puis
-docker compose up -d
-```
-
-**Ce qu'on observe.** Compose arrête l'ancien conteneur avant de démarrer le nouveau (les deux ne peuvent pas publier le port 8080 en même temps). Pendant ce court intervalle, la sonde affiche `000` (connexion refusée) : le site est coupé.
-**À retenir.** Sans autre instance pour servir le trafic, « recréer le conteneur » signifie interruption. Un orchestrateur remplace les instances **une par une** en gardant les autres en service : voir [Pod, Deployment, ReplicaSet](Pod-Deployment-ReplicaSet.md).
-
-### Cas 5 : multiplier les instances se heurte au port publié
-
-```yaml
-services:
-  web:
-    image: nginx:1.27
-    ports: ["8080:80"]
-```
-
-```bash
-docker compose up -d --scale web=2
-# Error ... Bind for 0.0.0.0:8080 failed: port is already allocated
-```
-
-**Ce qu'on observe.** Les deux répliques veulent le même port 8080 de l'hôte : la seconde ne peut pas démarrer. Il faudrait ajouter soi-même un répartiteur de charge devant.
-**À retenir.** Répliquer suppose un **point d'accès stable** qui répartit les requêtes entre instances, quel que soit leur nombre. Dans Kubernetes, c'est le rôle du **Service** : voir [Service et Ingress](Service-et-Ingress.md).
-
-### Cas 6 : le même besoin, exprimé à un orchestrateur
-
-```bash
-kubectl create deployment web --image=nginx:1.27 --replicas=3
-kubectl get pods -l app=web               # trois pods Running
-kubectl delete pod -l app=web --wait=false
-kubectl get pods -l app=web               # trois nouveaux pods, avec d'autres noms
-```
-
-**Ce qu'on observe.** On n'a pas demandé « lance trois conteneurs », on a déclaré « je veux trois réplicas ». Après la suppression, le cluster constate l'écart (0 observé, 3 désirés) et recrée trois pods sans intervention.
-**À retenir.** C'est la boucle de réconciliation en action. Elle est expliquée dans [Kubernetes : état désiré et réconciliation](Kubernetes-etat-desire.md).
-
----
-
-## 3. Idées de schémas
-
-### Schéma A : le nouveau problème, plusieurs hôtes
-
-```mermaid
-flowchart TB
-    C["Utilisateurs"] --> L["Point d'entrée"]
-    L --> H1["Hôte A : service web"]
-    L --> H2["Hôte B : service web"]
-    H1 --> B["Service de données"]
-    H2 --> B
-```
-
-À annoter avec les trois questions, chacune posée sur l'élément concerné : « où placer ? » sur les hôtes, « comment les joindre ? » sur le point d'entrée, « et si A disparaît ? » sur l'hôte A barré.
-
-### Schéma B : redémarrer ou replanifier
-
-```mermaid
-flowchart LR
-    subgraph Local["Politique de redémarrage locale"]
-        direction TB
-        A1["Hôte A"] --> C1["conteneur web"]
-        C1 -- "plante" --> A1
-        A1 -- "relance sur A" --> C1
-    end
-    subgraph Orch["Orchestrateur"]
-        direction TB
-        P["Plan de contrôle : web x2 désirés"]
-        NA["Nœud A (en panne)"]
-        NB["Nœud B"]
-        P -. "plus de nouvelles de A" .-> NA
-        P -- "recrée web sur B" --> NB
-    end
-```
-
-### Schéma C : besoins et réponses de Kubernetes
-
-```mermaid
-flowchart LR
-    B1["Placement"] --> K1["Scheduler"]
-    B2["Réplicas"] --> K2["Deployment / ReplicaSet"]
-    B3["Réseau"] --> K3["Service + DNS"]
-    B4["Mise à jour"] --> K4["RollingUpdate"]
-    B5["Panne"] --> K5["Contrôleurs"]
-    B6["Configuration"] --> K6["ConfigMap / Secret"]
-```
-
-En bas du schéma, un bandeau gris : « À concevoir soi-même : stockage persistant, sécurité, supervision ».
-
-### Schéma D : l'échelle des niveaux d'abstraction
-
-Trois marches d'escalier de gauche à droite : « Processus isolé » (Docker, `docker run`), « Application d'un hôte » (Compose, `compose.yaml`), « Service réparti sur un cluster » (Kubernetes, manifestes). Sous chaque marche, la question à laquelle elle répond : « comment isoler ? », « comment assembler ? », « comment garantir ? ».
-
----
-
-## 4. Script de motion design : « La nuit où le serveur A est tombé » (environ 70 s)
-
-Style : fond sombre, deux serveurs dessinés en blocs plats (A à gauche, B à droite), conteneurs en petits carrés bleus, une jauge « requêtes servies » en haut de l'écran.
-
-| Séq. | Durée | À l'écran | Animation | Texte à l'écran |
-|---|---|---|---|---|
-| 1 | 0-8 s | Le serveur A avec trois carrés « web » et un « db » ; le serveur B vide | Des points (requêtes) arrivent de la gauche et entrent dans les carrés ; la jauge est verte | « Un service, un serveur, un fichier Compose. » |
-| 2 | 8-16 s | Un carré « web » devient rouge et s'éteint | Une flèche circulaire part du serveur A et rallume le carré au même endroit | « Un conteneur plante : la politique de redémarrage le relance… sur place. » |
-| 3 | 16-26 s | Tout le serveur A clignote puis devient gris | Les carrés s'éteignent tous ; les points de requêtes rebondissent ; la jauge tombe à zéro ; le serveur B reste vide | « Le serveur tombe. Plus de moteur, plus de relance. B a de la place, mais personne ne le sait. » |
-| 4 | 26-34 s | Retour en arrière (effet de rembobinage) ; un bandeau « plan de contrôle » apparaît au-dessus des deux serveurs | Le bandeau affiche « désiré : web x3 » | « Rejouons la scène avec un orchestrateur. » |
-| 5 | 34-44 s | Le serveur A tombe de nouveau | Le bandeau affiche « observé : web x0 » en rouge, à côté de « désiré : web x3 » | « L'orchestrateur compare ce qu'il voit à ce qu'on lui a demandé. » |
-| 6 | 44-54 s | Trois carrés « web » apparaissent sur le serveur B | Les carrés naissent un par un ; une flèche « point d'entrée » se réoriente vers B ; la jauge remonte au vert | « Il replanifie ailleurs, et le point d'entrée suit. » |
-| 7 | 54-62 s | Zoom sur le carré « db », resté gris sur A | Un point d'interrogation clignote au-dessus | « Et les données ? Elles ne se déplacent pas toutes seules : ça se conçoit. » |
-| 8 | 62-70 s | Écran de synthèse : deux colonnes « Redémarrer » et « Replanifier » | Les mots « même hôte » et « autre nœud » s'inscrivent sous chaque colonne | « Compose exécute. Un orchestrateur garantit. » |
-
-**Conseil de réalisation.** L'effet de rembobinage de la séquence 4 est la clé : montrer **deux fois la même panne** rend la différence évidente. La séquence 7 évite le contresens fréquent selon lequel l'orchestrateur « sauve tout » : garder ce moment, même court.
-
----
-
-## 5. Vérifier soi-même
+## :material-flask-outline: À toi de jouer
 
 ```bash
 # 1. Redémarrage local : le moteur relance sur place, puis abandonne
-docker run -d --name crash --restart on-failure:3 alpine sh -c 'sleep 5; exit 1'
-sleep 30; docker inspect -f '{{.RestartCount}}' crash          # 3
+docker run -d --name crash --restart on-failure:3 alpine:3.22 sh -c 'sleep 2; exit 1'
+sleep 25; docker inspect -f '{{.RestartCount}} {{.State.Status}}' crash     # 3 exited
 docker rm -f crash
 
 # 2. Un healthcheck en échec ne remplace pas le conteneur
-docker run -d --name malade --health-cmd 'exit 1' --health-interval 5s --health-retries 2 nginx:1.27
-sleep 20; docker ps --filter name=malade --format '{{.Status}}'  # Up ... (unhealthy)
+docker run -d --name malade --health-cmd 'exit 1' --health-interval 2s --health-retries 2 nginx:stable
+sleep 12; docker ps --filter name=malade --format '{{.Status}}'           # Up ... (unhealthy)
 docker rm -f malade
 
 # 3. Le même besoin déclaré à Kubernetes (cluster Minikube démarré)
@@ -318,8 +146,26 @@ kubectl delete pod -l app=web --wait=false && kubectl get pods -l app=web -w   #
 kubectl delete deployment web
 ```
 
-## Voir aussi
+??? abstract "Pour les créateurs : script de motion design « La nuit où le serveur A est tombé » (70 s)"
 
-- [Accueil du wiki](../README.md)
-- Page précédente : [Secrets, fichiers, réseau et ressources](Secrets-fichiers-reseau-ressources.md)
-- Page suivante : [Kubernetes : état désiré et réconciliation](Kubernetes-etat-desire.md)
+    Fond sombre, deux serveurs dessinés en blocs plats (A à gauche, B à droite), conteneurs en petits carrés bleus, une jauge « requêtes servies » en haut de l'écran.
+
+    | Séq. | Durée | À l'écran | Animation | Texte à l'écran |
+    |---|---|---|---|---|
+    | 1 | 0-8 s | Le serveur A avec trois carrés « web » et un « db » ; le serveur B vide | Des points (requêtes) arrivent de la gauche et entrent dans les carrés ; la jauge est verte | « Un service, un serveur, un fichier Compose. » |
+    | 2 | 8-16 s | Un carré « web » devient rouge et s'éteint | Une flèche circulaire part du serveur A et rallume le carré au même endroit | « Un conteneur plante : la politique de redémarrage le relance… sur place. » |
+    | 3 | 16-26 s | Tout le serveur A clignote puis devient gris | Les carrés s'éteignent tous ; les points de requêtes rebondissent ; la jauge tombe à zéro ; le serveur B reste vide | « Le serveur tombe. Plus de moteur, plus de relance. B a de la place, mais personne ne le sait. » |
+    | 4 | 26-34 s | Retour en arrière (effet de rembobinage) ; un bandeau « plan de contrôle » apparaît au-dessus des deux serveurs | Le bandeau affiche « désiré : web x3 » | « Rejouons la scène avec un orchestrateur. » |
+    | 5 | 34-44 s | Le serveur A tombe de nouveau | Le bandeau affiche « observé : web x0 » en rouge, à côté de « désiré : web x3 » | « L'orchestrateur compare ce qu'il voit à ce qu'on lui a demandé. » |
+    | 6 | 44-54 s | Trois carrés « web » apparaissent sur le serveur B | Les carrés naissent un par un ; une flèche « point d'entrée » se réoriente vers B ; la jauge remonte au vert | « Il replanifie ailleurs, et le point d'entrée suit. » |
+    | 7 | 54-62 s | Zoom sur le carré « db », resté gris sur A | Un point d'interrogation clignote au-dessus | « Et les données ? Elles ne se déplacent pas toutes seules : ça se conçoit. » |
+    | 8 | 62-70 s | Écran de synthèse : deux colonnes « Redémarrer » et « Replanifier » | Les mots « même hôte » et « autre nœud » s'inscrivent sous chaque colonne | « Compose exécute. Un orchestrateur garantit. » |
+
+    L'effet de rembobinage de la séquence 4 est la clé : montrer **deux fois la même panne** rend la différence évidente. La séquence 7 évite le contresens selon lequel l'orchestrateur « sauve tout » : garder ce moment, même court.
+
+??? info "Pour les créateurs : idées de schémas"
+
+    - **Le nouveau problème, plusieurs hôtes** : utilisateurs, un point d'entrée, deux hôtes « service web », un service de données. Annoter chaque élément de sa question : « où placer ? » sur les hôtes, « comment les joindre ? » sur le point d'entrée, « et si A disparaît ? » sur l'hôte A barré.
+    - **Redémarrer ou replanifier** : à gauche, un hôte A dont le conteneur plante et repart sur A ; à droite, un plan de contrôle « web x2 désirés » qui n'a plus de nouvelles du nœud A et recrée web sur le nœud B.
+    - **Besoins et réponses** : six flèches besoin vers composant (Placement → Scheduler, Réplicas → Deployment / ReplicaSet, Réseau → Service + DNS, Mise à jour → RollingUpdate, Panne → Contrôleurs, Configuration → ConfigMap / Secret), avec en bas un bandeau gris « À concevoir soi-même : stockage persistant, sécurité, supervision ».
+    - **L'échelle des niveaux d'abstraction** : trois marches, « Processus isolé » (Docker, `docker run`, « comment isoler ? »), « Application d'un hôte » (Compose, `compose.yaml`, « comment assembler ? »), « Service réparti sur un cluster » (Kubernetes, manifestes, « comment garantir ? »).

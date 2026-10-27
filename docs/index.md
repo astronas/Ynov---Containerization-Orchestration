@@ -4,20 +4,9 @@ hide:
   - toc
 ---
 
-# Conteneurisation et orchestration, le cours complet !
+# Conteneurisation et orchestration { .visually-hidden }
 
-<div class="tech-logos">
-  <img src="assets/logos/docker.png" alt="Docker" title="Docker">
-  <img src="assets/logos/kubernetes.png" alt="Kubernetes" title="Kubernetes">
-  <img src="assets/logos/nginx.png" alt="nginx" title="nginx">
-  <img src="assets/logos/apache.png" alt="Apache" title="Apache">
-  <img src="assets/logos/mariadb.png" alt="MariaDB" title="MariaDB">
-  <img src="assets/logos/postgres.png" alt="PostgreSQL" title="PostgreSQL">
-  <img src="assets/logos/python.png" alt="Python" title="Python">
-  <img src="assets/logos/trivy.png" alt="Trivy" title="Trivy">
-  <img src="assets/logos/grafana.png" alt="Grafana" title="Grafana">
-  <img src="assets/logos/ubuntu-linux.png" alt="Ubuntu" title="Ubuntu">
-</div>
+![Cours Conteneurisation et orchestration](assets/illustrations/accueil.png){ .hero }
 
 ## Module **Conteneurisation et orchestration** (M2 Expert Cloud, Sécurité & Infrastructure)
 

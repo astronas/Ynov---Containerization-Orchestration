@@ -1,385 +1,187 @@
 # Contexte de build, cache et .dockerignore
 
-> **En une phrase.** Le constructeur ne voit que les fichiers du **contexte** (filtré par `.dockerignore`) et il **réutilise** le résultat d'une étape tant que ses entrées n'ont pas changé : bien filtrer le contexte et bien ordonner le Dockerfile, c'est construire vite, petit et sans fuite.
+<p class="lead">Le constructeur ne voit que les fichiers du <strong>contexte</strong>, filtré par <code>.dockerignore</code>, et il <strong>réutilise</strong> chaque étape tant que ses entrées n'ont pas changé. Bien filtrer et bien ordonner, c'est construire vite, petit et sans fuite.</p>
 
----
+![À gauche, le .dockerignore filtre le contexte ; à droite, une modification de app.py ne rejoue que les étapes qui suivent](assets/illustrations/img-cache.png){ .hero }
 
-## 1. Synthèse
+## L'essentiel en 30 secondes
 
-### Le modèle mental
+<div class="grid cards" markdown>
 
-```
-  dossier du projet
-        │
-        ▼   .dockerignore  (filtre appliqué AVANT l'envoi)
-  ┌─────────────┐
-  │  CONTEXTE   │  seuls fichiers lisibles par COPY et ADD
-  └─────┬───────┘
-        ▼
-  constructeur (BuildKit)
-        │   pour chaque étape : entrées identiques ?  ── oui ──►  CACHED (résultat réutilisé)
-        │                                              └─ non ──►  exécutée, et toutes les suivantes aussi
-        ▼
-      image
-```
+-   :material-folder-arrow-right-outline:{ .lg .middle } __Le contexte__
 
-### Le contexte de construction
+    ---
+
+    Le dernier argument de `docker build`. `COPY` ne peut rien lire en dehors.
+
+-   :material-filter-outline:{ .lg .middle } __.dockerignore__
+
+    ---
+
+    Exclut des fichiers **avant** l'envoi. Un fichier ignoré ne peut pas être copié.
+
+-   :material-cached:{ .lg .middle } __Le cache__
+
+    ---
+
+    Entrées identiques : `CACHED`. Une étape invalidée **invalide toutes les suivantes**.
+
+-   :material-layers-minus:{ .lg .middle } __Multi-étapes__
+
+    ---
+
+    On compile dans une étape, on ne livre que le résultat.
+
+</div>
+
+!!! warning "À retenir"
+
+    **Le stable en haut, ce qui change souvent en bas.** Et un secret s'**exclut** du contexte : le supprimer dans une étape suivante ne l'efface pas de l'image.
+
+## :material-folder-arrow-right-outline: Le contexte et son filtre
 
 ```bash
-docker build -t atelier-web:1.0 .
-#                               └── le contexte : ici, le répertoire courant
+docker build -t web:1.0 .                      # le contexte : le dossier courant
+docker build -f docker/Dockerfile -t web:1.0 . # Dockerfile ailleurs, contexte toujours « . »
 ```
 
-| Règle | Conséquence |
+`COPY ../config.ini .` est impossible : on ne sort pas du contexte. Le fichier `.dockerignore`, à la **racine du contexte**, retire des fichiers avant leur transfert :
+
+| Motif | Exclut |
 |---|---|
-| Le **dernier argument** de `docker build` désigne le contexte | c'est la racine des chemins sources de `COPY` et `ADD` |
-| Le constructeur ne lit que les fichiers du contexte, **après** application de `.dockerignore` | `COPY ../config.ini .` est impossible : on ne sort pas du contexte |
-| `-f` permet de placer le Dockerfile ailleurs | `docker build -f docker/Dockerfile .` garde `.` comme racine du contexte |
-| Le répertoire du Dockerfile et le contexte **ne sont pas synonymes** | un Dockerfile rangé dans `docker/` copie quand même depuis la racine du contexte |
+| `*.log` | les `.log` **à la racine seulement** |
+| `**/*.log` | les `.log` à tous les niveaux |
+| `secrets/` | le dossier `secrets` à la racine |
+| `!important.log` | **réinclut** ce fichier malgré une règle précédente |
 
-### `.dockerignore` : filtrer ce qui part au constructeur
+???+ example "En vrai : 50 Mo oubliés dans `public/`, trois `.dockerignore`"
 
-Sans filtrage, le contexte peut contenir le dépôt Git, des caches, des journaux, des fichiers temporaires ou des documents privés. Le fichier `.dockerignore`, placé **à la racine du contexte**, exclut des éléments **avant leur transfert**. Cela réduit les transferts inutiles et évite que des fichiers non souhaités soient disponibles pendant le build. Un fichier ignoré **ne peut pas** être copié par `COPY`.
+    ![Le contexte transféré : 52 Mo sans filtre, encore 52 Mo avec *.tmp, 86 octets avec **/*.tmp](assets/captures/img_contexte.png)
 
-Exemple pour une application Python :
+    La première petite ligne (`2B`, `46B`, `55B`) est le transfert du `.dockerignore` lui-même ; la seconde, celui du contexte. Le motif `*.tmp` ne voit pas `public/gros.tmp`.
 
-```
-.git
-__pycache__/
-*.pyc
-*.log
-.env
-secrets/
-```
+???+ example "En vrai : ce qui compte, c'est ce qui est DANS l'image"
 
-| Motif | Ce qu'il exclut |
-|---|---|
-| `*.log` | les fichiers `.log` **à la racine du contexte seulement** |
-| `**/*.log` | les fichiers `.log` à tous les niveaux |
-| `secrets/` | le dossier `secrets` à la racine et son contenu |
-| `!important.log` | une **exception** : réinclut ce fichier malgré une règle précédente |
-| `# commentaire` | une ligne ignorée |
+    ![L'archive est présente dans l'image avec le motif racine, absente avec le motif récursif ; 112 Mo contre 6,8 Mo](assets/captures/img_dockerignore.png)
 
-`.dockerignore` et `.gitignore` répondent à des usages différents : le premier filtre ce que reçoit le constructeur, le second ce que Git suit. On peut vouloir versionner un fichier sans l'envoyer au build (la documentation), ou l'inverse.
+??? note "Un petit transfert ne prouve rien"
 
-### Le cache de construction
+    BuildKit garde une copie des contextes déjà reçus et n'envoie que les **différences** : un `transferring context: 100B` peut cacher un gros fichier déjà transmis lors d'un build précédent. On vérifie donc toujours le **contenu de l'image** (`docker run --rm image ls -lh /chemin`). Sur son propre poste, on peut repartir d'une base propre en vidant ce seul cache : `docker builder prune -f --filter type=source.local`.
 
-Quand une étape et ses **entrées pertinentes** sont inchangées, le constructeur réutilise un résultat précédent (`CACHED` dans la sortie).
+`.dockerignore` et `.gitignore` n'ont pas le même rôle : l'un filtre ce que reçoit le constructeur, l'autre ce que Git suit.
 
-| Instruction | Ce qui entre dans la clé de cache |
+## :material-cached: Le cache, étape par étape
+
+| Instruction | Clé de cache |
 |---|---|
 | `FROM` | l'image de base désignée (son digest) |
-| `RUN` | l'étape précédente et le **texte** de la commande, pas ce qu'elle télécharge |
-| `COPY`, `ADD` | l'étape précédente et une **empreinte du contenu** des fichiers copiés |
-| `ENV`, `USER`, `CMD`, `WORKDIR`… | l'étape précédente et la valeur écrite |
+| `RUN` | l'étape précédente + le **texte** de la commande (pas ce qu'elle télécharge) |
+| `COPY`, `ADD` | l'étape précédente + l'**empreinte du contenu** copié |
+| `ENV`, `USER`, `CMD`… | l'étape précédente + la valeur écrite |
 
-Avec le Dockerfile de l'exemple, si seul `app.py` change :
+???+ example "En vrai : les dépendances avant le code"
 
-```
-FROM python:…        → réutilisable si la base est inchangée
-WORKDIR /app         → réutilisable
-RUN useradd …        → réutilisable
-COPY app.py .        → à recalculer : le contenu copié a changé
-ENV / USER / CMD …   → recalculés, puisqu'ils suivent une étape recalculée
-```
+    ![Premier build en 15 s ; après modification de app.py, seule la dernière copie est rejouée, en 2 s](assets/captures/img_cache.png)
 
-**Dès qu'une étape est invalidée, toutes les suivantes le sont aussi.** D'où la règle d'or : **placer les opérations stables avant les fichiers souvent modifiés.**
+    `requirements.txt` n'a pas changé : l'installation reste en cache. `--no-cache-dir` empêche `pip` de laisser son propre cache dans la couche.
 
-### Cache et fraîcheur : deux sujets différents
+???+ danger "En vrai : le même projet, mal ordonné"
 
-| Option | Effet | Ce qu'elle ne fait pas |
-|---|---|---|
-| (aucune) | réutilise tout ce qui peut l'être | ne vérifie ni la base dans le registre, ni les dépôts de paquets |
-| `--pull` | vérifie s'il existe une version plus récente de l'image de base | ne désactive pas le reste du cache |
-| `--no-cache` | rejoue toutes les étapes | ne garantit pas à lui seul des dépendances à jour, et ne retélécharge pas la base sans `--pull` |
-| `--pull --no-cache` | base vérifiée et toutes les étapes rejouées | ne remplace pas une politique de mise à jour |
+    ![Avec COPY . . avant pip install, chaque modification du code relance l'installation : 13 s](assets/captures/img_cache_ordre.png)
 
-Le cache accélère le build ; il ne remplace pas une politique de mise à jour. Une étape `RUN apt-get …` en cache n'a pas revu le dépôt de paquets, et une image de base référencée par tag a pu être republiée.
+    Même schéma pour Node.js (`COPY package*.json ./` puis `npm ci`), Java (`pom.xml`) ou Go (`go.mod`, `go.sum`).
 
-### Construire une image plus maîtrisable
+!!! tip "Cache et fraîcheur sont deux sujets"
 
-- choisir une image de base **maintenue** et adaptée au besoin ;
-- limiter les fichiers et outils inutiles (contexte filtré, base minimale, `--no-cache-dir` pour `pip`) ;
-- utiliser un utilisateur non-root lorsque c'est possible ;
-- séparer ce qui change souvent de ce qui change rarement ;
-- ne jamais intégrer de secret dans le Dockerfile, le contexte ou l'image ;
-- pour une application **compilée**, utiliser un **build multi-étapes** : une étape avec les outils de compilation, une image finale qui ne reçoit que l'artefact produit (`COPY --from=…`).
+    Le cache **ne voit pas le réseau** : un `RUN apk add` ou `pip install` en cache n'a pas revu les dépôts, et un tag de base a pu être republié.
 
-> [!IMPORTANT]
-> **Les pièges à retenir**
-> 1. **Un motif sans `**/` ne vise que la racine du contexte.** `*.tmp` n'exclut pas `public/gros.tmp` ; il faut `**/*.tmp`.
-> 2. **Supprimer un fichier dans une étape suivante ne l'efface pas de l'image.** Il reste dans la couche qui l'a ajouté, distribuée avec l'image. Un secret doit être **exclu du contexte**, pas supprimé après coup.
-> 3. **`.dockerignore` n'est qu'une liste d'exclusions maintenue à la main.** Un oubli, un motif mal écrit ou un `COPY . .` suffit à embarquer un fichier sensible. Il ne protège ni `ENV`, ni `ARG`, ni l'historique.
-> 4. **Le cache ne voit pas le réseau.** Il compare le texte d'un `RUN`, pas ce que la commande téléchargerait aujourd'hui.
-> 5. **Instruction, étape de cache et couche sont trois choses différentes** : une étape peut être en cache sans produire de couche, et une couche ne correspond pas toujours à une ligne d'historique.
+    | Option | Effet |
+    |---|---|
+    | `--pull` | vérifie si la base a une version plus récente ; garde le reste du cache |
+    | `--no-cache` | rejoue toutes les étapes, sans revérifier la base |
+    | `--pull --no-cache` | les deux : pour une livraison ou après un correctif de sécurité |
 
----
+## :material-shield-alert-outline: Ce qui part dans l'image
 
-## 2. Cas d'usage classiques
+???+ danger "En vrai : supprimer après coup ne suffit pas"
 
-### Cas 1 : mesurer ce qui part réellement au constructeur
+    ![Le .env n'apparaît plus dans le conteneur, mais on le relit dans la couche du COPY extraite de l'image](assets/captures/img_fuite.png)
 
-**Besoin.** Vérifier qu'un fichier volumineux (une archive de 200 Mo oubliée dans le projet) ne ralentit pas le build et n'arrive pas dans l'image.
+    Quiconque récupère l'image (`docker pull`, `docker image save`) peut lire la couche du `COPY`. La bonne approche : **exclure** (`.env`, `**/.env`, `secrets/` dans `.dockerignore`), puis monter le secret le temps d'une seule commande :
 
-```bash
-docker build --progress=plain -t demo/web-php:ctx-test ./app 2>&1 | grep -E "transferring context: [0-9]"
-docker image ls demo/web-php
-docker run --rm demo/web-php:ctx-test ls -lh /var/www/html/
-```
+    ```dockerfile
+    RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm ci --omit=dev
+    ```
 
-Sur un poste de test, avec un Dockerfile qui ne copie que `public/` :
+    ```bash
+    docker build --secret id=npmrc,src=$HOME/.npmrc -t app:1.0 .
+    ```
 
-| Emplacement du fichier de 200 Mo | Contexte transféré | Taille de l'image | Fichier dans l'image ? |
-|---|---|---|---|
-| `app/gros.tmp` (hors de `public/`) | 63 B | 721 Mo | non |
-| `app/public/gros.tmp` | **209,77 MB** (4,5 s) | **931 Mo** | **oui** |
+    Les secrets d'**exécution**, eux, se montent au lancement : voir [Secrets, fichiers, réseau et ressources](Secrets-fichiers-reseau-ressources.md).
 
-**Ce qu'on observe.** BuildKit n'envoie que les chemins dont les `COPY` ont besoin : hors de `public/`, le fichier n'a même pas été transmis. Dans `public/`, il est transféré **et** il finit dans l'image, qui prend 210 Mo.
-**À retenir.** Une grosse archive ralentit chaque build et gonfle l'image dès qu'un `COPY` la prend. Des fichiers temporaires dans le contexte rendent aussi les builds moins reproductibles et cassent le cache des `COPY`.
+???+ example "En vrai : un build multi-étapes, de 353 Mo à 112 ko"
 
-### Cas 2 : le piège du motif écrit pour la racine
+    ![L'étape de compilation est abandonnée ; l'image finale ne contient que le binaire, sans gcc ni shell](assets/captures/img_multi.png)
 
-Même situation, avec un `.dockerignore` qui contient `*.tmp`.
+    L'étape `build` porte le compilateur ; seule la sortie passe par `COPY --from=build`. L'image finale n'a ni compilateur, ni sources, ni gestionnaire de paquets : moins de composants à suivre. Pour un serveur Python sans compilation, le gain serait faible.
 
-```
-# .dockerignore, première version
-*.tmp
-```
+??? note "Le même principe en Go, avec une base distroless"
 
-**Ce qu'on observe.** Le fichier `public/gros.tmp` est **toujours** transféré et présent dans l'image : le motif ne vise que la racine du contexte. Avec la forme récursive, le contexte tombe à 124 B et le fichier disparaît de l'image :
+    ```dockerfile
+    FROM golang:1.24 AS build
+    WORKDIR /src
+    COPY go.* ./
+    RUN go mod download
+    COPY . .
+    RUN CGO_ENABLED=0 go build -o /out/app .
 
-```
-# .dockerignore, version corrigée
-*.tmp
-**/*.tmp
-*.log
-**/*.log
-.env
-**/.env
-.git
-**/.git
-```
+    FROM gcr.io/distroless/static-debian12:nonroot
+    COPY --from=build /out/app /app
+    ENTRYPOINT ["/app"]
+    ```
 
-**Un second piège, plus discret.** Lors d'un essai, la sortie annonçait seulement `transferring context: 100B`, alors que le fichier de 200 Mo était encore copié dans l'image. Le transfert du contexte est **incrémental** : BuildKit garde une copie des fichiers déjà reçus et n'envoie que les différences. Un petit chiffre ne prouve donc pas qu'un fichier est exclu. Pour vérifier sur une base propre, on peut vider ce seul cache de contextes locaux, puis regarder **le contenu de l'image** :
+    La variante `nonroot` fait tourner le binaire sous un utilisateur non privilégié.
+
+## :material-flask-outline: À toi de jouer
 
 ```bash
-docker builder prune -f --filter type=source.local
-docker run --rm mon-image ls -lh /chemin/copié/
-```
-
-**À retenir.** Tester un `.dockerignore`, c'est regarder ce qui est **dans l'image**, pas seulement la taille annoncée du transfert.
-
-### Cas 3 : tenir un secret hors de l'image
-
-**Besoin.** Le projet contient un fichier `.env` avec des mots de passe et un dossier `secrets/`.
-
-La mauvaise idée :
-
-```dockerfile
-COPY . .
-RUN rm -f .env          # trop tard : .env est déjà dans la couche du COPY
-```
-
-**Ce qu'on observe.** L'image finale ne montre plus `.env` dans son arborescence, mais la couche ajoutée par `COPY . .` le contient toujours. Quiconque récupère l'image (`docker pull`, `docker image save`) peut extraire cette couche et lire le fichier.
-
-La bonne approche : exclure, puis transmettre le secret par un mécanisme dédié.
-
-```
-# .dockerignore
-.env
-.env.*
-**/.env
-secrets/
-```
-
-```dockerfile
-# Un secret nécessaire PENDANT le build (ici un jeton de dépôt npm privé) est monté
-# le temps d'une seule commande, sans jamais être écrit dans une couche.
-RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm ci --omit=dev
-```
-
-```bash
-docker build --secret id=npmrc,src=$HOME/.npmrc -t myapp:1.0 .
-```
-
-**À retenir.** Exclure un secret du contexte vaut mieux que le copier puis tenter de le supprimer. Les secrets nécessaires **à l'exécution** se montent au lancement du conteneur : voir [Secrets, fichiers, réseau et ressources](Secrets-fichiers-reseau-ressources.md) et [Sécurité des images](Securite-des-images.md).
-
-### Cas 4 : voir le cache travailler
-
-**Besoin.** Comprendre pourquoi un second build prend moins d'une seconde.
-
-```dockerfile
-FROM php:8.4-apache
-RUN docker-php-ext-install pdo_mysql
-WORKDIR /var/www/html
-COPY public/ /var/www/html/
-```
-
-Après modification du **seul** code PHP, sur un poste de test :
-
-```
-#5 [1/4] FROM docker.io/library/php:8.4-apache@sha256:c6527b06c772…
-#6 [2/4] RUN docker-php-ext-install pdo_mysql
-#6 CACHED
-#7 [3/4] WORKDIR /var/www/html
-#7 CACHED
-#8 [4/4] COPY public/ /var/www/html/
-#8 DONE 0.1s
-```
-
-**Ce qu'on observe.** Build complet en **0,7 s**, contre **21,5 s** avec `--no-cache`. La clé du `RUN` (étape parente + texte de la commande) n'a pas changé ; celle du `COPY` inclut l'empreinte des fichiers copiés, qui a changé.
-**À retenir.** L'extension, lente et stable, est installée **avant** la copie du code. Dans l'ordre inverse, chaque modification du code relancerait la compilation de l'extension.
-
-### Cas 5 : copier les dépendances avant le code
-
-**Besoin.** Une application Python avec des bibliothèques externes listées dans `requirements.txt`.
-
-Ordre à éviter :
-
-```dockerfile
-COPY . .
-RUN pip install --no-cache-dir -r requirements.txt   # rejoué à CHAQUE modification du code
-```
-
-Ordre recommandé :
-
-```dockerfile
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt   # rejoué seulement si requirements.txt change
-COPY app.py .
-```
-
-**Ce qu'on observe.** Modifier `app.py` ne force pas, à lui seul, la réinstallation des dépendances si `requirements.txt` et les autres entrées pertinentes sont inchangés. `--no-cache-dir` empêche `pip` de garder son propre cache de téléchargement dans la couche, donc dans l'image.
-**À retenir.** Le même schéma vaut pour Node.js (`COPY package*.json ./` puis `RUN npm ci`), Java (`pom.xml`), Go (`go.mod`, `go.sum`). Le petit service HTTP de l'exemple, sans dépendance externe, n'en a pas besoin.
-
-### Cas 6 : récupérer des mises à jour malgré le cache
-
-**Besoin.** Un correctif de sécurité vient d'être publié pour l'image de base et pour un paquet installé par `RUN`.
-
-```bash
-docker build --pull -t atelier-web:1.0.1 .               # base vérifiée dans le registre
-docker build --pull --no-cache -t atelier-web:1.0.1 .    # base vérifiée ET toutes les étapes rejouées
-```
-
-**Quand utiliser `--no-cache`.**
-- récupérer des mises à jour que la clé de cache ne voit pas (paquets téléchargés par un `RUN apt-get` ou `pip install`) ;
-- produire une version finale de livraison, ou reconstruire après un correctif de sécurité ;
-- diagnostiquer un build qui semble dépendre d'un état ancien mis en cache.
-
-**À retenir.** Le cache n'est pas une politique de mise à jour. Reconstruire régulièrement, avec `--pull`, fait partie de l'entretien d'une image (voir [Sécurité des images](Securite-des-images.md)).
-
-### Cas 7 : séparer compilation et exécution (build multi-étapes)
-
-**Besoin.** Un service écrit en Go doit être compilé. Les outils de compilation (plusieurs centaines de Mo) n'ont rien à faire dans l'image de production.
-
-```dockerfile
-# Étape 1 : compilation
-FROM golang:1.24 AS build
-WORKDIR /src
-COPY go.* ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 go build -o /out/app .
-
-# Étape 2 : exécution, sans compilateur ni shell
-FROM gcr.io/distroless/static-debian12:nonroot
-COPY --from=build /out/app /app
-ENTRYPOINT ["/app"]
-```
-
-**Ce qu'on observe.** L'image finale ne contient que le binaire et le strict nécessaire : ni compilateur, ni sources, ni gestionnaire de paquets. La variante `nonroot` fait tourner le processus sous un utilisateur non privilégié.
-**À retenir.** Le build multi-étapes réduit les composants présents dans l'image distribuée et facilite sa maintenance. Pour le serveur Python de l'exemple, qui n'a rien à compiler, il n'apporterait que peu de bénéfices.
-
----
-
-## 3. Idées de schémas
-
-### Schéma A : l'entonnoir du contexte
-
-```mermaid
-flowchart LR
-    P["Dossier du projet<br/>.git, node_modules, .env,<br/>gros.tmp, app.py, public/"] --> F{".dockerignore"}
-    F -->|"exclus, jamais envoyés"| X["Corbeille"]
-    F -->|"retenus"| C["Contexte"]
-    C -->|"seuls les chemins des COPY"| B["Constructeur BuildKit"]
-    B --> I["Image"]
-```
-
-### Schéma B : la cascade d'invalidation
-
-```mermaid
-flowchart TB
-    s1["FROM python:3.13-slim-bookworm"]:::ok --> s2["WORKDIR /app"]:::ok
-    s2 --> s3["RUN useradd … app"]:::ok
-    s3 --> s4["COPY app.py . (fichier modifié)"]:::ko
-    s4 --> s5["ENV PORT=8080"]:::ko
-    s5 --> s6["USER app"]:::ko
-    s6 --> s7["CMD python app.py"]:::ko
-    classDef ok fill:#d4edda,stroke:#2e7d32,color:#1b5e20
-    classDef ko fill:#f8d7da,stroke:#c62828,color:#b71c1c
-```
-
-Vert : `CACHED`. Rouge : rejoué. Le rouge ne remonte jamais, il ne fait que descendre.
-
-### Schéma C : deux ordres, deux temps de build
-
-Deux colonnes côte à côte. À gauche, « `COPY . .` puis `pip install` » : à chaque modification de code, une longue barre rouge « installation des dépendances » réapparaît. À droite, « `COPY requirements.txt`, `pip install`, puis `COPY app.py` » : la barre d'installation reste verte, seule une fine barre rouge « copie du code » est rejouée. Sous chaque colonne, un chronomètre (par exemple 21 s contre moins d'une seconde).
-
-### Schéma D : le build multi-étapes
-
-```mermaid
-flowchart LR
-    S["Sources"] --> B["Étape de compilation<br/>golang : compilateur, outils"]
-    B -->|"COPY --from=build"| R["Image d'exécution<br/>distroless : binaire seul"]
-    R --> C["Conteneur"]
-    B -.->|"abandonnée, non distribuée"| T["(rien)"]
-```
-
----
-
-## 4. Script de motion design : « Le cache se casse à partir d'une ligne » (environ 70 s)
-
-Style : le Dockerfile affiché verticalement, chaque instruction dans une case ; à droite de chaque case, un témoin (vert « CACHED », rouge « rejoué ») et un chronomètre global en haut.
-
-| Séq. | Durée | À l'écran | Animation | Texte à l'écran |
-|---|---|---|---|---|
-| 1 | 0-8 s | Un dossier de projet plein d'objets (`.git`, `.env`, archive de 200 Mo, `app.py`) | Un tamis `.dockerignore` passe : `.git`, `.env` et l'archive tombent à côté ; `app.py` passe | « Le constructeur ne reçoit que le contexte, filtré par .dockerignore. » |
-| 2 | 8-16 s | Premier build : les 7 cases s'allument une à une | Chaque case s'exécute, témoins rouges, chronomètre à 21 s | « Premier build : toutes les étapes sont exécutées. » |
-| 3 | 16-24 s | Second build sans modification | Les 7 témoins passent au vert d'un coup, chronomètre à moins d'1 s | « Rien n'a changé : tout est réutilisé. » |
-| 4 | 24-36 s | On modifie `app.py` (un crayon touche le fichier) | Les cases 1 à 3 restent vertes ; la case `COPY` devient rouge, puis le rouge **coule** vers les cases du dessous | « Une entrée change : l'étape et toutes les suivantes sont rejouées. » |
-| 5 | 36-48 s | Même modification, avec un Dockerfile mal ordonné (`COPY . .` avant `pip install`) | Le rouge part de haut, la longue case « installation » est rejouée, chronomètre qui s'emballe | « Mal ordonné, le moindre changement relance tout. » |
-| 6 | 48-58 s | Le registre de paquets, en arrière-plan, affiche « nouvelle version » | La case `RUN apt-get` reste verte malgré tout ; un point d'exclamation apparaît | « Le cache ne voit pas le réseau : vert ne veut pas dire à jour. » |
-| 7 | 58-66 s | Boutons `--pull` et `--no-cache` | `--pull` rafraîchit la case `FROM` ; `--no-cache` repeint toutes les cases en rouge | « --pull vérifie la base, --no-cache rejoue tout. » |
-| 8 | 66-70 s | Synthèse | Le Dockerfile se réordonne : stable en haut, changeant en bas | « Le stable en haut, ce qui change en bas. » |
-
-**Conseil de réalisation.** Le moment clé est la séquence 4 : le rouge doit **couler vers le bas** comme un liquide, sans jamais remonter, pour faire sentir la cascade. Garder la même modification de `app.py` en séquences 4 et 5 pour que la comparaison des chronomètres soit juste.
-
----
-
-## 5. Vérifier soi-même
-
-```bash
-mkdir -p ~/demo-ctx/public && cd ~/demo-ctx
+mkdir -p demo-ctx/public && cd demo-ctx
 echo '<h1>ok</h1>' > public/index.html
-truncate -s 200M public/gros.tmp
+head -c 50M /dev/urandom > public/gros.tmp
 printf 'FROM busybox:1.37\nCOPY public/ /www/\n' > Dockerfile
 
 echo '*.tmp' > .dockerignore
-docker build --progress=plain -t demo-ctx . 2>&1 | grep "transferring context: [0-9]"
-docker run --rm demo-ctx ls -lh /www                 # gros.tmp est là
+docker build --progress=plain -t demo-ctx . 2>&1 | grep 'transferring context: [0-9]'
+docker run --rm demo-ctx ls /www                  # gros.tmp est là
 
 echo '**/*.tmp' >> .dockerignore
-docker build --progress=plain -t demo-ctx . 2>&1 | grep -E "transferring context: [0-9]|CACHED"
-docker run --rm demo-ctx ls -lh /www                 # gros.tmp a disparu
+docker build --progress=plain -t demo-ctx . 2>&1 | grep 'transferring context: [0-9]'
+docker run --rm demo-ctx ls /www                  # gros.tmp a disparu
 
 echo '<h1>v2</h1>' > public/index.html
-docker build --progress=plain -t demo-ctx . 2>&1 | grep -E "COPY|CACHED|DONE"   # seul le COPY est rejoué
-docker image rm demo-ctx && rm -rf ~/demo-ctx
+docker build --progress=plain -t demo-ctx . 2>&1 | grep -E '^#[0-9]+ (\[[0-9]|CACHED)'
+docker image rm demo-ctx && cd .. && rm -rf demo-ctx
 ```
 
-## Voir aussi
+??? abstract "Pour les créateurs : script de motion design (70 s)"
 
-- [Accueil du wiki](../README.md)
-- Page précédente : [Écrire un Dockerfile](Ecrire-un-Dockerfile.md)
-- Page suivante : [Versionner et publier une image](Versionner-et-publier-une-image.md)
-- Pour aller plus loin : [Sécurité des images](Securite-des-images.md) (secrets dans les couches, images minimales)
+    Le Dockerfile affiché verticalement, une case par instruction ; à droite de chaque case, un témoin (vert « CACHED », rouge « rejoué ») et un chronomètre global en haut.
+
+    | Séq. | Durée | À l'écran | Animation | Texte à l'écran |
+    |---|---|---|---|---|
+    | 1 | 0-8 s | Un dossier de projet (`.git`, `.env`, archive de 50 Mo, `app.py`) | Un tamis `.dockerignore` passe : `.git`, `.env` et l'archive tombent à côté | « Le constructeur ne reçoit que le contexte, filtré par .dockerignore. » |
+    | 2 | 8-16 s | Premier build : les cases s'allument une à une | Témoins rouges, chronomètre à 15 s | « Premier build : toutes les étapes sont exécutées. » |
+    | 3 | 16-24 s | Second build sans modification | Tous les témoins passent au vert, chronomètre sous 2 s | « Rien n'a changé : tout est réutilisé. » |
+    | 4 | 24-36 s | Un crayon touche `app.py` | Les cases du haut restent vertes ; la case `COPY app.py` rougit, puis le rouge **coule** vers le bas | « Une entrée change : l'étape et toutes les suivantes sont rejouées. » |
+    | 5 | 36-48 s | Même modification, Dockerfile mal ordonné (`COPY . .` avant `pip install`) | La longue case « installation » est rejouée, chronomètre qui s'emballe | « Mal ordonné, le moindre changement relance tout. » |
+    | 6 | 48-58 s | Le dépôt de paquets affiche « nouvelle version » | La case `RUN pip` reste verte ; un point d'exclamation apparaît | « Le cache ne voit pas le réseau : vert ne veut pas dire à jour. » |
+    | 7 | 58-66 s | Boutons `--pull` et `--no-cache` | `--pull` rafraîchit `FROM` ; `--no-cache` repeint tout en rouge | « --pull vérifie la base, --no-cache rejoue tout. » |
+    | 8 | 66-70 s | Synthèse | Le Dockerfile se réordonne : stable en haut, changeant en bas | « Le stable en haut, ce qui change en bas. » |
+
+    Moment clé : en séquence 4, le rouge **coule vers le bas** sans jamais remonter. Garder la même modification en séquences 4 et 5 pour comparer les chronomètres (2 s contre 13 s mesurés).
+
+??? info "Pour les créateurs : idées de schémas"
+
+    - **Deux ordres, deux temps** : deux colonnes ; à gauche `COPY . .` puis `pip install`, une longue barre rouge « installation » réapparaît à chaque modification ; à droite, seule une fine barre « copie du code » est rejouée. Chronomètres 13 s et 2 s.
+    - **Le build multi-étapes** : sources, étape de compilation (compilateur, outils), flèche `COPY --from=build` vers l'image d'exécution (binaire seul) ; l'étape de compilation part en pointillés vers « abandonnée, non distribuée ».
+    - **Trois notions distinctes** : une instruction, une étape de cache, une couche. Une étape peut être en cache sans produire de couche, et une couche ne correspond pas toujours à une ligne d'historique.

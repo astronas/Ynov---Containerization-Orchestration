@@ -62,7 +62,7 @@ nav = [
 [project.theme]
 language = "fr"
 custom_dir = "overrides"
-logo = "assets/logo_ynov_campus_sophia.png"
+logo = "assets/logo_ynov_white.png"
 favicon = "assets/favicon.svg"
 
 features = [
@@ -77,6 +77,7 @@ features = [
   "navigation.top",
   "navigation.footer",
   "toc.follow",
+  "toc.integrate",
   "search.highlight",
   "content.code.copy",
   "content.code.annotate",
@@ -87,7 +88,7 @@ features = [
 ]
 
 [project.theme.font]
-text = "Inter"
+text = "Inter"  # titres : Bahnschrift / Barlow Semi Condensed (extra.css)
 code = "JetBrains Mono"
 
 # Palette : couleurs de marque YNOV via "custom" (variables dans docs/stylesheets/extra.css).

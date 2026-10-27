@@ -1,319 +1,225 @@
 # Du monolithe aux microservices
 
-> **En une phrase.** Monolithe et microservices sont deux façons d'**organiser et de déployer** une application : découper en services achète de l'autonomie au prix d'une exploitation plus exigeante, et fait apparaître un problème nouveau, celui d'exécuter proprement tous ces services.
+<p class="lead">Monolithe et microservices sont deux façons d'<strong>organiser et de déployer</strong> une application. Découper en services achète de l'autonomie, au prix d'appels réseau et d'une exploitation plus exigeante.</p>
 
----
+![Un monolithe copié en entier face à des microservices dont seul le catalogue est multiplié](assets/illustrations/monolithe.png){ .hero }
 
-## 1. Synthèse
+## L'essentiel en 30 secondes
 
-### Le modèle mental
+<div class="grid cards" markdown>
 
-```
-        MONOLITHE                                    MICROSERVICES
+-   :material-cube-outline:{ .lg .middle } __Monolithe__
 
- ┌───────────────────────────────┐        ┌───────────┐   API    ┌───────────┐
- │   application-complete.jar    │        │ catalogue │◄────────►│ commandes │
- │  ┌───────────┐ ┌───────────┐  │        └───────────┘          └─────┬─────┘
- │  │ catalogue │ │ commandes │  │                                     │ API
- │  └───────────┘ └───────────┘  │                               ┌─────▼─────┐
- │  ┌───────────┐ ┌───────────┐  │                               │ paiement  │
- │  │ paiement  │ │ interface │  │                               └───────────┘
- │  └───────────┘ └───────────┘  │
- └───────────────────────────────┘
-   1 livrable · 1 déploiement            1 livrable et 1 déploiement par service,
-   appels internes (en mémoire)          reliés par des contrats sur le réseau
-```
+    ---
 
-### Le vocabulaire
+    Un livrable, **un déploiement**. Corriger le paiement, c'est redéployer toute l'application. Il peut être très bien découpé en modules.
 
-| Terme | Définition |
-|---|---|
-| **Monolithe** | Application qui regroupe ses principales fonctionnalités dans **un ensemble déployé comme une unité**. |
-| **Microservice** | Service qui prend en charge **un périmètre fonctionnel cohérent** (le catalogue, les commandes…), exécuté et déployé indépendamment. |
-| **Module** | Partie du code d'une même application, organisée à part (paquetage, bibliothèque interne). Un monolithe peut être très modulaire. |
-| **Contrat** (interface) | Ce qu'un service promet aux autres : routes d'API, format des messages, codes d'erreur. Tant qu'il reste compatible, chaque côté peut évoluer seul. |
-| **Couplage** | Degré de dépendance entre deux parties : fort si changer l'une oblige à changer l'autre. |
-| **Mise à l'échelle** (*scaling*) | Ajouter des instances d'un programme pour absorber plus de charge. |
+-   :material-puzzle-outline:{ .lg .middle } __Microservice__
 
-### Les caractéristiques du monolithe
+    ---
 
-- Les fonctionnalités partagent **un cycle de déploiement commun** : corriger le paiement, c'est redéployer toute l'application.
-- Le code peut être organisé en modules : un monolithe **n'est pas nécessairement fortement couplé**.
-- La mise à l'échelle porte généralement sur **l'application entière**.
-- Une défaillance peut affecter plusieurs fonctionnalités ; **son impact dépend de la conception**.
+    Un **périmètre fonctionnel** (catalogue, paiement…), déployé seul, derrière un **contrat** : API, messages.
 
-Exemple typique : `java -jar application-complete.jar` lance un seul programme qui contient l'API, l'interface utilisateur et la logique métier. Les données, elles, peuvent être stockées dans une base externe.
+-   :material-scale-balance:{ .lg .middle } __Le prix à payer__
 
-### Pourquoi l'architecture a évolué
+    ---
 
-- **Le contexte** : applications plus complexes, essor du web, besoin de **déployer souvent**. On a cherché plus d'autonomie entre les parties d'une application.
-- **Les moyens de communication** : API HTTP, SOAP ou gRPC, ou échanges de messages (files, bus). Ces techniques **ne sont pas réservées aux microservices**.
-- **Le choix** dépend de la taille de l'application, de l'organisation des équipes et des besoins de mise à l'échelle. Les microservices **ne sont pas une étape obligatoire**.
+    Chaque appel passe par le **réseau** : latence, pannes partielles, données à garder cohérentes, supervision distribuée.
 
-### Ce qu'est un microservice
+-   :material-docker:{ .lg .middle } __Pas un synonyme de conteneur__
 
-Un microservice est conçu pour :
-1. **s'exécuter et être déployé indépendamment** des autres services ;
-2. **exposer une interface de communication définie** ;
-3. permettre **une évolution et une mise à l'échelle ciblées**.
+    ---
 
-Cette autonomie suppose de **maîtriser les dépendances entre services et l'accès aux données**. Elle ne résulte pas du seul découpage en plusieurs processus. Et la distribution ajoute ses propres contraintes : **latence réseau**, **indisponibilité des dépendances**, **cohérence des données**, **supervision**.
+    Microservice = choix d'**architecture**. Conteneur = technique d'**exécution**. Les deux se combinent librement.
 
-### La vue architecturale
+</div>
+
+!!! warning "À retenir"
+
+    Découper peut **isoler une panne** et **agrandir une seule partie**, mais ne supprime pas les dépendances métier. Ce n'est pas une étape obligatoire : la taille de l'application, l'organisation des équipes et les besoins de mise à l'échelle décident.
+
+Pour les démonstrations ci-dessous, une petite boutique (catalogue, commandes, paiement) a été écrite **une seule fois** en Python, puis lancée de deux façons : en un seul processus, puis en trois services. Les captures sont des rendus de sorties réellement exécutées.
+
+## :material-cube-outline: Le monolithe : tout d'un seul tenant
+
+Les fonctionnalités partagent **un cycle de déploiement commun** et s'appellent par de simples appels de fonction, sans réseau. La mise à l'échelle porte sur l'application entière ; l'impact d'une panne **dépend de la conception**.
+
+???+ example "En vrai : la boutique en un seul processus"
+
+    ![Un conteneur, un processus Python, trois fonctions](assets/captures/f_monolithe.png)
+
+    Un seul livrable à construire, tester et superviser. Commandes appelle paiement en mémoire : rapide, et rien ne peut se perdre en route.
+
+???+ danger "En vrai : un bogue du paiement emporte le catalogue"
+
+    ![Le processus plante, le catalogue ne répond plus](assets/captures/f_mono_panne.png)
+
+    Ici, une erreur fatale dans le module paiement arrête le processus : **toute** la boutique tombe. Un monolithe mieux conçu peut contenir l'erreur, mais tout reste dans le même processus.
+
+## :material-puzzle-outline: Les microservices : un service par périmètre
+
+Un microservice est conçu pour **s'exécuter et se déployer seul**, **exposer une interface définie** et permettre **une évolution et une mise à l'échelle ciblées**. Cette autonomie suppose de maîtriser les dépendances et l'accès aux données : elle ne vient pas du seul découpage en processus.
 
 | Aspect | Monolithe | Microservices |
 |---|---|---|
-| Organisation | Modules réunis dans une application | Services aux responsabilités délimitées |
-| Couplage | Dépend de l'organisation interne du code | Faible couplage recherché, mais **non garanti** |
-| Déploiement | Application déployée comme un ensemble | Déploiement indépendant recherché par service |
-| Mise à l'échelle | Généralement l'application entière | Possibilité de cibler certains services |
-| Pannes | Une défaillance peut affecter l'ensemble | Isolement possible, mais propagation entre services à maîtriser |
-| Exploitation | Moins d'échanges réseau internes à gérer | Communications, données et diagnostic distribués plus complexes |
+| Déploiement | l'application comme un ensemble | indépendant, service par service |
+| Couplage | dépend de l'organisation du code | faible couplage recherché, **non garanti** |
+| Mise à l'échelle | l'application entière | ciblée sur certains services |
+| Pannes | peuvent affecter l'ensemble | isolables, mais la propagation est à maîtriser |
+| Exploitation | peu d'échanges réseau internes | réseau, données et diagnostic distribués |
 
-Le choix porte sur **des compromis** : les microservices peuvent faciliter l'autonomie des équipes et des déploiements, au prix d'une exploitation plus exigeante.
+???+ example "En vrai : la même boutique en trois services"
 
-### Microservice ou conteneur : deux notions différentes
+    ![Trois conteneurs ; commandes appelle paiement par son nom](assets/captures/f_micro.png)
 
-| Notion | Ce que c'est | Niveau |
-|---|---|---|
-| **Microservice** | Un choix d'**organisation fonctionnelle et de déploiement** du logiciel | Architecture |
-| **Conteneur** | Un **environnement d'exécution isolé** pour des processus applicatifs | Exécution |
+    Même image, trois conteneurs, trois rôles. Le paiement n'est même pas publié sur l'hôte : seul le service commandes l'appelle, **par son nom**, sur le réseau Docker du projet.
 
-- Un **monolithe peut être conteneurisé**.
-- Des **microservices peuvent tourner dans des machines virtuelles**, sans aucun conteneur.
-- La conteneurisation facilite la distribution du code et de ses dépendances dans un environnement reproductible, **sur des hôtes compatibles**. Elle n'impose pas les microservices et **ne garantit pas à elle seule la résilience** (capacité à continuer de servir malgré des pannes).
+???+ danger "En vrai : la panne est isolée, la dépendance demeure"
 
-### Le problème nouveau : exécuter tous ces services
+    ![Paiement arrêté : le catalogue répond, les commandes échouent en 503](assets/captures/f_micro_panne.png)
 
-Chaque service doit **disposer de ses dépendances**, **communiquer avec les autres** et **partager les ressources de la machine sans perturber ses voisins**. Deux mécanismes d'isolation, combinables, y répondent :
+    Le même bogue n'arrête que le conteneur paiement : le catalogue reste consultable. Mais aucune commande ne passe. Il faut donc des **délais d'expiration** (ici 2 s), des réessais limités et une supervision de chaque service, sinon la lenteur d'un service se propage aux autres.
 
-| Mécanisme | Principe | Page |
-|---|---|---|
-| **Virtualisation** | Fournir des machines virtuelles, chacune avec son propre système d'exploitation | [Machine virtuelle ou conteneur](Machine-virtuelle-ou-conteneur.md) |
-| **Conteneurisation** | Isoler des processus et leur environnement en **partageant un noyau** | [Isolation d'un conteneur](Isolation-des-conteneurs.md) |
+??? question "Les quatre confusions à éviter"
 
-Quand les instances et les machines se multiplient, il faut aussi organiser **leur placement, leurs mises à jour et leur remplacement** : c'est le besoin d'**orchestration** (voir [Pourquoi orchestrer ?](Pourquoi-orchestrer.md)).
+    1. **Monolithe ne veut pas dire code spaghetti.** Un monolithe modulaire est souvent le meilleur choix pour une petite équipe.
+    2. **Plusieurs processus ne font pas des microservices.** Sans contrats stables ni données séparées, on obtient un « monolithe distribué » : les inconvénients du réseau sans les avantages.
+    3. **Découper ne supprime pas les dépendances métier.** Sans paiement, pas de commande, quelle que soit l'architecture.
+    4. **Conteneur et microservice ne sont pas synonymes.** L'un est une technique d'exécution, l'autre un choix d'architecture.
 
-> [!IMPORTANT]
-> **Les quatre confusions à éviter**
-> 1. **Monolithe ne veut pas dire code spaghetti.** Un monolithe modulaire, bien conçu, est souvent le meilleur choix pour une petite équipe.
-> 2. **Plusieurs processus ne font pas des microservices.** Sans contrats stables ni données séparées, on obtient un « monolithe distribué » : tous les inconvénients du réseau, aucun des avantages.
-> 3. **Découper ne supprime pas les dépendances métier.** Si le paiement tombe, on ne finalise plus de commande, quelle que soit l'architecture.
-> 4. **Conteneur et microservice ne sont pas synonymes.** L'un est une technique d'exécution, l'autre un choix d'architecture.
+## :material-arrow-expand-horizontal: Agrandir seulement ce qui est chargé
 
----
+Pendant les soldes, le catalogue reçoit cent fois plus de visites que le paiement. En monolithe, on copie **toute** l'application ; en microservices, on n'augmente **que** le catalogue.
 
-## 2. Cas d'usage classiques
-
-Les cas suivants utilisent une boutique en ligne fictive, avec trois fonctions : **catalogue**, **commandes**, **paiement**.
-
-### Cas 1 : la boutique en monolithe
-
-**Besoin.** Une petite équipe lance la boutique. Le catalogue, les commandes et le paiement sont trois modules d'une même application, déployés ensemble.
-
-```bash
-java -jar application-complete.jar      # un seul processus : API + interface + logique métier
-```
-
-**Ce qu'on observe.** Un seul livrable à construire, tester et superviser. Les modules s'appellent par de simples appels de fonction, sans réseau. En revanche, corriger une ligne du module paiement oblige à **redéployer toute l'application**, catalogue compris.
-**À retenir.** C'est un choix raisonnable tant que l'équipe et la charge restent modestes.
-
-### Cas 2 : un pic de charge sur le catalogue seulement
-
-**Besoin.** Pendant les soldes, le catalogue reçoit cent fois plus de visites que le paiement.
-
-- **En monolithe** : on lance plusieurs copies de **toute** l'application. Chaque copie embarque aussi le paiement et les commandes, qui n'en avaient pas besoin.
-- **En microservices** : on augmente seulement le catalogue. Avec Docker Compose, par exemple (images fictives) :
-
-```yaml
-# compose.yaml
+```yaml title="compose.yaml (extrait)"
 services:
   catalogue:
-    image: boutique/catalogue:1.4
-  commandes:
-    image: boutique/commandes:2.0
+    image: wkf-boutique:1.0
+    ports:
+      - "127.0.0.1:18102-18109:8000"   # une PLAGE : chaque instance prend un port libre
   paiement:
-    image: boutique/paiement:1.1
+    image: wkf-boutique:1.0            # pas de port publié : interne au projet
 ```
 
-```bash
-docker compose up -d --scale catalogue=3     # 3 instances du catalogue, 1 seule du paiement
-docker compose ps
+???+ example "En vrai : `docker compose up -d --scale catalogue=3`"
+
+    ![Trois instances du catalogue, un seul paiement, trois adresses derrière le même nom](assets/captures/f_scale.png)
+
+    Seul le catalogue est multiplié (le paiement, arrêté par la panne précédente, est simplement relancé). Pour les autres services, le nom `catalogue` désigne désormais **trois** adresses.
+
+!!! tip "Deux conditions"
+
+    Le service doit être **sans état local** (rien d'important stocké dans le conteneur), et un mécanisme doit **répartir les requêtes** entre les instances. Avec un port fixe (`"8080:80"`), `--scale` échoue : trois instances ne peuvent pas réserver le même port de l'hôte (voir [Réseaux Docker et publication de ports](Reseaux-et-ports.md), et [Service et Ingress](Service-et-Ingress.md) pour Kubernetes).
+
+## :material-file-document-edit-outline: Le contrat : évoluer sans casser les autres
+
+Chaque service ne peut évoluer seul **que si son contrat reste compatible**. Ajouter un champ ne gêne personne ; en renommer un casse tous les clients qui le lisent.
+
+```text
+GET /api/v1/commandes/42 -> { "id": 42, "total": 59.90, "statut": "payée" }
+GET /api/v2/commandes/42 -> { "id": 42, "montant": 59.90, "statut": "payée", "devise": "EUR" }
 ```
 
-**À retenir.** La mise à l'échelle **ciblée** est l'un des vrais gains. Elle suppose que le service soit sans état local et qu'un mécanisme répartisse les requêtes entre ses instances (voir [Service et Ingress](Service-et-Ingress.md) pour Kubernetes).
+On publie donc une `v2` **et on garde la `v1`** le temps que les autres services migrent.
 
-> [!NOTE]
-> `--scale` échoue si le service publie un port fixe de l'hôte (`ports: ["8080:80"]`) : trois instances ne peuvent pas toutes réserver le port 8080 de l'hôte. Voir [Réseaux Docker et publication de ports](Reseaux-et-ports.md).
-
-### Cas 3 : le paiement tombe en panne
-
-**Besoin.** Comprendre ce que l'architecture change, et ne change pas, face à une panne.
-
-| Situation | Monolithe | Microservices |
-|---|---|---|
-| Bogue qui fait planter le module paiement | Peut faire tomber **tout** le processus, catalogue compris (selon la conception) | Le service paiement tombe ; le catalogue **reste consultable** |
-| Un client veut finaliser sa commande | Impossible | **Impossible aussi** : commandes dépend de paiement |
-| Le paiement répond lentement (5 s au lieu de 50 ms) | Lenteur interne | Les appels de commandes s'accumulent ; sans délai d'expiration, la lenteur **se propage** |
-
-**À retenir.** Le découpage peut **isoler** une panne, il ne supprime pas les dépendances métier. Il faut prévoir des délais d'expiration, des réessais limités et une supervision de chaque service.
-
-### Cas 4 : faire évoluer un service sans casser les autres (le contrat)
-
-**Besoin.** L'équipe commandes veut ajouter un champ à sa réponse et renommer un autre.
-
-```
-GET /api/v1/commandes/42   -> { "id": 42, "total": 59.90, "statut": "payée" }
-GET /api/v2/commandes/42   -> { "id": 42, "montant": 59.90, "statut": "payée", "devise": "EUR" }
-```
-
-**Ce qu'on observe.** Ajouter `devise` est compatible : les anciens clients l'ignorent. Renommer `total` en `montant` casse tous les clients qui lisent `total`. On publie donc une `v2` et on garde la `v1` le temps que les autres services migrent.
-**À retenir.** Chaque service ne peut évoluer et être déployé indépendamment **que si les contrats entre services restent compatibles**.
-
-### Cas 5 : conteneuriser un monolithe
-
-**Besoin.** Garder l'application d'un seul tenant, mais la livrer avec son environnement Java pour qu'elle tourne partout pareil.
-
-```dockerfile
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY application-complete.jar app.jar
-CMD ["java", "-jar", "app.jar"]
-```
-
-```bash
-docker build -t boutique/monolithe:1.0 .
-docker run -d -p 8080:8080 boutique/monolithe:1.0
-```
-
-**Ce qu'on observe.** Un conteneur, un monolithe : l'architecture n'a pas changé, seule la façon de l'**exécuter et de la distribuer** a changé.
-**À retenir.** Conteneuriser n'est pas découper. Le Dockerfile est détaillé dans [Écrire un Dockerfile](Ecrire-un-Dockerfile.md).
-
-### Cas 6 : des microservices sans conteneur
-
-**Besoin.** Une entreprise exploite déjà un parc de machines virtuelles.
-
-```
-VM 1 : catalogue  (service systemd, Java)
-VM 2 : commandes  (service systemd, Python)
-VM 3 : paiement   (service systemd, Go)
-```
-
-**Ce qu'on observe.** Chaque service a son périmètre, son contrat et son déploiement propres : ce sont bien des microservices. Le coût est plus élevé (un système d'exploitation complet par service), mais l'architecture est la même.
-**À retenir.** Le microservice est une **décision d'architecture**, pas une technologie.
-
-### Cas 7 : décider de ne pas découper
-
-**Besoin.** Une équipe de trois personnes, une application de gestion interne, peu d'utilisateurs.
-
-**La bonne réponse.** Un monolithe modulaire (code bien séparé en modules, une seule base). Découper ajouterait du réseau, plusieurs bases à garder cohérentes, plusieurs pipelines de déploiement et une supervision distribuée, sans besoin de mise à l'échelle ciblée pour le justifier.
-**À retenir.** Les critères de choix : **taille de l'application, organisation des équipes, besoins de mise à l'échelle**.
-
----
-
-## 3. Idées de schémas
-
-### Schéma A : la boutique, deux organisations
-
-```mermaid
-flowchart LR
-    subgraph Mono["Monolithe : un seul déploiement"]
-        direction TB
-        UI1["Interface"] --> CAT1["Module catalogue"]
-        UI1 --> CMD1["Module commandes"]
-        CMD1 --> PAY1["Module paiement"]
-    end
-    Mono --> DB1[("Base de données")]
-
-    subgraph Micro["Microservices : un déploiement par service"]
-        direction TB
-        UI2["Interface"] -- "HTTP" --> CAT2["Service catalogue"]
-        UI2 -- "HTTP" --> CMD2["Service commandes"]
-        CMD2 -- "API / messages" --> PAY2["Service paiement"]
-    end
-    CAT2 --> DBc[("Données catalogue")]
-    CMD2 --> DBo[("Données commandes")]
-```
-
-Message du schéma : à gauche, les flèches sont des appels de fonction ; à droite, ce sont des **appels réseau**, qui peuvent être lents ou échouer.
-
-### Schéma B : la mise à l'échelle ciblée
-
-```mermaid
-flowchart TB
-    subgraph M["Monolithe : on copie tout"]
-        direction LR
-        m1["Appli complète (1)"]
-        m2["Appli complète (2)"]
-        m3["Appli complète (3)"]
-    end
-    subgraph S["Microservices : on copie ce qui est chargé"]
-        direction LR
-        c1["catalogue (1)"]
-        c2["catalogue (2)"]
-        c3["catalogue (3)"]
-        o1["commandes (1)"]
-        p1["paiement (1)"]
-    end
-```
-
-### Schéma C : deux axes indépendants
-
-Un tableau à deux entrées, à dessiner comme une grille 2 x 2 :
+## :material-docker: Architecture et exécution : deux décisions distinctes
 
 | | **Sans conteneur** | **Avec conteneurs** |
 |---|---|---|
-| **Monolithe** | `java -jar` sur un serveur | un conteneur `boutique/monolithe` (cas 5) |
-| **Microservices** | un service par VM (cas 6) | un conteneur par service (cas 2) |
+| **Monolithe** | `java -jar boutique.jar` sur un serveur | un conteneur `boutique/monolithe` |
+| **Microservices** | un service par VM (systemd) | un conteneur par service |
 
-Les quatre cases existent en entreprise. Le schéma montre que **l'architecture (lignes) et l'exécution (colonnes) sont deux décisions distinctes**.
+Les quatre cases existent en entreprise. Conteneuriser n'est pas découper : la conteneurisation livre le code avec ses dépendances, sur des hôtes compatibles, mais n'impose pas les microservices et **ne garantit pas à elle seule la résilience**.
 
-### Schéma D : du découpage à l'orchestration
+??? example "Conteneuriser un monolithe (sans le découper)"
+
+    ```dockerfile
+    FROM eclipse-temurin:21-jre
+    WORKDIR /app
+    COPY boutique.jar app.jar
+    CMD ["java", "-jar", "app.jar"]
+    ```
+
+    Un conteneur, un monolithe : l'architecture n'a pas changé, seule la façon de l'**exécuter et de la distribuer** a changé. Le Dockerfile est détaillé dans [Écrire un Dockerfile](Ecrire-un-Dockerfile.md). À l'inverse, trois services Java, Python et Go dans trois VM, chacun avec son périmètre et son contrat, sont bien des microservices, sans aucun conteneur.
 
 ```mermaid
 flowchart LR
-    A["Monolithe"] -->|"découpage"| B["Plusieurs services"]
-    B -->|"chacun a besoin de ses dépendances, de réseau, de ressources"| C["Isolation : VM et/ou conteneurs"]
-    C -->|"les instances et les machines se multiplient"| D["Orchestration : placement, mises à jour, remplacement"]
+    A["Monolithe"] -->|découpage| B["Plusieurs services"]
+    B -->|"dépendances, réseau, ressources"| C["Isolation : VM et/ou conteneurs"]
+    C -->|"instances et machines se multiplient"| D["Orchestration"]
 ```
 
----
+Chaque service doit avoir ses dépendances, parler aux autres et partager la machine sans gêner ses voisins : c'est le rôle de l'isolation ([Machine virtuelle ou conteneur](Machine-virtuelle-ou-conteneur.md), [Isolation d'un conteneur](Isolation-des-conteneurs.md)). Quand instances et machines se multiplient, il faut organiser leur placement, leurs mises à jour et leur remplacement : c'est l'**orchestration** ([Pourquoi orchestrer ?](Pourquoi-orchestrer.md)).
 
-## 4. Script de motion design : « Du monolithe aux microservices » (environ 70 s)
+??? tip "Décider de ne pas découper"
 
-Style : formes plates, une couleur par fonction (bleu catalogue, vert commandes, orange paiement), fond clair. Les textes à l'écran suffisent.
+    Trois personnes, une application de gestion interne, peu d'utilisateurs : un **monolithe modulaire** (code séparé en modules, une seule base). Découper ajouterait du réseau, plusieurs bases à garder cohérentes, plusieurs pipelines et une supervision distribuée, sans besoin de mise à l'échelle ciblée pour le justifier.
 
-| Séq. | Durée | À l'écran | Animation | Texte à l'écran |
-|---|---|---|---|---|
-| 1 | 0-8 s | Un grand bloc gris « Boutique » contenant trois tuiles colorées : catalogue, commandes, paiement | Le bloc se pose sur un serveur ; un tampon « déployé » s'imprime sur l'ensemble | « Un monolithe : tout est livré et déployé d'un seul tenant. » |
-| 2 | 8-16 s | La tuile orange « paiement » reçoit une petite clé à molette (correctif) | Tout le bloc s'éteint, puis se rallume en entier | « Corriger une partie, c'est redéployer le tout. » |
-| 3 | 16-26 s | Une foule d'icônes « visiteurs » se dirige vers la tuile bleue | Le bloc entier est dupliqué trois fois ; les tuiles verte et orange des copies restent grisées, inutilisées | « Plus de visites sur le catalogue ? On copie toute l'application. » |
-| 4 | 26-36 s | Le bloc gris se fissure le long des tuiles | Les trois tuiles se séparent et deviennent trois boîtes autonomes, reliées par des câbles fins étiquetés « API » | « Découper : chaque fonction devient un service, avec un contrat. » |
-| 5 | 36-44 s | La foule revient vers « catalogue » | Seule la boîte bleue se multiplie (x3) ; les autres ne bougent pas | « Mise à l'échelle ciblée : on n'agrandit que ce qui est chargé. » |
-| 6 | 44-54 s | La boîte orange « paiement » devient rouge et s'éteint | Le catalogue continue de pulser ; une commande (petit chariot) avance vers paiement et reste bloquée devant | « Une panne peut être isolée, mais les dépendances métier demeurent. » |
-| 7 | 54-62 s | Les câbles « API » s'allongent et ondulent ; de petites horloges apparaissent dessus | Un paquet ralentit sur un câble, un autre se perd | « Le réseau a un prix : latence, pannes partielles, données à garder cohérentes. » |
-| 8 | 62-70 s | Recul : des dizaines de boîtes sur plusieurs serveurs, en désordre | Un point d'interrogation, puis trois mots apparaissent : « isoler », « placer », « remplacer » | « Nouvelle question : comment exécuter tous ces services ? » |
+## :material-flask-outline: À toi de jouer
 
-**Conseil de réalisation.** La séquence 3 doit rendre visible le **gaspillage** (les tuiles grisées dans les copies), sinon la séquence 5 perd son effet. La séquence 6 est la plus importante pédagogiquement : ne pas montrer les microservices comme une solution magique, laisser le chariot bloqué quelques secondes.
+Deux « services » sur un réseau Docker, puis une panne :
 
----
+```bash
+docker network create demo
+docker run -d --name paiement  --network demo httpd:2.4
+docker run -d --name catalogue --network demo nginx:stable
+docker run --rm --network demo alpine:3.22 wget -qO- http://paiement/              # It works!
+docker stop paiement                                                             # panne du paiement
+docker run --rm --network demo alpine:3.22 wget -qO- http://catalogue/ | grep title  # le catalogue répond
+docker run --rm --network demo alpine:3.22 wget -T 2 -qO- http://paiement/        # bad address 'paiement'
+docker rm -f paiement catalogue && docker network rm demo
+```
 
-## 5. Vérifier soi-même
+Puis prends une application que tu connais et réponds : combien de livrables sont déployés séparément ? Si on corrige une fonction, que faut-il redéployer ? Peut-on agrandir seule la fonction la plus chargée ? Si une fonction tombe, lesquelles restent utilisables ? Chaque fonction a-t-elle ses propres données ? Si toutes les réponses désignent « l'application entière », c'est un monolithe, conteneurisé ou non.
 
-Ce sujet est avant tout un sujet d'architecture : il n'y a pas de commande qui « prouve » qu'une application est en microservices. Un exercice utile consiste à prendre une application connue et à remplir ce tableau :
+??? abstract "Pour les créateurs : script de motion design (70 s)"
 
-| Question | Réponse pour l'application étudiée |
-|---|---|
-| Combien de livrables sont déployés séparément ? | |
-| Si on corrige une fonction, que faut-il redéployer ? | |
-| Quelle fonction reçoit le plus de charge ? Peut-on l'agrandir seule ? | |
-| Si une fonction tombe, lesquelles restent utilisables ? | |
-| Chaque fonction a-t-elle ses propres données, ou une base commune ? | |
+    Style : formes plates, une couleur par fonction (bleu catalogue, vert commandes, jaune paiement), fond sombre. Les textes à l'écran suffisent.
 
-Si toutes les réponses désignent « l'application entière », c'est un monolithe, conteneurisé ou non.
+    | Séq. | Durée | À l'écran | Animation | Texte à l'écran |
+    |---|---|---|---|---|
+    | 1 | 0-8 s | Un grand bloc gris « Boutique » contenant trois tuiles colorées : catalogue, commandes, paiement | Le bloc se pose sur un serveur ; un tampon « déployé » s'imprime sur l'ensemble | « Un monolithe : tout est livré et déployé d'un seul tenant. » |
+    | 2 | 8-16 s | La tuile « paiement » reçoit une petite clé à molette (correctif) | Tout le bloc s'éteint, puis se rallume en entier | « Corriger une partie, c'est redéployer le tout. » |
+    | 3 | 16-26 s | Une foule d'icônes « visiteurs » se dirige vers la tuile bleue | Le bloc entier est dupliqué trois fois ; les tuiles verte et jaune des copies restent grisées, inutilisées | « Plus de visites sur le catalogue ? On copie toute l'application. » |
+    | 4 | 26-36 s | Le bloc gris se fissure le long des tuiles | Les trois tuiles se séparent et deviennent trois boîtes autonomes, reliées par des câbles fins étiquetés « API » | « Découper : chaque fonction devient un service, avec un contrat. » |
+    | 5 | 36-44 s | La foule revient vers « catalogue » | Seule la boîte bleue se multiplie (x3) ; les autres ne bougent pas | « Mise à l'échelle ciblée : on n'agrandit que ce qui est chargé. » |
+    | 6 | 44-54 s | La boîte « paiement » devient rouge et s'éteint | Le catalogue continue de pulser ; une commande (petit chariot) avance vers paiement et reste bloquée devant | « Une panne peut être isolée, mais les dépendances métier demeurent. » |
+    | 7 | 54-62 s | Les câbles « API » s'allongent et ondulent ; de petites horloges apparaissent dessus | Un paquet ralentit sur un câble, un autre se perd | « Le réseau a un prix : latence, pannes partielles, données à garder cohérentes. » |
+    | 8 | 62-70 s | Recul : des dizaines de boîtes sur plusieurs serveurs, en désordre | Un point d'interrogation, puis trois mots apparaissent : « isoler », « placer », « remplacer » | « Nouvelle question : comment exécuter tous ces services ? » |
 
-## Voir aussi
+    La séquence 3 doit rendre visible le **gaspillage** (les tuiles grisées dans les copies), sinon la séquence 5 perd son effet. La séquence 6 est la plus importante : ne pas montrer les microservices comme une solution magique, laisser le chariot bloqué quelques secondes.
 
-- [Accueil du wiki](../README.md)
-- Page suivante : [Machine virtuelle ou conteneur](Machine-virtuelle-ou-conteneur.md)
-- Pour aller plus loin : la bande dessinée [Kubernetes par Google Cloud](https://cloud.google.com/kubernetes-engine/kubernetes-comic/)
+??? info "Pour les créateurs : idées de schémas"
+
+    **La boutique, deux organisations.** À gauche, les flèches sont des appels de fonction ; à droite, des **appels réseau**, qui peuvent être lents ou échouer.
+
+    ```mermaid
+    flowchart LR
+        subgraph Mono["Monolithe : un seul déploiement"]
+            direction TB
+            UI1["Interface"] --> CAT1["Module catalogue"]
+            UI1 --> CMD1["Module commandes"]
+            CMD1 --> PAY1["Module paiement"]
+        end
+        Mono --> DB1[("Base de données")]
+        subgraph Micro["Microservices : un déploiement par service"]
+            direction TB
+            UI2["Interface"] -- "HTTP" --> CAT2["Service catalogue"]
+            UI2 -- "HTTP" --> CMD2["Service commandes"]
+            CMD2 -- "API / messages" --> PAY2["Service paiement"]
+        end
+        CAT2 --> DBc[("Données catalogue")]
+        CMD2 --> DBo[("Données commandes")]
+    ```
+
+    **Deux axes indépendants.** Le tableau « architecture et exécution » se dessine comme une grille 2 x 2 : les lignes (architecture) et les colonnes (exécution) sont deux décisions distinctes.
+
+    **Vocabulaire à afficher.** Module : partie du code d'une même application (paquetage, bibliothèque interne). Contrat : ce qu'un service promet aux autres (routes, format des messages, codes d'erreur). Couplage : fort si changer l'une des parties oblige à changer l'autre. Mise à l'échelle (*scaling*) : ajouter des instances pour absorber la charge.
+
+    **Code de la démonstration.** `wiki_sources/scripts/fondements_boutique/` : `boutique.py` (le rôle est choisi par la variable `ROLE`), `Dockerfile`, `mono.yaml` et `compose.yaml`.
+
+??? note "Pourquoi l'architecture a évolué"
+
+    - **Le contexte** : applications plus complexes, essor du web, besoin de **déployer souvent**. On a cherché plus d'autonomie entre les parties d'une application.
+    - **Les moyens de communication** : API HTTP, SOAP ou gRPC, ou échanges de messages (files, bus). Ces techniques **ne sont pas réservées aux microservices**.
+    - Pour aller plus loin : la bande dessinée [Kubernetes par Google Cloud](https://cloud.google.com/kubernetes-engine/kubernetes-comic/).
