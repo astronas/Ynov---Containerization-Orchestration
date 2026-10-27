@@ -1,0 +1,108 @@
+[project]
+site_name = "Conteneurisation et orchestration"
+site_url = "https://astronas.github.io/Ynov---Containerization-Orchestration/"
+site_description = "Cours de conteneurisation et d'orchestration : Docker, Compose, sécurité, Kubernetes."
+site_author = "Thibaut Gianola"
+repo_url = "https://github.com/astronas/Ynov---Containerization-Orchestration"
+repo_name = "astronas/Ynov---Containerization-Orchestration"
+# Sources générées par scripts/preparer_site.py à partir de README.md et docs/.
+docs_dir = "build_docs"
+nav = [
+  { "Accueil" = "index.md" },
+  { "1 · Comprendre les conteneurs" = [
+    { "Du monolithe aux microservices" = "Du-monolithe-aux-microservices.md" },
+    { "Machine virtuelle ou conteneur" = "Machine-virtuelle-ou-conteneur.md" },
+    { "Isolation : namespaces, cgroups, protections" = "Isolation-des-conteneurs.md" },
+    { "Image et cycle de vie" = "Image-et-cycle-de-vie.md" },
+  ] },
+  { "2 · Construire des images" = [
+    { "Les couches d'une image" = "Couches-d-une-image.md" },
+    { "Écrire un Dockerfile" = "Ecrire-un-Dockerfile.md" },
+    { "Contexte de build et cache" = "Contexte-de-build-et-cache.md" },
+    { "Versionner et publier" = "Versionner-et-publier-une-image.md" },
+  ] },
+  { "3 · Application complète" = [
+    { "Réseaux et ports" = "Reseaux-et-ports.md" },
+    { "Stockage et volumes" = "Stockage-et-volumes.md" },
+    { "Docker Compose" = "Docker-Compose.md" },
+    { "Démarré n'est pas disponible" = "Demarre-n-est-pas-disponible.md" },
+  ] },
+  { "4 · Sécuriser" = [
+    { "Sécurité des images" = "Securite-des-images.md" },
+    { "Identités et privilèges" = "Identites-et-privileges.md" },
+    { "Secrets, fichiers, réseau, ressources" = "Secrets-fichiers-reseau-ressources.md" },
+  ] },
+  { "5 · Orchestrer" = [
+    { "Pourquoi orchestrer ?" = "Pourquoi-orchestrer.md" },
+    { "Kubernetes : état désiré" = "Kubernetes-etat-desire.md" },
+    { "Pod, Deployment, ReplicaSet" = "Pod-Deployment-ReplicaSet.md" },
+    { "Service et Ingress" = "Service-et-Ingress.md" },
+    { "De Compose à Kubernetes" = "De-Compose-a-Kubernetes.md" },
+    { "Virtualisation et orchestration" = "Virtualisation-et-orchestration.md" },
+  ] },
+]
+
+[project.theme]
+language = "fr"
+features = [
+  "content.code.annotate",
+  "content.code.copy",
+  "content.code.select",
+  "content.footnote.tooltips",
+  "content.tabs.link",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.instant.prefetch",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+  "toc.follow",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Passer en mode clair"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Passer en mode sombre"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Suivre le système"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+tables = {}
+toc.permalink = true
+pymdownx.betterem = {}
+pymdownx.caret = {}
+pymdownx.details = {}
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.line_spans = "__span"
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.magiclink = {}
+pymdownx.mark = {}
+pymdownx.smartsymbols = {}
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+pymdownx.tabbed.alternate_style = true
+pymdownx.tasklist.custom_checkbox = true
+pymdownx.tilde = {}
