@@ -121,6 +121,8 @@ Un microservice est conçu pour **tourner et se mettre à jour seul**, **exposer
 
     Le samedi des soldes, le magasin ouvre **plus de caisses**, pas plus de réserves. En microservices, c'est pareil : on ajoute des copies du seul service débordé.
 
+    ![Schéma animé : la file s'allonge, deux caisses s'ouvrent, la réserve reste unique](assets/anim/soldes.svg){ .anim }
+
 Pendant les soldes, le catalogue reçoit cent fois plus de visites que le paiement. En monolithe, on copie **toute** l'application ; en microservices, on n'augmente **que** le catalogue. Ici, les trois services sont décrits dans un fichier Compose, un fichier qui liste les conteneurs à lancer ensemble (voir [Docker Compose](Docker-Compose.md)) :
 
 ```yaml title="compose.yaml (extrait)"

@@ -335,3 +335,6 @@ html { scroll-behavior: smooth; }
 
 /* Mots du glossaire : soulignés en pointillés turquoise */
 .md-typeset abbr { text-decoration: none; border-bottom: 1px dotted var(--ynov-teal); cursor: help; }
+
+/* Schémas animés de vulgarisation (SVG) */
+.md-typeset img.anim { display: block; width: 100%; border-radius: 14px; margin: 0.8rem 0 0.2rem; box-shadow: 0 8px 22px rgba(10, 0, 6, 0.25); }

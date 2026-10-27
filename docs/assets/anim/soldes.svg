@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le samedi des soldes : on ouvre plus de caisses, pas plus de réserves</title>
+  <desc id="d">Des clients arrivent et la file s'allonge devant l'unique caisse. Deux caisses supplémentaires s'ouvrent, la file se vide. La réserve, elle, reste unique.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; rx: 14; }
+      /* 8 s par cycle : la file se remplit, les caisses ouvrent, la file se vide. */
+      .client { animation: client 8s infinite both; opacity: 0; }
+      @keyframes client {
+        0%   { opacity: 0; transform: translateX(-60px); }
+        8%   { opacity: 1; transform: translateX(0); }
+        50%  { opacity: 1; transform: translateX(0); }
+        62%  { opacity: 0; transform: translateX(150px); }
+        100% { opacity: 0; transform: translateX(150px); }
+      }
+      .renfort { transform-box: fill-box; transform-origin: center; animation: renfort 8s infinite both; opacity: 0; }
+      @keyframes renfort {
+        0%, 33% { opacity: 0; transform: scale(.6); }
+        37%     { opacity: 1; transform: scale(1.08); }
+        41%     { transform: scale(1); }
+        92%     { opacity: 1; transform: scale(1); }
+        100%    { opacity: 0; transform: scale(.6); }
+      }
+      .badge { animation: badge 8s infinite both; opacity: 0; }
+      @keyframes badge { 0%, 35% { opacity: 0; } 40%, 90% { opacity: 1; } 100% { opacity: 0; } }
+      .alerte { animation: alerte 8s infinite both; }
+      @keyframes alerte { 0%, 10% { opacity: 0; } 18%, 34% { opacity: 1; } 40%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .client { animation: none; opacity: 0; }
+        .renfort, .badge { animation: none; opacity: 1; }
+        .alerte { animation: none; opacity: 0; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Samedi des soldes</text>
+  <text class="petit" x="32" y="78">la boutique = l'application, chaque rayon = un service</text>
+
+  <!-- Entrée -->
+  <text class="label" x="32" y="214" fill="#eaf0eb">Entrée</text>
+  <path d="M108 208 h40" stroke="#5affb6" stroke-width="3" marker-end="url(#f)"/>
+  <defs><marker id="f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#5affb6"/></marker></defs>
+
+  <!-- Rayons (catalogue) -->
+  <rect class="boite" x="160" y="90" width="200" height="200" stroke="#00eaff"/>
+  <text class="label" x="180" y="124" fill="#00eaff">Rayons</text>
+  <text class="petit" x="180" y="146">un service</text>
+  <g fill="#00eaff" opacity=".35"><rect x="182" y="168" width="156" height="14" rx="4"/><rect x="182" y="200" width="156" height="14" rx="4"/><rect x="182" y="232" width="156" height="14" rx="4"/></g>
+  <text class="petit" x="180" y="276">ça tient la charge</text>
+
+  <!-- Réserve (stock) -->
+  <rect class="boite" x="400" y="250" width="200" height="90" stroke="#859cff"/>
+  <text class="label" x="420" y="284" fill="#859cff">Réserve</text>
+  <text class="petit" x="420" y="306">un autre service</text>
+  <g class="badge"><text class="petit" x="420" y="328" fill="#859cff" style="fill:#859cff">×1 · on ne la double pas</text></g>
+
+  <!-- File d'attente : 8 clients, arrivées décalées -->
+  <g fill="#eeff57">
+    <circle class="client" cx="600" cy="128" r="11" style="animation-delay:0s"/>
+    <circle class="client" cx="572" cy="128" r="11" style="animation-delay:.3s"/>
+    <circle class="client" cx="544" cy="128" r="11" style="animation-delay:.6s"/>
+    <circle class="client" cx="516" cy="128" r="11" style="animation-delay:.9s"/>
+    <circle class="client" cx="488" cy="128" r="11" style="animation-delay:1.2s"/>
+    <circle class="client" cx="460" cy="128" r="11" style="animation-delay:1.5s"/>
+    <circle class="client" cx="432" cy="128" r="11" style="animation-delay:1.8s"/>
+    <circle class="client" cx="404" cy="128" r="11" style="animation-delay:2.1s"/>
+  </g>
+  <g class="alerte"><text class="label" x="404" y="92" fill="#ff1a1a">La file déborde !</text></g>
+
+  <!-- Caisses (paiement) -->
+  <rect class="boite" x="660" y="100" width="150" height="58" stroke="#ff84ef"/>
+  <text class="label" x="680" y="136" fill="#ff84ef">Caisse 1</text>
+  <g class="renfort"><rect class="boite" x="660" y="178" width="150" height="58" stroke="#ff84ef"/><text class="label" x="680" y="214" fill="#ff84ef">Caisse 2</text></g>
+  <g class="renfort" style="animation-delay:.25s"><rect class="boite" x="660" y="256" width="150" height="58" stroke="#ff84ef"/><text class="label" x="680" y="292" fill="#ff84ef">Caisse 3</text></g>
+  <g class="badge"><rect x="826" y="182" width="112" height="40" rx="20" fill="#5affb6"/><text class="label" x="842" y="208" fill="#0a0006">+2 copies</text></g>
+  <text class="petit" x="660" y="84">le service débordé</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Microservices : on ajoute des copies du <tspan fill="#ff84ef" font-weight="700">seul service débordé</tspan>, pas de toute la boutique.</text>
+</svg>
