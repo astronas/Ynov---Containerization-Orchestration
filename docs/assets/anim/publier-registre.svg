@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Le registre stocke et prête des images ; le nom de l'image donne son adresse</title>
+<desc id="d">Depuis ton poste, docker push compte/web:1.1 envoie l'image vers Docker Hub, l'adresse par défaut, car le nom ne contient pas d'adresse. docker push ghcr.io/compte/web:1.1 l'envoie vers ghcr.io, nommé au début du nom. Enfin un serveur fait docker pull depuis ghcr.io et c'est lui qui lance le conteneur ; le registre ne fait que stocker.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<marker id="fg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#a0a4a0"/></marker>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.push1,.push2,.pull,.run{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.push1{animation-name:push1}.push2{animation-name:push2}.pull{animation-name:pull}.run{animation-name:run}
+@keyframes push1{0%{opacity:0;transform:translate(-266px,52px)}5%{opacity:1;transform:translate(-266px,52px)}24%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes push2{0%,35%{opacity:0;transform:translate(-266px,-80px)}39%{opacity:1;transform:translate(-266px,-80px)}56%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes pull{0%,64%{opacity:0;transform:translate(-366px,76px)}67%{opacity:1;transform:translate(-366px,76px)}78%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes run{0%,78%{opacity:0}82%,95%{opacity:1}100%{opacity:0}}
+.pouls{animation:pouls 1s infinite alternate}
+@keyframes pouls{from{opacity:1}to{opacity:.25}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.push1,.push2,.pull,.run{opacity:1;transform:none}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le registre, une bibliothèque d'images</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> push compte/web:1.1 : pas d'adresse dans le nom, direction Docker Hub</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> push ghcr.io/compte/web:1.1 : le début du nom donne l'adresse</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> pull : le serveur emprunte l'image, et c'est lui qui la fait tourner</text>
+<text class="etape rm" x="32" y="84">Le nom envoie l'image au bon registre ; le serveur l'emprunte et la lance</text>
+
+<rect x="32" y="110" width="210" height="220" rx="14" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/>
+<text class="label" x="50" y="140" fill="#eeff57">Ton poste</text>
+<text class="petit" x="50" y="162">docker push</text>
+<rect x="66" y="196" width="140" height="84" rx="6" fill="none" stroke="#eeff57" stroke-width="2.5"/>
+<path d="M54 296 h164 l-12 -14 h-140z" fill="none" stroke="#eeff57" stroke-width="2.5"/>
+<path d="M248 214 C290 190 300 175 326 168" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#fg)"/>
+<path d="M248 250 C290 280 300 300 326 306" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#fg)"/>
+<rect x="330" y="98" width="280" height="118" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+<text class="label" x="346" y="126" fill="#00eaff">Docker Hub</text>
+<text class="petit" x="346" y="148">docker.io, l'adresse par défaut</text>
+<rect x="330" y="230" width="280" height="118" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/>
+<text class="label" x="346" y="258" fill="#859cff">ghcr.io</text>
+<text class="petit" x="346" y="280">le registre de GitHub</text>
+<g class="push1"><rect x="346" y="162" width="150" height="32" rx="7" fill="#00eaff" stroke="#00eaff" stroke-width="2"/><text x="421.0" y="183.4" text-anchor="middle" font-size="15" font-weight="700" fill="#0a0006">compte/web:1.1</text></g>
+<g class="push2"><rect x="346" y="296" width="200" height="32" rx="7" fill="#859cff" stroke="#859cff" stroke-width="2"/><text x="446.0" y="317.4" text-anchor="middle" font-size="15" font-weight="700" fill="#0a0006">ghcr.io/compte/web:1.1</text></g>
+<path d="M614 300 C650 290 660 260 676 250" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#fg)"/>
+<rect x="680" y="150" width="250" height="190" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/>
+<text class="label" x="696" y="180" fill="#ff84ef">Serveur</text>
+<text class="petit" x="696" y="202">docker pull</text>
+<g class="pull"><rect x="712" y="220" width="200" height="32" rx="7" fill="#859cff" stroke="#859cff" stroke-width="2"/><text x="812.0" y="241.4" text-anchor="middle" font-size="15" font-weight="700" fill="#0a0006">ghcr.io/compte/web:1.1</text></g>
+<g class="run"><rect x="712" y="274" width="200" height="40" rx="20" fill="#0a0006" stroke="#5affb6" stroke-width="2"/>
+<circle class="pouls" cx="734" cy="294" r="7" fill="#5affb6"/>
+<text x="750" y="300" font-size="17" font-weight="700" fill="#5affb6">conteneur lancé</text></g>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Le registre stocke et prête sans rien lancer ; le début du nom donne son adresse.</text>
+</svg>

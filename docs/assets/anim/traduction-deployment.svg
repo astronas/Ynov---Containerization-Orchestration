@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le Deployment, un chef d'équipe qui maintient deux pods</title>
+  <desc id="d">Le chef d'équipe a pour consigne replicas : 2 et compte deux pods prêts. Le pod A tombe : le compteur passe à 1 sur 2 et le chef crée le pod C. Puis il met à jour les pods un par un, de la version v1 à la version v2.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .podA { animation: podA 9s infinite both; }
+      @keyframes podA { 0%, 33% { opacity: 1; } 40%, 95% { opacity: 0; } 99%, 100% { opacity: 1; } }
+      .croix { animation: croix 9s infinite both; }
+      @keyframes croix { 0%, 31% { opacity: 0; } 33%, 40% { opacity: 1; } 43%, 100% { opacity: 0; } }
+      .ko { animation: ko 9s infinite both; }
+      @keyframes ko { 0%, 35% { opacity: 0; } 37%, 50% { opacity: 1; } 53%, 100% { opacity: 0; } }
+      .ok { animation: ok 9s infinite both; }
+      @keyframes ok { 0%, 34% { opacity: 1; } 36%, 51% { opacity: 0; } 54%, 100% { opacity: 1; } }
+      .podC { animation: podC 9s infinite both; }
+      @keyframes podC { 0%, 48% { opacity: 0; transform: scale(.5); } 52% { opacity: 1; transform: scale(1.1); } 55%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      .remplace { animation: remplace 9s infinite both; }
+      @keyframes remplace { 0%, 51% { opacity: 0; } 54%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      .v2b { animation: v2b 9s infinite both; }
+      @keyframes v2b { 0%, 64% { opacity: 0; } 67%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      .v2c { animation: v2c 9s infinite both; }
+      @keyframes v2c { 0%, 72% { opacity: 0; } 75%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .podA, .croix, .ko { animation: none; opacity: 0; }
+        .ok, .podC, .remplace, .v2b, .v2c { animation: none; opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le Deployment, un chef d'équipe</text>
+  <text class="petit" x="32" y="80">la consigne : « je veux toujours deux pods comme celui-ci »</text>
+
+  <rect x="40" y="100" width="270" height="246" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/>
+  <text class="label" x="60" y="134" fill="#859cff">Chef d'équipe</text>
+  <text class="petit" x="60" y="158">le Deployment</text>
+  <rect x="60" y="176" width="230" height="50" rx="10" fill="#0a0006" stroke="#859cff" stroke-width="2"/>
+  <text class="label" x="78" y="208" fill="#eaf0eb">replicas : 2</text>
+  <g class="ok"><text class="label" x="60" y="276" fill="#5affb6" style="font-size:24px">2 / 2 prêts</text></g>
+  <g class="ko"><text class="label" x="60" y="276" fill="#ff1a1a" style="font-size:24px">1 / 2 prêts</text></g>
+  <text class="petit" x="60" y="316">il compare et corrige</text>
+  <path d="M310 210 H346" stroke="#859cff" stroke-width="3"/><path d="M346 202 L358 210 L346 218 z" fill="#859cff"/>
+
+  <rect x="370" y="150" width="170" height="120" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/><rect x="760" y="150" width="170" height="120" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+  <g class="podA"><rect x="370" y="150" width="170" height="120" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="label" x="390" y="190" fill="#5affb6">Pod A</text><rect x="390" y="212" width="60" height="30" rx="15" fill="#0a0006" stroke="#5affb6" stroke-width="2"/><text class="l18" x="408" y="233" fill="#5affb6">v1</text></g>
+  <g class="croix"><path d="M395 170 l120 80 M515 170 l-120 80" stroke="#ff1a1a" stroke-width="5"/></g>
+  <g class="pbc"><text class="l18" x="390" y="300" fill="#ff1a1a">tombé</text></g>
+  <rect x="565" y="150" width="170" height="120" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="label" x="585" y="190" fill="#5affb6">Pod B</text><rect x="585" y="212" width="60" height="30" rx="15" fill="#0a0006" stroke="#5affb6" stroke-width="2"/><text class="l18" x="603" y="233" fill="#5affb6">v1</text><g class="v2b"><rect x="585" y="212" width="60" height="30" rx="15" fill="#eeff57"/><text class="l18" x="603" y="233" fill="#0a0006">v2</text></g>
+  <g class="podC pop"><rect x="760" y="150" width="170" height="120" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="label" x="780" y="190" fill="#5affb6">Pod C</text><rect x="780" y="212" width="60" height="30" rx="15" fill="#0a0006" stroke="#5affb6" stroke-width="2"/><text class="l18" x="798" y="233" fill="#5affb6">v1</text><g class="v2c"><rect x="780" y="212" width="60" height="30" rx="15" fill="#eeff57"/><text class="l18" x="798" y="233" fill="#0a0006">v2</text></g></g>
+  <g class="remplace"><text class="l18" x="780" y="300" fill="#eeff57">remplacé</text></g>
+  <g class="pc"><text class="l18" x="370" y="336" fill="#eeff57">mise à jour un pod après l'autre : v1 → v2</text></g>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">On ne lance plus un conteneur, on décrit un état : <tspan fill="#859cff" font-weight="700">le chef d'équipe le maintient</tspan>.</text>
+</svg>

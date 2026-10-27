@@ -18,6 +18,8 @@
 
     Construire une image, c'est comme **envoyer un colis à un cuisinier** qui suit ta recette. Il ne peut utiliser que ce qu'il y a dans le colis (le contexte) ; la liste `.dockerignore` dit ce qu'il ne faut pas y mettre. Et il garde au frigo chaque préparation déjà faite (le cache) : si rien n'a changé, il la ressort au lieu de tout refaire. Limite de l'image : dès qu'une étape change, il refait aussi **toutes les suivantes**, même si elles n'ont pas changé.
 
+    ![Schéma animé : le dossier filtré par .dockerignore part en colis chez le cuisinier, qui ressort du frigo les étapes déjà faites](assets/anim/cache-colis.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     Le **contexte**, c'est le dossier que tu désignes à la fin de `docker build`. Docker l'envoie en entier à son constructeur (BuildKit) avant de lire la première ligne de la recette. Tout ce qui est dedans voyage ; rien de ce qui est dehors n'est accessible.
+
+    ![Schéma animé : le point désigne le dossier, envoyé en entier à BuildKit ; un fichier situé hors du dossier est introuvable](assets/anim/cache-contexte.svg){ .anim }
 
 ```bash
 docker build -t web:1.0 .                       # (1)!
@@ -111,6 +115,8 @@ docker build -f docker/Dockerfile -t web:1.0 .  # (2)!
 !!! quote "En clair"
 
     Avant chaque étape, le constructeur se demande : « ai-je déjà fait **exactement** cette étape, sur **exactement** le même point de départ ? ». Si oui, il réutilise le résultat et affiche `CACHED`. Sinon, il la refait, et tout ce qui vient après aussi, car le point de départ des suivantes a changé.
+
+    ![Schéma animé : les deux premières étapes sortent du cache, la troisième a changé, et toutes les suivantes sont refaites](assets/anim/cache-frigo.svg){ .anim }
 
 Ce que le constructeur compare pour décider (la « clé de cache ») :
 

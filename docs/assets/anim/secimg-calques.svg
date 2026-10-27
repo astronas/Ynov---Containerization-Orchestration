@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Un secret effacé d'une couche reste lisible dans la couche du dessous</title>
+<desc id="d">Trois calques empilés : vu d'en haut, la clé a disparu, car le calque RUN rm la masque. Les calques se décollent : la clé est toujours dans le calque COPY du dessous. La bonne méthode apparaît : avec RUN --mount=type=secret, la clé passe pendant le build sans être écrite dans aucune couche.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<g id="cle" fill="none" stroke-width="3" stroke-linecap="round"><circle r="7"/><path d="M7 0 h20 M21 0 v7 M27 0 v6"/></g>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.haut{transform:translateY(-84px);animation:haut 9s infinite both}
+@keyframes haut{0%,30%{transform:none}38%,96%{transform:translateY(-84px)}100%{transform:none}}
+.bas{transform:translateY(44px);animation:bas 9s infinite both}
+@keyframes bas{0%,30%{transform:none}38%,96%{transform:translateY(44px)}100%{transform:none}}
+.lab{animation:lab 9s infinite both}
+@keyframes lab{0%,36%{opacity:0}40%,96%{opacity:1}100%{opacity:0}}
+.passe{opacity:0;animation:passe 9s infinite both}
+@keyframes passe{0%,66%{opacity:0;transform:none}70%{opacity:1;transform:none}86%{opacity:1;transform:translateX(230px)}90%,100%{opacity:0;transform:translateX(230px)}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Effacer dans une couche ne fait que cacher</text>
+<text class="petit" x="32" y="78">les couches d'une image sont des calques transparents empilés</text>
+<g class="bas"><path d="M100 224 h300 l-60 56 h-300 z" fill="#859cff" fill-opacity=".12" stroke="#859cff" stroke-width="2.5"/></g>
+<path d="M100 210 h300 l-60 56 h-300 z" fill="#eeff57" fill-opacity=".12" stroke="#eeff57" stroke-width="2.5"/><use href="#cle" x="206" y="238" stroke="#eeff57"/>
+<g class="haut"><path d="M100 196 h300 l-60 56 h-300 z" fill="#ff84ef" fill-opacity=".12" stroke="#ff84ef" stroke-width="2.5"/><rect x="186" y="226" width="70" height="24" rx="4" fill="#3a3a3a" stroke="#a0a4a0" stroke-width="1.5"/></g>
+<g class="s1"><text class="label bl" x="420" y="222">Vu d'en haut :</text><text class="petit" x="420" y="246">la clé a disparu</text></g>
+<g class="lab"><text class="label ro" x="420" y="146">RUN rm cle.txt</text><text class="label ja" x="420" y="244">COPY cle.txt</text><text class="label la" x="420" y="302">FROM debian</text><circle cx="216" cy="238" r="26" fill="none" stroke="#ff1a1a" stroke-width="3"/><text class="label rg" x="110" y="198">toujours là !</text></g>
+<g class="a3"><rect class="boite" x="600" y="96" width="330" height="262" rx="14" stroke="#5affb6"/><text class="label mt" x="620" y="130">La bonne méthode</text><text class="label ja" x="620" y="164">RUN --mount=type=secret</text><rect x="640" y="230" width="250" height="28" rx="6" fill="none" stroke="#a0a4a0" stroke-width="2"/><text class="petit mid" x="765" y="249">couche : aucune clé</text><rect x="640" y="266" width="250" height="28" rx="6" fill="none" stroke="#a0a4a0" stroke-width="2"/><text class="petit mid" x="765" y="285">couche : aucune clé</text><text class="petit" x="620" y="318">la clé sert pendant le build,</text><text class="petit" x="620" y="340">aucune couche ne la garde</text></g>
+<g class="passe"><use href="#cle" x="640" y="208" stroke="#eeff57"/></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Un secret effacé reste lisible dans la couche du dessous : il ne doit jamais y entrer.</text>
+</svg>

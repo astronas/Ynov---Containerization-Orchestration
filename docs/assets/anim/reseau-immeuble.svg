@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">L'immeuble de bureaux : une porte publique, un standard qui connaît les noms</title>
+  <desc id="d">Un visiteur entre par la seule porte publiée et arrive au bureau web. Le bureau web demande « db » au standard, qui le met en relation avec le bureau db. Un conteneur d'un autre immeuble demande lui aussi « db » : son propre standard ne le connaît pas, l'appel n'aboutit pas.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) le visiteur entre par la porte publiée, 2) web appelle db par le standard, 3) l'autre immeuble ne connaît pas db. */
+      .s1 { animation: s1 9s infinite both; opacity: 0; }
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      @keyframes s1 { 0% { opacity: 0; } 3%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 63% { opacity: 0; } 66%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+      .visiteur { animation: visiteur 9s infinite both; }
+      @keyframes visiteur {
+        0%   { opacity: 0; transform: translate(0, 0); }
+        3%   { opacity: 1; transform: translate(0, 0); }
+        13%  { transform: translate(75px, 0); }
+        24%  { opacity: 1; transform: translate(170px, 0); }
+        30%, 100% { opacity: 0; transform: translate(170px, 0); }
+      }
+      .appel { animation: appel 9s infinite both; opacity: 0; }
+      @keyframes appel {
+        0%, 44% { opacity: 0; transform: translate(0, 0); }
+        46%     { opacity: 1; transform: translate(0, 0); }
+        58%     { opacity: 1; transform: translate(118px, 42px); }
+        92%     { opacity: 1; transform: translate(118px, 42px); }
+        96%, 100% { opacity: 0; transform: translate(118px, 42px); }
+      }
+      .refus { animation: refus 9s infinite both; opacity: 0; }
+      @keyframes refus {
+        0%, 64% { opacity: 0; transform: translate(0, 0); fill: #ff84ef; }
+        66%     { opacity: 1; transform: translate(0, 0); }
+        76%     { opacity: 1; transform: translate(-36px, 0); fill: #ff84ef; }
+        78%     { fill: #ff1a1a; }
+        92%     { opacity: 1; transform: translate(-36px, 0); fill: #ff1a1a; }
+        96%, 100% { opacity: 0; transform: translate(-36px, 0); }
+      }
+      .porte { animation: porte 9s infinite both; }
+      @keyframes porte { 0%, 8% { stroke-width: 3; } 14%, 20% { stroke-width: 7; } 26%, 100% { stroke-width: 3; } }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .visiteur, .porte { animation: none; opacity: 0; }
+        .porte { opacity: 1; }
+        .s2, .s3 { animation: none; opacity: 1; }
+        .appel { animation: none; opacity: 1; transform: translate(118px, 42px); }
+        .refus { animation: none; opacity: 1; transform: translate(-36px, 0); fill: #ff1a1a; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">L'immeuble de bureaux</text>
+  <text class="petit" x="32" y="76">bureau = conteneur · immeuble = réseau · standard = DNS interne · accueil = port publié</text>
+
+  <!-- Dehors -->
+  <text class="label" x="32" y="150" fill="#eaf0eb">Dehors</text>
+  <g fill="#eeff57"><circle cx="70" cy="208" r="10"/><rect x="58" y="221" width="24" height="30" rx="8"/></g>
+  <text class="petit" x="32" y="290">ton poste</text>
+
+  <!-- Immeuble A -->
+  <rect class="boite" x="180" y="96" width="500" height="250" rx="14" stroke="#859cff"/>
+  <text class="label" x="200" y="126" fill="#859cff">Immeuble « appli »</text>
+  <rect x="176" y="206" width="9" height="52" fill="#0a0006"/>
+  <rect class="porte" x="174" y="206" width="12" height="52" rx="3" fill="none" stroke="#5affb6" stroke-width="3"/>
+  <text class="petit" x="112" y="200" fill="#5affb6" style="fill:#5affb6">8080</text>
+
+  <rect class="boite" x="230" y="196" width="150" height="72" rx="12" stroke="#00eaff"/>
+  <text class="label" x="250" y="228" fill="#00eaff">web</text>
+  <text class="petit" x="250" y="252">bureau 1</text>
+
+  <rect class="boite" x="430" y="140" width="160" height="62" rx="12" stroke="#eeff57"/>
+  <text class="label" x="448" y="168" fill="#eeff57">Standard</text>
+  <text class="petit" x="448" y="190">connaît les noms</text>
+
+  <rect class="boite" x="500" y="258" width="160" height="72" rx="12" stroke="#5affb6"/>
+  <text class="label" x="520" y="290" fill="#5affb6">db</text>
+  <text class="petit" x="520" y="314">172.18.0.2</text>
+
+  <!-- Étape 1 : le visiteur entre -->
+  <circle class="visiteur" cx="96" cy="232" r="9" fill="#eeff57"/>
+  <g class="s1"><text class="petit" x="200" y="186" fill="#5affb6" style="fill:#5affb6">entre par la porte publiée</text></g>
+
+  <!-- Étape 2 : web demande db au standard -->
+  <g class="s2">
+    <path d="M380 210 L430 185" stroke="#eeff57" stroke-width="2.5" stroke-dasharray="6 5" fill="none"/>
+    <text class="petit" x="388" y="236" fill="#eeff57" style="fill:#eeff57">« db ? »</text>
+    <path d="M380 250 L500 292" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="6 5" fill="none"/>
+  </g>
+  <circle class="appel" cx="384" cy="250" r="9" fill="#5affb6"/>
+
+  <!-- Immeuble B -->
+  <rect class="boite" x="716" y="96" width="220" height="250" rx="14" stroke="#a0a4a0" stroke-dasharray="8 6"/>
+  <text class="label" x="734" y="126" fill="#a0a4a0">Autre réseau</text>
+  <rect class="boite" x="742" y="150" width="170" height="64" rx="12" stroke="#ff84ef"/>
+  <text class="label" x="760" y="179" fill="#ff84ef">outil</text>
+  <text class="petit" x="760" y="202">autre conteneur</text>
+  <rect class="boite" x="742" y="236" width="170" height="54" rx="12" stroke="#eeff57" stroke-opacity=".5"/>
+  <text class="label" x="760" y="270" fill="#eeff57" fill-opacity=".7">son standard</text>
+  <circle class="refus" cx="736" cy="182" r="9"/>
+  <g class="s3">
+    <text x="689" y="166" font-size="24" font-weight="700" fill="#ff1a1a">✗</text>
+    <text class="petit" x="742" y="318" fill="#ff1a1a" style="fill:#ff1a1a">« db ? » : inconnu</text>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Dedans, on se trouve <tspan fill="#eeff57" font-weight="700">par le nom</tspan> ; dehors, seule la <tspan fill="#5affb6" font-weight="700">porte publiée</tspan> entre.</text>
+</svg>

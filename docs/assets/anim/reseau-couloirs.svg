@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Deux couloirs : frontend public, backend de service</title>
+  <desc id="d">Un visiteur entre par le couloir public et arrive au serveur web. Web passe par sa seconde porte dans le couloir de service et joint la base. Le visiteur essaie ensuite d'aller directement à la base par le couloir public : la base n'a pas de porte de ce côté, il est bloqué.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .couloir { stroke-width: 2.5; }
+      /* 9 s : 1) visiteur vers web, 2) web vers db par le couloir de service, 3) visiteur vers db : bloqué. */
+      .s1 { animation: s1 9s infinite both; opacity: 0; }
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      @keyframes s1 { 0% { opacity: 0; } 3%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 74% { opacity: 0; } 77%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      .v1 { animation: v1 9s infinite both; opacity: 0; }
+      @keyframes v1 {
+        0% { opacity: 0; transform: translate(0, 0); }
+        3% { opacity: 1; transform: translate(0, 0); }
+        20% { transform: translate(380px, 0); }
+        27% { opacity: 1; transform: translate(380px, 88px); }
+        31%, 100% { opacity: 0; transform: translate(380px, 88px); }
+      }
+      .v2 { animation: v2 9s infinite both; opacity: 0; }
+      @keyframes v2 {
+        0%, 33% { opacity: 0; transform: translate(0, 0); }
+        35% { opacity: 1; transform: translate(0, 0); }
+        41% { transform: translate(0, 86px); }
+        53% { transform: translate(310px, 86px); }
+        59% { opacity: 1; transform: translate(310px, 10px); }
+        63%, 100% { opacity: 0; transform: translate(310px, 10px); }
+      }
+      .v3 { animation: v3 9s infinite both; opacity: 0; }
+      @keyframes v3 {
+        0%, 63% { opacity: 0; transform: translate(0, 0); fill: #eeff57; }
+        65% { opacity: 1; transform: translate(0, 0); fill: #eeff57; }
+        74% { transform: translate(690px, 0); fill: #eeff57; }
+        77% { transform: translate(690px, 26px); fill: #eeff57; }
+        79% { transform: translate(690px, 18px); fill: #ff1a1a; }
+        93% { opacity: 1; transform: translate(690px, 18px); fill: #ff1a1a; }
+        97%, 100% { opacity: 0; transform: translate(690px, 18px); fill: #ff1a1a; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .s2, .v1, .v2 { animation: none; opacity: 0; }
+        .s3 { animation: none; opacity: 1; }
+        .v3 { animation: none; opacity: 1; transform: translate(690px, 18px); fill: #ff1a1a; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Deux couloirs</text>
+  <text class="petit" x="32" y="76">couloir = réseau · porte = branchement d'un conteneur sur ce réseau</text>
+
+  <!-- Couloirs -->
+  <rect class="couloir" x="180" y="98" width="756" height="70" rx="12" fill="#00eaff" fill-opacity=".08" stroke="#00eaff"/>
+  <text class="label" x="200" y="128" fill="#00eaff">Couloir public</text>
+  <text class="petit" x="200" y="150">frontend</text>
+  <rect class="couloir" x="180" y="282" width="756" height="70" rx="12" fill="#859cff" fill-opacity=".08" stroke="#859cff"/>
+  <text class="label" x="200" y="312" fill="#859cff">Couloir de service</text>
+  <text class="petit" x="200" y="334">backend</text>
+
+  <!-- Entrée publiée -->
+  <rect x="176" y="114" width="9" height="40" fill="#0a0006"/>
+  <rect x="174" y="114" width="12" height="40" rx="3" fill="none" stroke="#5affb6" stroke-width="3"/>
+  <g fill="#eeff57"><circle cx="70" cy="118" r="10"/><rect x="58" y="131" width="24" height="30" rx="8"/></g>
+  <text class="petit" x="32" y="190">visiteur</text>
+  <text class="petit" x="122" y="104" style="fill:#5affb6">8080</text>
+
+  <!-- Salles -->
+  <rect class="boite" x="390" y="168" width="170" height="114" rx="12" stroke="#00eaff"/>
+  <text class="label" x="410" y="216" fill="#00eaff">web</text>
+  <text class="petit" x="410" y="240">deux portes</text>
+  <rect x="455" y="163" width="40" height="10" rx="3" fill="#5affb6"/>
+  <rect x="455" y="277" width="40" height="10" rx="3" fill="#5affb6"/>
+
+  <rect class="boite" x="700" y="168" width="170" height="114" rx="12" stroke="#5affb6"/>
+  <text class="label" x="720" y="216" fill="#5affb6">db</text>
+  <text class="petit" x="720" y="240">une seule porte</text>
+  <rect x="765" y="277" width="40" height="10" rx="3" fill="#5affb6"/>
+  <rect x="765" y="164" width="40" height="8" rx="2" fill="#a0a4a0"/>
+
+  <!-- Trajets -->
+  <circle class="v1" cx="95" cy="134" r="9" fill="#eeff57"/>
+  <circle class="v2" cx="475" cy="230" r="9" fill="#859cff"/>
+  <circle class="v3" cx="95" cy="134" r="9"/>
+  <g class="s1"><text class="label" x="200" y="232" fill="#5affb6">entre par 8080</text></g>
+  <g class="s2"><text class="label" x="200" y="232" fill="#859cff">web fait le pont</text></g>
+  <g class="s3">
+    <text class="label" x="200" y="232" fill="#ff1a1a">✗ aucune porte</text>
+    <text class="petit" x="200" y="256" style="fill:#ff1a1a">de db côté public</text>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">La base n'a qu'une porte, <tspan fill="#859cff" font-weight="700">côté service</tspan> : on n'y arrive qu'en passant par web.</text>
+</svg>

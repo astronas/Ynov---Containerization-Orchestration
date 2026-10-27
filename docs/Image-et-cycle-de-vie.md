@@ -18,6 +18,8 @@
 
     L'image est un **moule à gâteau**. On ne mange jamais le moule : on s'en sert pour faire autant de gâteaux qu'on veut. Chaque gâteau (un conteneur) peut être décoré à sa façon sans toucher au moule ni aux autres gâteaux : ce qu'on fait à un gâteau ne change jamais le moule. Limite de l'image : un conteneur a en plus une **vie**, il démarre, s'arrête et redémarre, ce qu'un gâteau ne fait pas.
 
+    ![Schéma animé : le moule fait trois gâteaux décorés différemment, et le gâteau refait sort nu car le moule n'a pas changé](assets/anim/cycle-moule.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     La commande `docker` que tu tapes n'est qu'une **télécommande**. Le vrai travail est fait par le **moteur**, qui tourne en permanence en arrière-plan. Il va chercher les images dans un **registre**, un entrepôt en ligne, puis confie la fabrication du conteneur à deux ouvriers spécialisés, containerd et runc.
+
+    ![Schéma animé : l'ordre part du client vers le moteur, qui va chercher l'image au registre et la confie à containerd et runc](assets/anim/cycle-telecommande.svg){ .anim }
 
 | Composant | Rôle |
 |---|---|
@@ -119,6 +123,8 @@ Un chemin comme `/var/www/html` appartient à la vue du conteneur : il **ne dés
 
     Un conteneur, c'est une **salle de concert réservée pour un artiste**. Tant que l'artiste joue (le programme principal), la salle est ouverte. Quand il a fini, elle ferme, mais le décor reste en place jusqu'à ce qu'on démonte tout.
 
+    ![Schéma animé : l'artiste joue (Up), s'en va en laissant le décor (Exited), puis tout est démonté (docker rm)](assets/anim/cycle-concert.svg){ .anim }
+
 **Règle centrale : le conteneur s'arrête quand son programme principal se termine.** Un serveur web tourne sans fin, donc son conteneur reste en marche ; une tâche d'export s'arrête dès que son travail est fini.
 
 | État (`docker ps -a`) | Ce que ça veut dire | Comment y arriver |
@@ -174,6 +180,8 @@ stateDiagram-v2
 !!! quote "En clair"
 
     La couche inscriptible est un **calque transparent** posé sur l'image : le conteneur écrit sur le calque, jamais sur l'image. Arrêter le conteneur laisse le calque en place ; le supprimer jette le calque. Un **volume**, c'est un classeur rangé à part, qu'on peut rebrancher sur le conteneur suivant.
+
+    ![Schéma animé : trace.txt survit au stop et start, part avec le calque au rm, tandis que le volume se rebranche](assets/anim/cycle-calque.svg){ .anim }
 
 Pour un conteneur lancé sans `--rm` : les fichiers de la couche inscriptible sont **conservés** quand on l'arrête et le redémarre, **supprimés** avec le conteneur, et **absents** d'un nouveau conteneur créé avec la même image. La **mémoire** du programme, elle, n'est jamais conservée : au redémarrage, le programme repart de zéro, avec ses fichiers.
 

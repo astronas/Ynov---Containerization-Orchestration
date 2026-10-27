@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Un tag est un marque-page : certains restent fixes, d'autres se déplacent</title>
+<desc id="d">Sur une étagère, l'édition 1.2.0 porte trois marque-pages : 1.2.0, 1.2 et latest. L'édition 1.2.1 arrive : 1.2 et latest se déplacent dessus, 1.2.0 reste. L'édition 2.0.0 arrive : latest se déplace encore, 1.2 reste sur 1.2.1. Chaque livre garde son digest.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.m12,.mlat{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.m12{animation-name:m12}.mlat{animation-name:mlat}
+@keyframes m12{0%{opacity:0;transform:none}4%,38%{opacity:1;transform:none}47%,95%{opacity:1;transform:translateX(200px)}100%{opacity:0;transform:translateX(200px)}}
+@keyframes mlat{0%{opacity:0;transform:none}4%,38%{opacity:1;transform:none}47%,68%{opacity:1;transform:translateX(200px)}77%,95%{opacity:1;transform:translateX(400px)}100%{opacity:0;transform:translateX(400px)}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.m12{transform:translateX(200px)}.mlat{transform:translateX(400px)}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Des marque-pages, fixes ou mobiles</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Trois tags sur la même édition : 1.2.0, 1.2 et latest</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Sortie de 1.2.1 : 1.2 et latest suivent, 1.2.0 ne bouge pas</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Sortie de 2.0.0 : latest suit encore, 1.2 reste sur la dernière 1.2.x</text>
+<text class="etape rm" x="32" y="84">1.2.0 reste fixe, 1.2 suit les correctifs, latest suit tout ; le digest désigne un livre</text>
+<path d="M60 300 H900" stroke="#a0a4a0" stroke-width="3"/><g style=""><rect x="90" y="198" width="110" height="100" rx="5" fill="#859cff" fill-opacity=".22" stroke="#859cff" stroke-width="2.5"/><path d="M100 198 V298" stroke="#859cff" stroke-width="2" stroke-opacity=".6"/><text class="label" x="150.0" y="255.0" text-anchor="middle" fill="#eaf0eb">1.1.0</text></g><text x="145" y="326" text-anchor="middle" font-size="15" fill="#a0a4a0">1a2b…</text><g style=""><rect x="290" y="198" width="110" height="100" rx="5" fill="#859cff" fill-opacity=".22" stroke="#859cff" stroke-width="2.5"/><path d="M300 198 V298" stroke="#859cff" stroke-width="2" stroke-opacity=".6"/><text class="label" x="350.0" y="255.0" text-anchor="middle" fill="#eaf0eb">1.2.0</text></g><text x="345" y="326" text-anchor="middle" font-size="15" fill="#a0a4a0">5f3a…</text><g class="a2" style=""><rect x="490" y="198" width="110" height="100" rx="5" fill="#859cff" fill-opacity=".22" stroke="#859cff" stroke-width="2.5"/><path d="M500 198 V298" stroke="#859cff" stroke-width="2" stroke-opacity=".6"/><text class="label" x="550.0" y="255.0" text-anchor="middle" fill="#eaf0eb">1.2.1</text></g><text class="a2" x="545" y="326" text-anchor="middle" font-size="15" fill="#a0a4a0">9c41…</text><g class="a3" style=""><rect x="690" y="198" width="110" height="100" rx="5" fill="#859cff" fill-opacity=".22" stroke="#859cff" stroke-width="2.5"/><path d="M700 198 V298" stroke="#859cff" stroke-width="2" stroke-opacity=".6"/><text class="label" x="750.0" y="255.0" text-anchor="middle" fill="#eaf0eb">2.0.0</text></g><text class="a3" x="745" y="326" text-anchor="middle" font-size="15" fill="#a0a4a0">d07e…</text>
+<rect x="295" y="166" width="100" height="26" rx="5" fill="#859cff"/>
+<text x="336" y="185" text-anchor="middle" font-size="17" font-weight="700" fill="#0a0006">1.2.0</text>
+<rect x="370" y="177" width="12" height="9" rx="1.5" fill="#0a0006"/><path d="M372 177 v-3 a4 4 0 0 1 8 0 v3" fill="none" stroke="#0a0006" stroke-width="1.8"/>
+<g class="m12"><rect x="295" y="134" width="100" height="26" rx="7" fill="#00eaff" stroke="#00eaff" stroke-width="2"/><text x="345.0" y="153.1" text-anchor="middle" font-size="17" font-weight="700" fill="#0a0006">1.2</text></g>
+<g class="mlat"><rect x="295" y="102" width="100" height="26" rx="7" fill="#eeff57" stroke="#eeff57" stroke-width="2"/><text x="345.0" y="121.1" text-anchor="middle" font-size="17" font-weight="700" fill="#0a0006">latest</text></g>
+<rect x="826" y="168" width="14" height="14" rx="3" fill="#859cff"/><text class="petit" x="848" y="181">fixe</text>
+<rect x="826" y="196" width="14" height="14" rx="3" fill="#00eaff"/><rect x="842" y="196" width="14" height="14" rx="3" fill="#eeff57"/>
+<text class="petit" x="864" y="209">mobiles</text>
+<text class="petit" x="826" y="240">sous chaque</text>
+<text class="petit" x="826" y="258">livre : son</text>
+<text class="petit" x="826" y="276">digest</text>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">En production, on vise un tag fixe ou le digest : latest change à chaque sortie.</text>
+</svg>

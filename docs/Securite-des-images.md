@@ -18,6 +18,8 @@
 
     Une image, c'est un **plat préparé** : tu ajoutes ta garniture (ton site) sur une base toute faite (Apache, Debian) que tu n'as pas cuisinée. Avant de la servir, tu regardes **qui l'a produite**, tu notes son **numéro de lot** pour racheter exactement la même, tu consultes les **avis de rappel** (les failles connues), et tu ne caches jamais la clé de chez toi dans la sauce. Limite de l'image : un plat se goûte, une image non. Il faut des outils pour regarder dedans.
 
+    ![Schéma animé : les couches du plat se posent, la liste de contrôle se coche et la clé cachée dans la sauce est retirée](assets/anim/secimg-plat-prepare.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -58,6 +60,8 @@
 
     Un château fort n'a pas un seul mur, mais plusieurs **remparts** successifs. Si l'ennemi passe le premier, le deuxième l'arrête. En sécurité, c'est pareil : on ne compte jamais sur une seule protection.
 
+    ![Schéma animé : l'attaquant franchit le rempart de l'image puis bute sur celui de l'utilisateur non root](assets/anim/secimg-remparts.svg){ .anim }
+
 Un conteneur **partage le noyau de l'hôte**, le cœur de Linux (voir [Isolation d'un conteneur](Isolation-des-conteneurs.md)). Prenons un scénario concret : un attaquant trouve une faille dans ton site et peut y lancer des commandes. Ce qu'il obtient ensuite dépend de chaque rempart : ce que contient l'image, sous quel utilisateur tourne le programme, ce qu'on lui a monté, à qui il peut parler. On empile donc des protections **indépendantes**, une par niveau.
 
 ![Six frontières successives : l'attaque franchit l'image et l'application, puis bute sur le conteneur](assets/illustrations/defense-profondeur.png)
@@ -89,6 +93,8 @@ Ces protections se complètent sans se remplacer : une configuration Docker stri
 !!! quote "En clair"
 
     Ton `Dockerfile` commence par `FROM` : tu poses ta brique sur une pile de briques fabriquées par d'autres. Si l'une d'elles est fissurée, ta maison l'est aussi, même si ta brique est parfaite.
+
+    ![Schéma animé : une fissure dans la brique Apache remonte jusqu'à ta brique, puis la base corrigée est remise en place](assets/anim/secimg-briques.svg){ .anim }
 
 Avant d'adopter une image, on vérifie **qui la produit** (dépôt source, maintenance, mises à jour) et **ce qu'elle contient**. Le nombre de téléchargements ne prouve rien : un attaquant peut publier une copie piégée au nom presque identique.
 
@@ -144,6 +150,8 @@ Pour désigner une image, on a deux moyens. Le **tag** (`mariadb:11.4`) est une 
 
     Un scanner, c'est le **contrôle des avis de rappel** : il lit la liste des ingrédients de l'image (le SBOM) et la compare à la liste publique des produits rappelés (les CVE). Il ne peut pas signaler un défaut que personne n'a encore déclaré.
 
+    ![Schéma animé : le scanner relie deux ingrédients de l'image à la liste publique des rappels](assets/anim/secimg-avis-rappel.svg){ .anim }
+
 Un analyseur comme Trivy ou Docker Scout produit un rapport. Ce rapport n'est qu'un point de départ : on décide ligne par ligne.
 
 ???+ example "En vrai : 54 failles graves, une seule corrigeable"
@@ -187,6 +195,8 @@ Un analyseur comme Trivy ou Docker Scout produit un rapport. Ce rapport n'est qu
 !!! quote "En clair"
 
     Les couches d'une image sont des **calques transparents** empilés. Effacer un fichier ne gratte pas le calque du dessous : on pose un nouveau calque qui le **cache**. Quiconque décolle les calques retrouve le dessin d'origine.
+
+    ![Schéma animé : les calques se décollent et révèlent la clé effacée, puis RUN --mount=type=secret la fait passer sans l'écrire](assets/anim/secimg-calques.svg){ .anim }
 
 `ENV`, `ARG` et les fichiers copiés laissent des traces dans l'image ou dans ses métadonnées (les informations jointes à l'image). Et une image poussée sur un registre ne se « dé-publie » pas : des copies existent peut-être déjà. Scénario : ta clé d'API se retrouve dans une image publique ; quelqu'un la télécharge, la retrouve en cinq minutes et utilise ton compte à tes frais.
 

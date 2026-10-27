@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le standard de l'immeuble : le DNS interne traduit un nom en adresse du moment</title>
+  <desc id="d">Le conteneur web demande « db » au standard, qui répond 172.18.0.2 et l'appel aboutit. Le conteneur db est recréé et change d'adresse : 172.18.0.5. Web redemande « db », le standard donne la nouvelle adresse et l'appel aboutit encore. Sur le bridge par défaut, il n'y a pas de standard.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) appel vers .2, 2) db recréé en .5, 3) même nom, nouvel appel vers .5. */
+      .s1 { animation: s1 9s infinite both; opacity: 0; }
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      .avant { animation: avant 9s infinite both; }
+      .apres { animation: apres 9s infinite both; opacity: 0; }
+      @keyframes s1 { 0% { opacity: 0; } 3%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 63% { opacity: 0; } 66%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+      @keyframes avant { 0%, 32% { opacity: 1; } 37%, 97% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes apres { 0%, 40% { opacity: 0; } 45%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      .db1 { animation: db1 9s infinite both; transform-box: fill-box; transform-origin: center; }
+      @keyframes db1 { 0%, 32% { opacity: 1; transform: scale(1); } 37% { opacity: 0; transform: scale(.4); } 97% { opacity: 0; transform: scale(.4); } 100% { opacity: 1; transform: scale(1); } }
+      .db2 { animation: db2 9s infinite both; opacity: 0; transform-box: fill-box; transform-origin: center; }
+      @keyframes db2 { 0%, 40% { opacity: 0; transform: scale(.4); } 44% { opacity: 1; transform: scale(1.1); } 47%, 94% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      .appel1 { animation: appel1 9s infinite both; opacity: 0; }
+      @keyframes appel1 {
+        0%, 9% { opacity: 0; transform: translate(0, 0); }
+        11% { opacity: 1; transform: translate(0, 0); }
+        19% { transform: translate(296px, 0); }
+        24% { opacity: 1; transform: translate(296px, -86px); }
+        29%, 100% { opacity: 0; transform: translate(296px, -86px); }
+      }
+      .appel2 { animation: appel2 9s infinite both; opacity: 0; }
+      @keyframes appel2 {
+        0%, 72% { opacity: 0; transform: translate(0, 0); }
+        74% { opacity: 1; transform: translate(0, 0); }
+        82% { transform: translate(296px, 0); }
+        86% { opacity: 1; transform: translate(296px, 30px); }
+        93% { opacity: 1; transform: translate(296px, 30px); }
+        97%, 100% { opacity: 0; transform: translate(296px, 30px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .s2, .avant, .db1, .appel1, .appel2 { animation: none; opacity: 0; }
+        .s3, .apres, .db2 { animation: none; opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Le standard de l'immeuble</text>
+  <text class="petit" x="32" y="76">le DNS interne traduit un nom en adresse du moment</text>
+
+  <!-- Réseau créé -->
+  <rect class="boite" x="24" y="96" width="700" height="255" rx="14" stroke="#859cff"/>
+  <text class="label" x="44" y="126" fill="#859cff">Réseau créé « appli »</text>
+
+  <rect class="boite" x="48" y="196" width="150" height="72" rx="12" stroke="#00eaff"/>
+  <text class="label" x="68" y="228" fill="#00eaff">web</text>
+  <text class="petit" x="68" y="252">veut joindre db</text>
+
+  <!-- Standard -->
+  <rect class="boite" x="266" y="140" width="210" height="96" rx="12" stroke="#eeff57"/>
+  <text class="label" x="284" y="168" fill="#eeff57">Standard</text>
+  <text class="label avant" x="284" y="198" fill="#5affb6">db → 172.18.0.2</text>
+  <text class="label apres" x="284" y="198" fill="#5affb6">db → 172.18.0.5</text>
+  <text class="petit" x="284" y="222">127.0.0.11</text>
+
+  <!-- Demandes au standard -->
+  <g class="s1"><path d="M198 212 L266 196" stroke="#eeff57" stroke-width="2.5" stroke-dasharray="6 5"/><text class="petit" x="200" y="186" style="fill:#eeff57">« db ? »</text></g>
+  <g class="s3"><path d="M198 212 L266 196" stroke="#eeff57" stroke-width="2.5" stroke-dasharray="6 5"/><text class="petit" x="200" y="186" style="fill:#eeff57">« db ? »</text></g>
+
+  <!-- Bureaux de db -->
+  <rect class="boite" x="530" y="132" width="172" height="70" rx="12" stroke="#a0a4a0"/>
+  <text class="petit" x="546" y="158">172.18.0.2</text>
+  <g class="db1"><rect x="546" y="168" width="64" height="26" rx="13" fill="#5affb6"/><text class="label" x="563" y="188" fill="#0a0006">db</text></g>
+  <text class="petit apres" x="626" y="188">vide</text>
+
+  <rect class="boite" x="530" y="262" width="172" height="70" rx="12" stroke="#a0a4a0"/>
+  <text class="petit" x="546" y="288">172.18.0.5</text>
+  <g class="db2"><rect x="546" y="298" width="64" height="26" rx="13" fill="#5affb6"/><text class="label" x="563" y="318" fill="#0a0006">db</text></g>
+
+  <g class="s2"><text class="label" x="530" y="238" fill="#ff84ef">db recréé</text><text class="petit" x="626" y="238" style="fill:#ff84ef">a déménagé</text></g>
+
+  <!-- Appels -->
+  <path class="s1" d="M198 254 H494 V168 H530" fill="none" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <path class="s3" d="M198 254 H494 V284 H530" fill="none" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <circle class="appel1" cx="202" cy="254" r="9" fill="#5affb6"/>
+  <circle class="appel2" cx="202" cy="254" r="9" fill="#5affb6"/>
+  <g class="s3"><text class="label" x="70" y="316" fill="#5affb6">✓ même nom, ça marche</text></g>
+
+  <!-- Bridge par défaut -->
+  <rect class="boite" x="746" y="96" width="190" height="255" rx="14" stroke="#a0a4a0" stroke-dasharray="8 6"/>
+  <text class="label" x="764" y="126" fill="#a0a4a0">Bridge</text>
+  <text class="label" x="764" y="150" fill="#a0a4a0">par défaut</text>
+  <text class="petit" x="764" y="190">pas de standard :</text>
+  <text class="petit" x="764" y="212">seulement des IP</text>
+  <text class="label" x="764" y="276" fill="#a0a4a0">« db ? »</text>
+  <text class="label" x="764" y="306" fill="#ff1a1a">✗ inconnu</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">On appelle <tspan fill="#eeff57" font-weight="700">« db » par son nom</tspan> : le standard suit l'adresse du moment.</text>
+</svg>

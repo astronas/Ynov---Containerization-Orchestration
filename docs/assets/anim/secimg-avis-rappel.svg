@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Le scanner compare les ingrédients de l'image (SBOM) aux rappels publics (CVE)</title>
+<desc id="d">Le scanner lit la liste des ingrédients de l'image, ligne par ligne. Deux ingrédients, libxml2 et curl, figurent sur la liste publique des rappels : ils sont reliés et surlignés. Le rapport annonce deux rappels à trier, et rappelle qu'un défaut non déclaré n'apparaît sur aucune liste.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.scan{opacity:0;animation:scan 9s infinite both}
+@keyframes scan{0%{opacity:0;transform:none}4%{opacity:1;transform:none}28%{opacity:1;transform:translateY(136px)}31%,100%{opacity:0;transform:translateY(136px)}}
+.lien{stroke-dasharray:100;animation:lien 9s infinite both}
+@keyframes lien{0%,33%{stroke-dashoffset:100;opacity:1}42%,96%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le scanner : contrôle des avis de rappel</text>
+<text class="petit" x="32" y="78">il compare la liste des ingrédients de l'image aux rappels publiés</text>
+<rect class="boite" x="40" y="100" width="330" height="236" rx="14" stroke="#00eaff"/><text class="label cy" x="60" y="134">Ingrédients (SBOM)</text>
+<rect class="scan" x="46" y="154" width="318" height="28" rx="6" fill="#00eaff" fill-opacity=".22"/>
+<text class="label bl" x="70" y="176">openssl</text>
+<text class="label bl" x="70" y="210">libxml2</text>
+<text class="label bl" x="70" y="244">curl</text>
+<text class="label bl" x="70" y="278">zlib</text>
+<text class="label bl" x="70" y="312">bash</text>
+<rect class="boite" x="590" y="100" width="330" height="236" rx="14" stroke="#ff84ef"/><text class="label ro" x="610" y="134">Rappels publics (CVE)</text>
+<text class="label bl" x="620" y="176">libxml2</text><text class="petit ro fin" x="900" y="176">rappel</text>
+<text class="label bl" x="620" y="210">curl</text><text class="petit ro fin" x="900" y="210">rappel</text>
+<text class="label bl" x="620" y="244">glibc</text><text class="petit ro fin" x="900" y="244">rappel</text>
+<rect class="boite" x="415" y="100" width="130" height="58" rx="12" stroke="#eeff57"/><text class="label ja mid" x="480" y="126">Scanner</text><text class="petit mid" x="480" y="148">Trivy, Scout</text>
+<g class="a2"><rect x="50" y="191" width="310" height="26" rx="6" fill="#ff1a1a" fill-opacity=".25"/><rect x="50" y="225" width="310" height="26" rx="6" fill="#ff1a1a" fill-opacity=".25"/><rect x="600" y="157" width="310" height="26" rx="6" fill="#ff1a1a" fill-opacity=".25"/><rect x="600" y="191" width="310" height="26" rx="6" fill="#ff1a1a" fill-opacity=".25"/></g>
+<path class="lien" pathLength="100" d="M372 204 L588 170" stroke="#ff1a1a" stroke-width="2.5" fill="none"/><path class="lien" pathLength="100" d="M372 238 L588 204" stroke="#ff1a1a" stroke-width="2.5" fill="none"/>
+<g class="a3"><rect x="405" y="258" width="150" height="40" rx="20" fill="#eeff57"/><text class="label nr mid" x="480" y="284">2 rappels</text><text class="petit mid" x="480" y="320">à trier ligne par ligne</text><text class="petit" x="40" y="358">Limite : un défaut que personne n'a encore déclaré n'est sur aucune liste.</text></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Le scanner croise le SBOM avec les CVE publiées : il ne voit que les défauts déclarés.</text>
+</svg>

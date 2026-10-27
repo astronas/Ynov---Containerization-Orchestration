@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">up, ps et logs, down : installer, regarder, ranger</title>
+  <desc id="d">docker compose up -d installe dans la salle web, db, leur réseau et le volume. ps et logs regardent l'état et les journaux sans rien changer. down range la salle : conteneurs et réseau disparaissent, le volume reste, sauf avec down -v.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) up -d installe, 2) ps et logs regardent, 3) down range (le volume reste). */
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 66% { opacity: 0; } 70%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      .c1, .c2, .c3 { animation: 9s infinite both; }
+      .c1 { animation-name: c1; } .c2 { animation-name: c2; } .c3 { animation-name: c3; }
+      @keyframes c1 { 0%, 28% { stroke-width: 5; opacity: 1; } 31%, 97% { stroke-width: 2; opacity: .45; } 100% { stroke-width: 5; opacity: 1; } }
+      @keyframes c2 { 0%, 31% { stroke-width: 2; opacity: .45; } 34%, 60% { stroke-width: 5; opacity: 1; } 63%, 100% { stroke-width: 2; opacity: .45; } }
+      @keyframes c3 { 0%, 63% { stroke-width: 2; opacity: .45; } 66%, 94% { stroke-width: 5; opacity: 1; } 97%, 100% { stroke-width: 2; opacity: .45; } }
+      .obj { animation: obj 9s infinite both; opacity: 0; transform-box: fill-box; transform-origin: center; }
+      @keyframes obj { 0%, 3% { opacity: 0; transform: scale(.5); } 7% { opacity: 1; transform: scale(1.06); } 9%, 65% { opacity: 1; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(.5); } }
+      .vol { animation: vol 9s infinite both; opacity: 0; transform-box: fill-box; transform-origin: center; }
+      @keyframes vol { 0%, 3% { opacity: 0; transform: scale(.5); } 7% { opacity: 1; transform: scale(1.06); } 9%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      .garde { animation: garde 9s infinite both; }
+      @keyframes garde { 0%, 68% { stroke-width: 2.5; } 72%, 90% { stroke-width: 6; } 94%, 100% { stroke-width: 2.5; } }
+      .oeil { animation: oeil 9s infinite both; opacity: 0; }
+      @keyframes oeil { 0%, 32% { opacity: 0; transform: translate(0, 0); } 35% { opacity: 1; transform: translate(0, 0); } 46% { transform: translate(210px, 0); } 58% { opacity: 1; transform: translate(0, 0); } 61%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .s2, .obj, .oeil, .c1, .c2 { animation: none; opacity: 0; }
+        .c1, .c2 { opacity: .45; stroke-width: 2; }
+        .s3, .vol, .c3 { animation: none; opacity: 1; }
+        .c3, .garde { stroke-width: 5; animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Installer, regarder, ranger</text>
+  <text class="petit" x="32" y="76">trois verbes de docker compose, appliqués à la même salle</text>
+
+  <!-- Commandes -->
+  <rect class="boite c1" x="32" y="100" width="280" height="72" rx="12" stroke="#eeff57"/>
+  <text class="label" x="52" y="130" fill="#eeff57">up -d</text>
+  <text class="petit" x="52" y="154">mets la salle conforme au plan</text>
+  <rect class="boite c2" x="32" y="188" width="280" height="72" rx="12" stroke="#00eaff"/>
+  <text class="label" x="52" y="218" fill="#00eaff">ps · logs</text>
+  <text class="petit" x="52" y="242">regarde, sans rien changer</text>
+  <rect class="boite c3" x="32" y="276" width="280" height="72" rx="12" stroke="#ff84ef"/>
+  <text class="label" x="52" y="306" fill="#ff84ef">down</text>
+  <text class="petit" x="52" y="330">range tout</text>
+
+  <!-- Salle -->
+  <rect class="boite" x="332" y="96" width="604" height="256" rx="14" stroke="#859cff"/>
+  <text class="label" x="352" y="124" fill="#859cff">Salle</text>
+
+  <g class="obj"><rect class="boite" x="356" y="138" width="180" height="62" rx="12" stroke="#00eaff"/><text class="label" x="376" y="176" fill="#00eaff">web</text></g>
+  <g class="obj" style="animation-delay:.25s"><rect class="boite" x="556" y="138" width="180" height="62" rx="12" stroke="#5affb6"/><text class="label" x="576" y="176" fill="#5affb6">db</text></g>
+  <g class="obj" style="animation-delay:.5s"><rect x="356" y="214" width="380" height="30" rx="8" fill="#859cff" fill-opacity=".18" stroke="#859cff" stroke-width="2"/><text class="petit" x="372" y="235" style="fill:#859cff">réseau du projet</text></g>
+  <g class="vol" style="animation-delay:.75s"><rect class="garde" x="756" y="138" width="160" height="106" rx="12" fill="#ff84ef" fill-opacity=".12" stroke="#ff84ef" stroke-width="2.5"/><text class="label" x="776" y="176" fill="#ff84ef">volume</text><text class="petit" x="776" y="200">db_data</text></g>
+
+  <!-- Étape 2 : on regarde -->
+  <g class="oeil">
+    <ellipse cx="446" cy="122" rx="22" ry="11" fill="none" stroke="#00eaff" stroke-width="2.5"/>
+    <circle cx="446" cy="122" r="5" fill="#00eaff"/>
+  </g>
+  <g class="s2">
+    <rect x="356" y="258" width="560" height="80" rx="10" fill="#0a0006" stroke="#00eaff" stroke-opacity=".5"/>
+    <text class="petit" x="374" y="284" style="fill:#5affb6">web   running</text>
+    <text class="petit" x="374" y="306" style="fill:#5affb6">db    running (healthy)</text>
+    <text class="petit" x="374" y="328">db  | ready for connections</text>
+    <text class="label" x="660" y="306" fill="#00eaff">rien ne change</text>
+  </g>
+
+  <!-- Étape 3 : on range -->
+  <g class="s3">
+    <g fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="6 5" stroke-opacity=".6"><rect x="356" y="138" width="380" height="62" rx="12"/><rect x="356" y="214" width="380" height="30" rx="8"/></g>
+    <text class="label" x="374" y="176" fill="#ff84ef">conteneurs supprimés</text>
+    <text class="petit" x="374" y="235">réseau supprimé</text>
+    <text class="label" x="756" y="276" fill="#ff84ef">gardé</text>
+    <text class="petit" x="756" y="300">down -v le</text>
+    <text class="petit" x="756" y="320">supprimerait</text>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400"><tspan fill="#eeff57" font-weight="700">up</tspan> installe, <tspan fill="#00eaff" font-weight="700">ps</tspan> et <tspan fill="#00eaff" font-weight="700">logs</tspan> regardent, <tspan fill="#ff84ef" font-weight="700">down</tspan> range ; le volume reste, sauf avec -v.</text>
+</svg>

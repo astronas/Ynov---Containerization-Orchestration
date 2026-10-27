@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">ARG ne sert que pendant la fabrication, ENV voyage jusqu'au conteneur</title>
+<desc id="d">Pendant le build, la recette lit une note jaune ARG APP_VERSION=1.1 et une ligne ENV PORT=8080, et le bocal se remplit. À la fin du build, la note ARG part à la poubelle tandis que ENV PORT=8080 est imprimé sur l'étiquette de l'image. Deux conteneurs démarrent : chacun voit PORT=8080, et APP_VERSION n'existe pas.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<marker id="fm" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#5affb6"/></marker><marker id="fr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#ff84ef"/></marker>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.remplir{transform-box:fill-box;transform-origin:center bottom;animation:remplir 8s infinite both}
+@keyframes remplir{0%{transform:scaleY(0)}26%,95%{transform:scaleY(1)}100%{transform:scaleY(0)}}
+.couvercle{animation:couvercle 8s infinite both}
+@keyframes couvercle{0%,24%{opacity:0;transform:translateY(-30px)}30%,95%{opacity:1;transform:none}100%{opacity:0}}
+
+.jeter{transform-box:fill-box;transform-origin:center;animation:jeter 8s infinite both}
+@keyframes jeter{0%{opacity:0;transform:none}4%,37%{opacity:1;transform:none}47%{opacity:1;transform:translate(185px,98px) scale(.2) rotate(25deg)}50%,100%{opacity:0;transform:translate(185px,98px) scale(.2)}}
+.halo{animation:halo 1s infinite alternate}
+@keyframes halo{from{stroke-opacity:1}to{stroke-opacity:.2}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.remplir,.couvercle{opacity:1;transform:none}.jeter{opacity:0}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">ARG au brouillon, ENV sur l'étiquette</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Pendant le build, la recette lit ses deux notes</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Fin du build : la note ARG est jetée, ENV est imprimé sur l'étiquette</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Chaque conteneur lit l'étiquette : PORT existe, APP_VERSION non</text>
+<text class="etape rm" x="32" y="84">ARG jeté après le build ; ENV imprimé sur l'image et retrouvé par chaque conteneur</text>
+
+<rect x="32" y="104" width="260" height="240" rx="14" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/>
+<text class="label" x="50" y="134" fill="#eaf0eb">Recette</text>
+<text class="petit" x="50" y="156">le brouillon</text>
+<text x="50" y="190" font-size="15" fill="#a0a4a0">FROM python:3.12</text>
+<text x="50" y="282" font-size="17" font-weight="700" fill="#5affb6">ENV PORT=8080</text>
+<text x="50" y="316" font-size="15" fill="#a0a4a0">COPY app.py .</text>
+<g class="jeter"><rect x="56" y="206" width="216" height="38" rx="4" fill="#eeff57"/>
+<text x="66" y="231" font-size="17" font-weight="700" fill="#0a0006">ARG APP_VERSION=1.1</text></g>
+<g class="e1"><rect class="halo" x="50" y="200" width="228" height="50" rx="7" fill="none" stroke="#eeff57" stroke-width="2.5"/></g>
+<path d="M330 304 h40 l-5 40 h-30z" fill="none" stroke="#a0a4a0" stroke-width="2"/><path d="M326 304 h48" stroke="#a0a4a0" stroke-width="2.5"/>
+<text class="a2" x="302" y="292" font-size="15" font-weight="700" fill="#eeff57">note jetée</text>
+<path d="M300 196 H418" stroke="#5affb6" stroke-width="3" marker-end="url(#fm)"/>
+<text x="326" y="184" font-size="17" font-weight="700" fill="#5affb6">build</text>
+<rect x="450" y="134" width="94" height="18" fill="#1d1d1d" stroke="#00eaff" stroke-width="2"/>
+<rect x="432" y="150" width="130" height="180" rx="22" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+<rect class="remplir" x="442" y="166" width="110" height="154" rx="14" fill="#00eaff" fill-opacity=".3"/>
+<rect class="couvercle" x="444" y="116" width="106" height="18" rx="5" fill="#5affb6"/>
+
+<g class="p2"><rect x="420" y="226" width="154" height="38" rx="6" fill="#0a0006" stroke="#5affb6" stroke-width="2"/>
+<text x="497" y="251" text-anchor="middle" font-size="17" font-weight="700" fill="#5affb6">ENV PORT=8080</text></g>
+<text class="petit" x="497" y="352" text-anchor="middle">l'image</text>
+<path d="M574 226 H640" stroke="#ff84ef" stroke-width="3" marker-end="url(#fr)"/>
+<text x="586" y="212" font-size="17" font-weight="700" fill="#ff84ef">run</text>
+<g class="a3" style=""><rect x="650" y="104" width="280" height="110" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/><text class="label" x="668" y="134" fill="#ff84ef">conteneur 1</text><text x="668" y="166" font-size="17" font-weight="700" fill="#5affb6">PORT=8080 ✓</text><text class="petit" x="668" y="194">APP_VERSION : absente</text></g>
+<g class="a3" style="animation-delay:.35s"><rect x="650" y="232" width="280" height="110" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/><text class="label" x="668" y="262" fill="#ff84ef">conteneur 2</text><text x="668" y="294" font-size="17" font-weight="700" fill="#5affb6">PORT=8080 ✓</text><text class="petit" x="668" y="322">APP_VERSION : absente</text></g>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">ARG sert pendant la fabrication puis disparaît ; ENV voyage jusqu'au conteneur.</text>
+</svg>

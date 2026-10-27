@@ -18,6 +18,8 @@
 
     Imagine un **terrain** (le serveur physique). La **virtualisation** y construit des **bâtiments** séparés, chacun avec ses fondations (les VM et leur noyau). La **conteneurisation** découpe chaque bâtiment en **appartements** qui partagent les mêmes fondations (les conteneurs). L'**orchestration**, c'est le **syndic** : il attribue les appartements, remplace ce qui casse et en ouvre d'autres quand la demande monte. Mais le syndic ne construit pas de bâtiments : pour cela, il faut revenir à la couche du dessous.
 
+    ![Schéma animé : des bâtiments s'élèvent sur le terrain, se découpent en appartements, puis le syndic remplace et ouvre des appartements](assets/anim/couches-pile-terrain.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -112,6 +114,8 @@ Sur le poste de test (Windows 11, Ubuntu 26.04 sous WSL2, Docker Engine 29.8, Mi
 
     Pour Kubernetes, un nœud est simplement un **poste de travail** équipé d'un agent (le kubelet) et d'un moteur de conteneurs. Peu lui importe que ce poste soit un serveur physique, une VM ou même un conteneur.
 
+    ![Schéma animé : le même poste passe d'un serveur physique à une VM puis à un conteneur, Kubernetes voit toujours un nœud Ready](assets/anim/couches-pile-noeud.svg){ .anim }
+
 Ce sont souvent des VM, car la virtualisation apporte l'isolation matérielle, la répartition des ressources et la souplesse : créer ou supprimer des nœuds en quelques minutes, et sur certaines plateformes les déplacer d'un serveur à l'autre sans les arrêter.
 
 | Environnement | Ce qu'est un nœud |
@@ -148,6 +152,8 @@ Ce sont souvent des VM, car la virtualisation apporte l'isolation matérielle, l
 
     Un restaurant se remplit. D'abord, on **ajoute des tables** dans la salle (des pods sur les nœuds existants). Quand la salle est pleine, il faut **ouvrir une autre salle** (une nouvelle VM). Ce ne sont pas les mêmes personnes qui s'en chargent.
 
+    ![Schéma animé : le chef de rang ajoute des tables, la salle est pleine, le gérant ouvre une seconde salle](assets/anim/couches-pile-restaurant.svg){ .anim }
+
 | Mécanisme | Ce qu'il ajuste | Couche | Outil |
 |---|---|---|---|
 | Ajustement automatique des **pods** | le nombre de copies | orchestration | **HPA** (*Horizontal Pod Autoscaler*) ; **VPA** pour les ressources d'un pod |
@@ -180,6 +186,8 @@ Les 70 % se comptent par rapport aux `requests` de processeur déclarées dans l
 !!! quote "En clair"
 
     Plus on monte, plus on supprime de **points de panne uniques**, ces pièces dont la chute fait tout tomber. Chaque palier protège contre une panne plus grosse, et demande plus de travail d'exploitation.
+
+    ![Schéma animé : on monte de P0 à P3, chaque marche survit à une panne plus grosse et demande plus d'exploitation](assets/anim/couches-pile-paliers.svg){ .anim }
 
 Des **scénarios pédagogiques**, pas des catégories officielles ni des étapes obligatoires. Le **plan de contrôle** est le cerveau du cluster (API, base etcd, scheduler) ; les **workers** sont les nœuds qui exécutent les pods. Un **domaine de panne** est un ensemble de machines qui peuvent tomber ensemble (un serveur, une salle, une zone de centre de données).
 

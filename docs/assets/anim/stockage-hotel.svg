@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">La chambre d'hôtel : ce qui doit durer va au casier</title>
+  <desc id="d">Dans la chambre 1 (un conteneur), on écrit sur le tableau blanc (tmpfs), on laisse des affaires, on utilise un casier de la consigne (volume) et son propre classeur venu de la maison (bind mount). docker rm rend la clé : le tableau et les affaires sont effacés, le casier et le classeur restent. La chambre 2 rouvre le même casier et le même classeur.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) séjour, 2) docker rm : ménage, 3) chambre 2 rouvre casier et classeur. */
+      .s1 { animation: s1 9s infinite both; opacity: 0; }
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      .d2 { animation: d2 9s infinite both; opacity: 0; }
+      @keyframes s1 { 0% { opacity: 0; } 3%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 63% { opacity: 0; } 66%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes d2 { 0%, 33% { opacity: 0; } 37%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      .ecrit { animation: ecrit 9s infinite both; transform-box: fill-box; transform-origin: center; }
+      @keyframes ecrit { 0%, 31% { opacity: 1; transform: scale(1); } 37% { opacity: 0; transform: scale(.2); } 97% { opacity: 0; transform: scale(.2); } 100% { opacity: 1; transform: scale(1); } }
+      .c1 { animation: c1 9s infinite both; }
+      @keyframes c1 { 0%, 33% { opacity: 1; } 39%, 95% { opacity: .35; } 100% { opacity: 1; } }
+      .c2 { animation: c2 9s infinite both; opacity: 0; transform-box: fill-box; transform-origin: center; }
+      @keyframes c2 { 0%, 63% { opacity: 0; transform: scale(.85); } 68% { opacity: 1; transform: scale(1.04); } 71%, 93% { opacity: 1; transform: scale(1); } 97%, 100% { opacity: 0; } }
+      .garde { animation: garde 9s infinite both; }
+      @keyframes garde { 0%, 36% { stroke-width: 2.5; } 42%, 56% { stroke-width: 6; } 62%, 100% { stroke-width: 2.5; } }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .s2, .ecrit, .garde { animation: none; opacity: 0; }
+        .garde { opacity: 1; }
+        .c1 { animation: none; opacity: .35; }
+        .s3, .d2, .c2 { animation: none; opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">La chambre d'hôtel</text>
+  <text class="petit" x="32" y="76">chambre = conteneur · casier = volume · classeur = bind mount · tableau blanc = tmpfs</text>
+
+  <!-- Étapes -->
+  <g class="s1"><text class="label" x="32" y="196" fill="#eeff57">1. Séjour</text><text class="petit" x="32" y="222">on écrit, on range,</text><text class="petit" x="32" y="242">on laisse des affaires</text></g>
+  <g class="s2"><text class="label" x="32" y="196" fill="#ff1a1a">2. docker rm</text><text class="petit" x="32" y="222">clé rendue :</text><text class="petit" x="32" y="242">le ménage efface tout</text></g>
+  <g class="s3"><text class="label" x="32" y="196" fill="#5affb6">3. Chambre 2</text><text class="petit" x="32" y="222">rouvre le casier</text><text class="petit" x="32" y="242">et le classeur</text></g>
+
+  <!-- Hôtel -->
+  <rect class="boite" x="250" y="96" width="496" height="256" rx="14" stroke="#859cff"/>
+  <text class="label" x="268" y="124" fill="#859cff">Hôtel</text>
+  <text class="petit" x="330" y="124">l'hôte : s'il brûle, le casier aussi</text>
+
+  <!-- Chambre 1 -->
+  <g class="c1">
+    <rect class="boite" x="270" y="138" width="220" height="134" rx="12" stroke="#00eaff"/>
+    <text class="label" x="286" y="162" fill="#00eaff">Chambre 1</text>
+    <rect x="286" y="174" width="188" height="38" rx="6" fill="none" stroke="#eaf0eb" stroke-opacity=".6"/>
+    <text class="petit" x="296" y="198">tableau · tmpfs</text>
+  </g>
+  <path class="ecrit" d="M412 186 q8 -6 14 0 t14 0 t14 0 M412 198 q8 -6 14 0 t14 0" fill="none" stroke="#eeff57" stroke-width="2.5"/>
+  <g class="ecrit" fill="#eeff57"><rect x="290" y="226" width="18" height="18" rx="3"/><rect x="314" y="226" width="18" height="18" rx="3"/><rect x="338" y="226" width="18" height="18" rx="3"/></g>
+  <text class="petit ecrit" x="366" y="240">affaires laissées</text>
+  <g class="d2"><text class="label" x="300" y="258" fill="#ff1a1a">✗ effacé</text></g>
+
+  <!-- Chambre 2 -->
+  <g class="c2">
+    <rect class="boite" x="510" y="138" width="220" height="134" rx="12" stroke="#00eaff"/>
+    <text class="label" x="526" y="162" fill="#00eaff">Chambre 2</text>
+    <rect x="526" y="174" width="188" height="38" rx="6" fill="none" stroke="#eaf0eb" stroke-opacity=".6"/>
+    <text class="petit" x="536" y="198">tableau vierge</text>
+    <text class="petit" x="530" y="240">nouveau conteneur</text>
+  </g>
+
+  <!-- Consigne et casier -->
+  <rect class="boite" x="270" y="284" width="460" height="60" rx="12" stroke="#5affb6" stroke-opacity=".5"/>
+  <text class="petit" x="286" y="320">Consigne</text>
+  <rect class="garde" x="400" y="292" width="316" height="44" rx="8" fill="#5affb6" fill-opacity=".12" stroke="#5affb6" stroke-width="2.5"/>
+  <text class="label" x="416" y="321" fill="#5affb6">Casier · volume</text>
+  <g fill="#5affb6"><rect x="630" y="306" width="16" height="16" rx="3"/><rect x="652" y="306" width="16" height="16" rx="3"/><rect x="674" y="306" width="16" height="16" rx="3"/></g>
+
+  <!-- Maison et classeur -->
+  <rect class="boite" x="762" y="138" width="174" height="206" rx="14" stroke="#ff84ef" stroke-dasharray="8 6"/>
+  <text class="label" x="780" y="164" fill="#ff84ef">Maison</text>
+  <text class="petit" x="780" y="186">ton poste</text>
+  <rect class="garde" x="780" y="236" width="138" height="66" rx="8" fill="#ff84ef" fill-opacity=".12" stroke="#ff84ef" stroke-width="2.5"/>
+  <text class="label" x="796" y="264" fill="#ff84ef">Classeur</text>
+  <text class="petit" x="796" y="288">bind mount</text>
+
+  <!-- Liens -->
+  <g class="s1" fill="none" stroke-width="3">
+    <path d="M440 272 V292" stroke="#5affb6"/>
+    <path d="M490 252 H500 V278 H780" stroke="#ff84ef" stroke-dasharray="7 5"/>
+  </g>
+  <g class="s3" fill="none" stroke-width="3">
+    <path d="M620 272 V292" stroke="#5affb6"/>
+    <path d="M730 258 H780" stroke="#ff84ef" stroke-dasharray="7 5"/>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Ce qui doit durer va <tspan fill="#5affb6" font-weight="700">au casier</tspan> ; le reste part au ménage avec la chambre.</text>
+</svg>

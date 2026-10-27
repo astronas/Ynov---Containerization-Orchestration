@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Redémarrer ou replanifier : rallumer la même lampe ou en allumer une dans une autre pièce</title>
+  <desc id="d">Dans la pièce 1, la lampe s'éteint brièvement puis se rallume sur place : c'est un redémarrage. Ensuite la pièce 1 n'a plus de courant : la relancer sur place est impossible. Une flèche mène à la pièce 2, où une lampe s'allume : c'est une replanification sur une autre machine.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <marker id="f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#859cff"/></marker>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .cy { fill: #00eaff; } .me { fill: #5affb6; }
+      /* 9 s : coupure brève et redémarrage (0-3 s), pièce sans courant (3-6 s), lampe allumée ailleurs (6-9 s). Base = état final. */
+      .e1, .e2, .s0, .s1, .l1 { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; }
+      .e23 { animation: e23 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e23 { 0%, 31% { opacity: 0; } 34%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .s0 { animation: s0 9s infinite; } @keyframes s0 { 0%, 4% { opacity: 0; } 6%, 10% { opacity: 1; } 11%, 100% { opacity: 0; } }
+      .s1 { animation: s1 9s infinite; } @keyframes s1 { 0%, 10% { opacity: 0; } 12%, 30% { opacity: 1; } 33%, 100% { opacity: 0; } }
+      .l1 { animation: l1 9s infinite; }
+      @keyframes l1 { 0%, 5% { opacity: 1; } 6%, 10% { opacity: 0; } 11.5%, 32% { opacity: 1; } 33%, 34% { opacity: .3; } 35%, 36% { opacity: .8; } 37%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .noir { animation: noir 9s infinite; }
+      @keyframes noir { 0%, 34% { opacity: 0; } 38%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .l2 { transform-box: fill-box; transform-origin: center; animation: l2 9s infinite; }
+      @keyframes l2 { 0%, 69% { opacity: 0; transform: scale(.6); } 72% { opacity: 1; transform: scale(1.1); } 75%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.6); } }
+      .va { opacity: 0; animation: va 9s infinite; }
+      @keyframes va { 0%, 63% { opacity: 0; transform: translateX(0); } 64% { opacity: 1; } 69% { opacity: 1; transform: translateX(126px); } 71%, 100% { opacity: 0; transform: translateX(126px); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Redémarrer ou replanifier</text>
+  <text class="petit" x="32" y="80">lampe = conteneur, pièce = machine avec son moteur Docker</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#00eaff">1 · Coupure brève : on rallume</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · La pièce n'a plus de courant</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#859cff">3 · On allume dans l'autre pièce</text>
+
+  <!-- Pièce 1 -->
+  <rect class="boite" x="40" y="100" width="360" height="246" rx="14" stroke="#00eaff"/>
+  <text class="label" x="60" y="132" fill="#00eaff">Pièce 1</text>
+  <text class="petit" x="60" y="154">machine 1</text>
+  <path d="M220 100 v86" stroke="#a0a4a0" stroke-width="2"/>
+  <circle cx="220" cy="214" r="28" fill="#3a3a3a"/>
+  <rect x="208" y="241" width="24" height="16" rx="3" fill="#a0a4a0"/>
+  <g class="l1"><circle cx="220" cy="214" r="62" fill="#eeff57" opacity=".18"/><circle cx="220" cy="214" r="28" fill="#eeff57"/></g>
+  <text class="petit" x="264" y="220">conteneur</text>
+  <rect class="noir" x="41.5" y="101.5" width="357" height="243" rx="13" fill="#000" fill-opacity=".6"/>
+  <text class="label s0" x="220" y="300" text-anchor="middle" fill="#eeff57">coupure brève…</text>
+  <text class="label cy s1" x="220" y="300" text-anchor="middle">rallumée sur place</text>
+  <text class="petit cy s1" x="220" y="324" text-anchor="middle">politique restart du moteur</text>
+  <text class="label e23" x="220" y="300" text-anchor="middle" fill="#ff1a1a">plus de courant</text>
+  <text class="petit e23" x="220" y="324" text-anchor="middle">la relancer ici : impossible</text>
+
+  <!-- Flèche de replanification -->
+  <g class="e3">
+    <path d="M410 222 h132" stroke="#859cff" stroke-width="3" marker-end="url(#f)"/>
+    <text class="label" x="480" y="206" text-anchor="middle" fill="#859cff">replanifier</text>
+  </g>
+  <circle class="va" cx="414" cy="222" r="8" fill="#859cff"/>
+
+  <!-- Pièce 2 -->
+  <rect class="boite" x="560" y="100" width="368" height="246" rx="14" stroke="#00eaff"/>
+  <text class="label" x="580" y="132" fill="#00eaff">Pièce 2</text>
+  <text class="petit" x="580" y="154">machine 2</text>
+  <path d="M744 100 v86" stroke="#a0a4a0" stroke-width="2"/>
+  <circle cx="744" cy="214" r="28" fill="#3a3a3a"/>
+  <rect x="732" y="241" width="24" height="16" rx="3" fill="#a0a4a0"/>
+  <g class="l2"><circle cx="744" cy="214" r="62" fill="#eeff57" opacity=".18"/><circle cx="744" cy="214" r="28" fill="#eeff57"/></g>
+  <text class="petit" x="788" y="220">conteneur</text>
+  <text class="label me e3" x="744" y="300" text-anchor="middle">replanifié ici</text>
+  <text class="petit e3" x="744" y="324" text-anchor="middle">même image, nouvelle instance</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400"><tspan fill="#00eaff" font-weight="700">Redémarrer</tspan> : même machine. <tspan fill="#859cff" font-weight="700">Replanifier</tspan> : ailleurs, le métier de l'orchestrateur.</text>
+</svg>

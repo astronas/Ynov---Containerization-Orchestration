@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Un nœud Kubernetes est un poste de travail équipé, quel que soit son support</title>
+  <desc id="d">Le même poste de travail, un kubelet et un moteur de conteneurs, est posé tour à tour sur un serveur physique, sur une machine virtuelle, puis dans un conteneur. À droite, Kubernetes voit toujours la même chose : le nœud-1 est Ready, car le kubelet répond.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .battement { animation: battement 3s infinite both; }
+      @keyframes battement { 0% { opacity: 0; transform: translate(0, 0); } 6% { opacity: 1; } 60% { opacity: 1; transform: translate(118px, 34px); } 70%, 100% { opacity: 0; transform: translate(118px, 34px); } }
+      .ready { transform-box: fill-box; transform-origin: center; animation: ready 3s infinite both; }
+      @keyframes ready { 0%, 58% { transform: scale(1); } 66% { transform: scale(1.15); } 76%, 100% { transform: scale(1); } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .battement { animation: none; opacity: 0; }
+        .ready { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Un nœud, c'est un poste équipé</text>
+  <text class="petit" x="32" y="80">un kubelet et un moteur de conteneurs : peu importe ce qu'il y a dessous</text>
+
+  <rect x="100" y="110" width="380" height="88" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/>
+  <text class="label" x="120" y="142" fill="#5affb6">Poste de travail</text>
+  <text class="petit" x="120" y="172" fill="#eaf0eb" style="fill:#eaf0eb">kubelet + moteur de conteneurs</text>
+  <path d="M290 198 V222" stroke="#a0a4a0" stroke-width="3"/><path d="M282 220 L290 230 L298 220 z" fill="#a0a4a0"/>
+
+  <g class="pa"><rect x="100" y="234" width="380" height="114" rx="14" fill="#1d1d1d" stroke="#1f9e91" stroke-width="2.5"/><text class="l18" x="120" y="266" fill="#1f9e91">posé sur un serveur physique</text>
+    <rect x="120" y="284" width="340" height="12" rx="3" fill="#1f9e91" opacity=".45"/><rect x="120" y="304" width="340" height="12" rx="3" fill="#1f9e91" opacity=".45"/><rect x="120" y="324" width="340" height="12" rx="3" fill="#1f9e91" opacity=".45"/></g>
+  <g class="pb"><rect x="100" y="234" width="380" height="114" rx="14" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="7 6"/><text class="petit" x="118" y="256">un hôte avec son hyperviseur</text>
+    <rect x="126" y="268" width="328" height="68" rx="10" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="l18" x="146" y="308" fill="#859cff">posé sur une machine virtuelle</text></g>
+  <g class="pc"><rect x="100" y="234" width="380" height="114" rx="14" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="7 6"/><text class="petit" x="118" y="256">un hôte Docker (Minikube, driver docker)</text>
+    <rect x="126" y="268" width="328" height="68" rx="10" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/><text class="l18" x="146" y="308" fill="#ff84ef">posé dans un conteneur</text></g>
+
+  <path d="M480 154 L600 190" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+  <circle class="battement" cx="482" cy="155" r="8" fill="#5affb6"/>
+  <rect x="580" y="110" width="340" height="238" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+  <text class="label" x="600" y="142" fill="#00eaff">Ce que voit Kubernetes</text>
+  <rect x="600" y="162" width="300" height="92" rx="10" fill="#0a0006" stroke="#5affb6" stroke-width="2"/>
+  <text class="label" x="620" y="198" fill="#eaf0eb">nœud-1</text>
+  <g class="ready"><rect x="780" y="178" width="100" height="30" rx="15" fill="#5affb6"/><text class="l18" x="830" y="199" fill="#0a0006" text-anchor="middle">Ready</text></g>
+  <text class="petit" x="620" y="236">le kubelet répond</text>
+  <text class="petit" x="600" y="292" fill="#eaf0eb" style="fill:#eaf0eb">la même vue dans les trois cas :</text>
+  <text class="petit" x="600" y="316">le support ne le regarde pas</text>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Un nœud, c'est <tspan fill="#5affb6" font-weight="700">un kubelet qui répond</tspan> : le support en dessous ne change rien pour Kubernetes.</text>
+</svg>

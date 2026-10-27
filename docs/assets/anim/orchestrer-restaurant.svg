@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Une seule cuisine ou une chaîne de cuisines : ce que change un orchestrateur</title>
+  <desc id="d">Avec Compose, une seule cuisine reçoit les commandes et sert les plats. La cuisine prend feu : les commandes s'accumulent et plus aucun plat ne sort. Avec un orchestrateur, le gérant envoie les commandes vers deux autres cuisines qui servent la salle ; les provisions, c'est-à-dire les données, restent bloquées dans la cuisine brûlée.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .la { fill: #859cff; } .tu { fill: #1f9e91; } .bl { fill: #eaf0eb; }
+      /* 9 s : une cuisine sert (0-3 s), elle brûle (3-6 s), le gérant répartit ailleurs (6-9 s). Etat de base = état final. */
+      .e1, .e2, .e12 { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; }
+      .e3 { animation: e3 9s infinite; } .e12 { animation: e12 9s infinite; } .e13 { animation: e13 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e12 { 0%, 61% { opacity: 1; } 64%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e13 { 0%, 30% { opacity: 1; } 33%, 62% { opacity: 0; } 65%, 100% { opacity: 1; } }
+      .tk, .pl { opacity: 0; }
+      .tk { animation: tk 9s infinite; }
+      @keyframes tk { 0% { opacity: 0; transform: translateX(0); } 2% { opacity: 1; } 10% { opacity: 1; transform: translateX(66px); } 12%, 100% { opacity: 0; transform: translateX(66px); } }
+      .pl { animation: pl 9s infinite; }
+      @keyframes pl { 0% { opacity: 0; transform: translateX(0); } 2% { opacity: 1; } 13% { opacity: 1; transform: translateX(215px); } 15%, 100% { opacity: 0; transform: translateX(215px); } }
+      .feu { animation: feu 9s infinite; }
+      @keyframes feu { 0%, 33% { opacity: 0; } 37%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .flamme { transform-box: fill-box; transform-origin: bottom; animation: flamme .6s infinite alternate; }
+      @keyframes flamme { from { transform: scaleY(.85); } to { transform: scaleY(1.12); } }
+      .ouvre { transform-box: fill-box; transform-origin: center; animation: ouvre 9s infinite; }
+      @keyframes ouvre { 0%, 62% { opacity: 0; transform: scale(.6); } 66% { opacity: 1; transform: scale(1.05); } 69%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.6); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Une cuisine ou une chaîne</text>
+  <text class="petit" x="32" y="80">cuisine = machine, commande = travail à faire, provisions = données</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#eaf0eb">1 · Compose : une seule cuisine</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · La cuisine prend feu</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#859cff">3 · Le gérant envoie ailleurs</text>
+
+  <!-- Commandes / gérant -->
+  <rect class="boite" x="32" y="100" width="160" height="246" rx="14" stroke="#eeff57"/>
+  <text class="label" x="48" y="132" fill="#eeff57">Commandes</text>
+  <text class="petit" x="48" y="154">les plats à servir</text>
+  <g fill="#eeff57" opacity=".5"><rect x="58" y="178" width="34" height="22" rx="4"/><rect x="66" y="208" width="34" height="22" rx="4"/><rect x="74" y="238" width="34" height="22" rx="4"/></g>
+  <text class="petit e12" x="48" y="304">pas de gérant :</text>
+  <text class="petit e12" x="48" y="326">un seul moteur</text>
+  <text class="label la e3" x="48" y="304">le gérant</text>
+  <text class="petit la e3" x="48" y="326">répartit ailleurs</text>
+
+  <!-- Cuisine A -->
+  <rect class="boite" x="290" y="100" width="230" height="70" rx="14" stroke="#00eaff"/>
+  <text class="label" x="306" y="130" fill="#00eaff">Cuisine A</text>
+  <text class="petit" x="306" y="154">machine 1</text>
+  <rect x="470" y="116" width="36" height="28" rx="4" fill="#1f9e91"/><path d="M470 126 h36 M488 116 v10" stroke="#0a0006" stroke-width="2"/>
+  <g class="feu">
+    <rect x="290" y="100" width="230" height="70" rx="14" fill="#ff1a1a" fill-opacity=".14" stroke="#ff1a1a" stroke-width="3"/>
+    <path class="flamme" d="M440 164 C426 164 424 150 432 140 C434 148 440 146 438 132 C450 140 454 152 450 158 C448 163 444 164 440 164Z" fill="#ff1a1a"/>
+    <path class="flamme" d="M440 164 C434 164 432 156 437 150 C439 155 442 153 441 146 C447 152 448 158 446 161 C445 163 443 164 440 164Z" fill="#eeff57"/>
+  </g>
+
+  <!-- Emplacements vides (Compose) puis cuisines B et C (orchestrateur) -->
+  <g class="e12" fill="none" stroke="#a0a4a0" stroke-dasharray="6 6" stroke-width="1.5"><rect x="290" y="188" width="230" height="70" rx="14"/><rect x="290" y="276" width="230" height="70" rx="14"/></g>
+  <text class="petit e12" x="306" y="228">aucune autre cuisine</text>
+  <g class="ouvre"><rect class="boite" x="290" y="188" width="230" height="70" rx="14" stroke="#00eaff"/><text class="label" x="306" y="218" fill="#00eaff">Cuisine B</text><text class="petit" x="306" y="242">machine 2</text></g>
+  <g class="ouvre" style="animation-delay:.2s"><rect class="boite" x="290" y="276" width="230" height="70" rx="14" stroke="#00eaff"/><text class="label" x="306" y="306" fill="#00eaff">Cuisine C</text><text class="petit" x="306" y="330">machine 3</text></g>
+
+  <!-- Commandes qui partent vers les cuisines -->
+  <g fill="#eeff57">
+    <rect class="tk" x="200" y="128" width="22" height="14" rx="3" style="animation-delay:.1s"/>
+    <rect class="tk" x="200" y="128" width="22" height="14" rx="3" style="animation-delay:1.1s"/>
+    <rect class="tk" x="200" y="128" width="22" height="14" rx="3" style="animation-delay:2.1s"/>
+    <rect class="tk" x="200" y="128" width="22" height="14" rx="3" style="animation-delay:3.4s"/>
+    <rect class="tk" x="200" y="128" width="22" height="14" rx="3" style="animation-delay:4.4s"/>
+    <rect class="tk" x="200" y="216" width="22" height="14" rx="3" style="animation-delay:6s"/>
+    <rect class="tk" x="200" y="216" width="22" height="14" rx="3" style="animation-delay:7s"/>
+    <rect class="tk" x="200" y="304" width="22" height="14" rx="3" style="animation-delay:6.5s"/>
+    <rect class="tk" x="200" y="304" width="22" height="14" rx="3" style="animation-delay:7.5s"/>
+  </g>
+  <!-- Plats servis -->
+  <g fill="#5affb6">
+    <circle class="pl" cx="530" cy="135" r="9" style="animation-delay:.4s"/>
+    <circle class="pl" cx="530" cy="135" r="9" style="animation-delay:1.2s"/>
+    <circle class="pl" cx="530" cy="135" r="9" style="animation-delay:1.9s"/>
+    <circle class="pl" cx="530" cy="223" r="9" style="animation-delay:6.6s"/>
+    <circle class="pl" cx="530" cy="223" r="9" style="animation-delay:7.4s"/>
+    <circle class="pl" cx="530" cy="311" r="9" style="animation-delay:7s"/>
+    <circle class="pl" cx="530" cy="311" r="9" style="animation-delay:7.6s"/>
+  </g>
+  <text class="label e2" x="540" y="142" fill="#ff1a1a">plus aucun plat</text>
+  <text class="label tu e3" x="540" y="130">données bloquées</text>
+  <text class="petit e3" x="540" y="153">ne déménagent pas seules</text>
+
+  <!-- Salle -->
+  <rect class="boite" x="760" y="100" width="168" height="246" rx="14" stroke="#5affb6"/>
+  <text class="label" x="776" y="132" fill="#5affb6">Salle</text>
+  <text class="petit" x="776" y="154">les clients</text>
+  <text class="label e13" x="776" y="236" fill="#5affb6">servie</text>
+  <text class="label e2" x="776" y="236" fill="#ff1a1a">rien ne sort</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">L'orchestrateur envoie le travail ailleurs ; <tspan fill="#1f9e91" font-weight="700">les données</tspan> ne suivent pas seules.</text>
+</svg>

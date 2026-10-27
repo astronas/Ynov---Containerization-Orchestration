@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le surveillant de piscine : un contrôleur compte, compare et agit</title>
+  <desc id="d">Trois nageurs, les pods, nagent dans trois couloirs ; un trait balaie sans arrêt le bassin : le surveillant recompte. Il en attend 3 et en compte 3. Puis pod-b disparaît : le surveillant compte 2 et en fait entrer un. Un nouveau nageur, pod-d, avec un autre nom, entre dans le couloir vide : le compte revient à 3. Le surveillant ne sait ni qui est sorti, ni quand.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <g id="nageur"><circle r="13" fill="#5affb6"/><path d="M-30 4 q8 -10 16 0 M14 4 q8 -10 16 0" stroke="#5affb6" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .bl { fill: #eaf0eb; } .me { fill: #5affb6; } .rg { fill: #ff1a1a; } .ja { fill: #eeff57; }
+      /* 9 s : 3 sur 3 (0-3 s), un nageur disparaît (3-6 s), un autre entre (6-9 s). Base = état final. */
+      .e1, .e2, .part { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; } .e13 { animation: e13 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e13 { 0%, 30% { opacity: 1; } 33%, 62% { opacity: 0; } 65%, 100% { opacity: 1; } }
+      .nage { animation: nage 3s ease-in-out infinite alternate; }
+      @keyframes nage { from { transform: translateX(0); } to { transform: translateX(110px); } }
+      .part { animation: part 9s infinite; }
+      @keyframes part { 0%, 33% { opacity: 1; } 38%, 99% { opacity: 0; } 100% { opacity: 1; } }
+      .entre { animation: entre 9s infinite; }
+      @keyframes entre { 0%, 62% { opacity: 0; transform: translateX(-90px); } 64% { opacity: 1; } 70%, 97% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; } }
+      .scan { animation: scan 2.25s linear infinite; }
+      @keyframes scan { from { transform: translateX(0); } to { transform: translateX(530px); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } .scan { opacity: 0; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le surveillant de piscine</text>
+  <text class="petit" x="32" y="80">nageur = pod, surveillant = contrôleur : il recompte sans arrêt</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#5affb6">1 · Il compte : 3 sur 3</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · Un nageur manque</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#5affb6">3 · Un autre entre</text>
+
+  <!-- Bassin -->
+  <rect x="32" y="100" width="560" height="246" rx="14" fill="#0d1f2a" stroke="#00eaff" stroke-width="2.5"/>
+  <g stroke="#00eaff" stroke-opacity=".35" stroke-width="2" stroke-dasharray="10 8"><path d="M34 182 h556"/><path d="M34 264 h556"/></g>
+  <path class="scan" d="M46 106 v234" stroke="#859cff" stroke-width="3" stroke-opacity=".7"/>
+
+  <!-- Nageurs -->
+  <g class="nage"><use href="#nageur" x="110" y="141"/><text class="petit bl" x="152" y="146">pod-a</text></g>
+  <g class="part"><g class="nage" style="animation-delay:-1.2s"><use href="#nageur" x="110" y="223"/><text class="petit bl" x="152" y="228">pod-b</text></g></g>
+  <g class="nage" style="animation-delay:-2.2s"><use href="#nageur" x="110" y="305"/><text class="petit bl" x="152" y="310">pod-c</text></g>
+  <text class="label rg e2" x="180" y="230">pod-b a disparu</text>
+  <g class="entre"><g class="nage" style="animation-delay:-.6s"><use href="#nageur" x="110" y="223"/><text class="petit me" x="152" y="228">pod-d, nouveau nom</text></g></g>
+
+  <!-- Surveillant -->
+  <rect class="boite" x="630" y="100" width="298" height="246" rx="14" stroke="#859cff"/>
+  <text class="label" x="650" y="132" fill="#859cff">Surveillant</text>
+  <text class="petit" x="650" y="156">= un contrôleur</text>
+  <text class="label ja" x="650" y="196">attendu : 3</text>
+  <text class="label me e13" x="650" y="228">compté : 3</text>
+  <text class="label rg e2" x="650" y="228">compté : 2</text>
+  <text class="petit e13" x="650" y="258">rien à faire</text>
+  <text class="label ja e2" x="650" y="260">en fait entrer 1</text>
+  <text class="petit" x="650" y="304">il ne sait ni qui est sorti, ni quand :</text>
+  <text class="petit" x="650" y="326">il compte, compare, agit</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Il ne rejoue pas l'histoire : <tspan fill="#859cff" font-weight="700">il compte, compare et agit</tspan>. D'où l'auto-guérison.</text>
+</svg>

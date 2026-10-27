@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le bind mount : ton propre classeur posé dans la chambre</title>
+  <desc id="d">Le dossier ~/site de ton poste est monté dans le conteneur nginx : c'est le même dossier, sans copie. Tu modifies index.html sur ton poste, de v1 à v2 : le conteneur voit v2 aussitôt. Sur un autre poste, ~/site n'existe pas : avec -v, Docker y crée un dossier vide et nginx répond 403, faute de page à servir.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .version { font-size: 40px; font-weight: 700; }
+      /* 9 s : 1) même dossier des deux côtés, 2) on modifie sur le poste, le conteneur le voit, 3) autre poste : dossier absent. */
+      .v1 { animation: v1 9s infinite both; }
+      .v2 { animation: v2 9s infinite both; opacity: 0; }
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      .avant3 { animation: avant3 9s infinite both; }
+      @keyframes v1 { 0%, 36% { opacity: 1; } 38%, 97% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes v2 { 0%, 36% { opacity: 0; } 38%, 63% { opacity: 1; } 66%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 64% { opacity: 0; } 68%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes avant3 { 0%, 63% { opacity: 1; } 67%, 96% { opacity: 0; } 100% { opacity: 1; } }
+      .flash { animation: flash 9s infinite both; }
+      @keyframes flash { 0%, 36% { stroke-width: 2; stroke: #eaf0eb; } 38%, 48% { stroke-width: 5; stroke: #eeff57; } 56%, 100% { stroke-width: 2; stroke: #eaf0eb; } }
+      .stylo { animation: stylo 9s infinite both; opacity: 0; }
+      @keyframes stylo { 0%, 31% { opacity: 0; transform: translate(0, 0); } 33% { opacity: 1; transform: translate(0, 0); } 36% { transform: translate(-20px, 8px); } 37% { transform: translate(0, 0); } 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .v1, .s3, .stylo { animation: none; opacity: 0; }
+        .v2, .s2, .avant3 { animation: none; opacity: 1; }
+        .flash { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Ton propre classeur</text>
+  <text class="petit" x="32" y="76">bind mount : un dossier de ton poste, posé tel quel dans le conteneur</text>
+
+  <!-- Tuyau : le même dossier -->
+  <g class="avant3">
+    <rect x="200" y="212" width="424" height="30" fill="#ff84ef" fill-opacity=".18"/>
+    <path d="M200 212 H624 M200 242 H624" stroke="#ff84ef" stroke-width="2.5"/>
+    <text class="label" x="378" y="200" fill="#ff84ef">même dossier</text>
+    <text class="petit" x="380" y="268">pas de copie</text>
+  </g>
+  <g class="s3">
+    <path d="M200 227 H380 M444 227 H624" stroke="#ff1a1a" stroke-width="2.5" stroke-dasharray="7 6"/>
+    <text x="398" y="236" font-size="26" font-weight="700" fill="#ff1a1a">✗</text>
+  </g>
+
+  <!-- Ton poste -->
+  <g class="avant3">
+    <rect class="boite" x="32" y="100" width="300" height="210" rx="14" stroke="#ff84ef" stroke-dasharray="8 6"/>
+    <text class="label" x="52" y="130" fill="#ff84ef">Ton poste</text>
+    <text class="petit" x="52" y="154">~/site</text>
+    <rect class="flash" x="52" y="170" width="150" height="114" rx="8" fill="#0a0006" stroke="#eaf0eb" stroke-width="2"/>
+    <text class="petit" x="66" y="194">index.html</text>
+    <text class="version v1" x="104" y="256" fill="#eeff57">v1</text>
+    <text class="version v2" x="104" y="256" fill="#eeff57">v2</text>
+  </g>
+  <g class="stylo"><text class="label" x="52" y="342" fill="#eeff57">✎ tu modifies le fichier sur ton poste</text></g>
+  <g class="s3">
+    <rect class="boite" x="32" y="100" width="300" height="210" rx="14" stroke="#a0a4a0" stroke-dasharray="8 6"/>
+    <text class="label" x="52" y="130" fill="#a0a4a0">Autre poste</text>
+    <text class="petit" x="52" y="154">~/site n'existe pas</text>
+    <rect x="52" y="170" width="150" height="114" rx="8" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="114" y="240" font-size="40" font-weight="700" fill="#a0a4a0">?</text>
+  </g>
+
+  <!-- Conteneur -->
+  <rect class="boite" x="600" y="100" width="330" height="210" rx="14" stroke="#00eaff"/>
+  <text class="label" x="620" y="130" fill="#00eaff">Conteneur nginx</text>
+  <text class="petit" x="620" y="154">/usr/share/nginx/html</text>
+  <rect class="flash" x="620" y="170" width="150" height="114" rx="8" fill="#0a0006" stroke="#eaf0eb" stroke-width="2"/>
+  <g class="avant3"><text class="petit" x="634" y="194">index.html</text></g>
+  <text class="version v1" x="672" y="256" fill="#eeff57">v1</text>
+  <text class="version v2" x="672" y="256" fill="#eeff57">v2</text>
+  <g class="s3"><text class="version" x="652" y="256" fill="#ff1a1a">403</text></g>
+  <g class="s2"><text class="label" x="786" y="226" fill="#5affb6">voit v2</text><text class="petit" x="786" y="250">aussitôt</text></g>
+  <g class="s3"><text class="label" x="786" y="226" fill="#ff1a1a">rien</text><text class="label" x="786" y="250" fill="#ff1a1a">à servir</text></g>
+
+  <g class="s3"><text class="petit" x="32" y="342" style="fill:#eaf0eb">Avec -v, Docker y crée un dossier vide, qui masque la page. Les droits (UID/GID) comptent aussi.</text></g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Même dossier des deux côtés, sans copie ; mais il <tspan fill="#ff84ef" font-weight="700">dépend de ton poste</tspan>.</text>
+</svg>

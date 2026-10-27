@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le chef d'atelier : le noyau reçoit les appels système des programmes</title>
+  <desc id="d">Deux images arrivent dans l'espace utilisateur : l'une apporte les outils de Debian, l'autre ceux d'Alpine, aucune n'apporte de noyau. Un programme Debian demande au noyau de l'hôte de lire un fichier : c'est le noyau qui actionne le disque. Puis un programme Alpine demande de la mémoire au même noyau, qui actionne la mémoire. Les programmes ne touchent jamais eux-mêmes aux machines.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .etape { font-size: 18px; font-weight: 700; text-anchor: end; }
+      .m { text-anchor: middle; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .ticket { font-size: 15px; font-weight: 700; fill: #0a0006; text-anchor: middle; }
+      /* 8 s : 1 les images arrivent, 2 Debian demande au noyau, 3 Alpine demande au même noyau */
+      .a1, .a2, .a3 { animation: 8s infinite both; opacity: 0; }
+      .a1 { animation-name: a1; } .a2 { animation-name: a2; } .a3 { animation-name: a3; }
+      @keyframes a1 { 0%, 31% { opacity: 1; } 34%, 100% { opacity: 0; } }
+      @keyframes a2 { 0%, 31% { opacity: 0; } 34%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      @keyframes a3 { 0%, 64% { opacity: 0; } 67%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .arrive { animation: arrive 8s infinite both; opacity: 0; }
+      @keyframes arrive { 0% { opacity: 0; transform: translateY(-40px); } 10%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+      .t2 { animation: t2 8s infinite both; opacity: 0; }
+      @keyframes t2 { 0%, 34% { opacity: 0; transform: translateY(-26px); } 38% { opacity: 1; transform: translateY(-26px); } 46%, 62% { opacity: 1; transform: translateY(0); } 65%, 100% { opacity: 0; transform: translateY(0); } }
+      .t3 { animation: t3 8s infinite both; opacity: 0; }
+      @keyframes t3 { 0%, 67% { opacity: 0; transform: translateY(-26px); } 71% { opacity: 1; transform: translateY(-26px); } 79%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(0); } }
+      .chef { animation: chef 8s infinite both; fill-opacity: 0; }
+      @keyframes chef { 0%, 45% { fill-opacity: 0; } 49%, 55% { fill-opacity: .35; } 60%, 78% { fill-opacity: 0; } 82%, 88% { fill-opacity: .35; } 93%, 100% { fill-opacity: 0; } }
+      .disque { animation: disque 8s infinite both; opacity: 0; }
+      @keyframes disque { 0%, 50% { opacity: 0; } 54%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      .memoire { animation: memoire 8s infinite both; opacity: 0; }
+      @keyframes memoire { 0%, 83% { opacity: 0; } 87%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .a1, .a2, .chef { animation: none; opacity: 0; }
+        .a3, .arrive, .t2, .t3, .disque, .memoire { animation: none; opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le chef d'atelier</text>
+  <text class="petit" x="32" y="78">le noyau, les appels système et l'espace utilisateur</text>
+  <text class="etape a1" x="928" y="52" fill="#ff84ef">1 · l'image apporte ses outils</text>
+  <text class="etape a2" x="928" y="52" fill="#eeff57">2 · on demande au chef</text>
+  <text class="etape a3" x="928" y="52" fill="#00eaff">3 · le même chef pour tous</text>
+
+  <!-- Espace utilisateur -->
+  <rect x="32" y="96" width="896" height="84" rx="12" fill="none" stroke="#a0a4a0" stroke-width="1.5" stroke-dasharray="6 6"/>
+  <text class="petit" x="48" y="130">espace</text>
+  <text class="petit" x="48" y="150">utilisateur</text>
+  <g class="arrive">
+    <rect class="boite" x="215" y="104" width="260" height="66" rx="10" stroke="#ff84ef"/>
+    <text class="l18" x="231" y="132" fill="#ff84ef">image Debian</text>
+    <text class="petit" x="231" y="156">ses outils, pas de noyau</text>
+    <circle cx="446" cy="124" r="9" fill="#eaf0eb"/><path d="M432 156 q14 -26 28 0 z" fill="#eaf0eb"/>
+  </g>
+  <g class="arrive" style="animation-delay:.4s">
+    <rect class="boite" x="555" y="104" width="260" height="66" rx="10" stroke="#00eaff"/>
+    <text class="l18" x="571" y="132" fill="#00eaff">image Alpine</text>
+    <text class="petit" x="571" y="156">ses outils, pas de noyau</text>
+    <circle cx="786" cy="124" r="9" fill="#eaf0eb"/><path d="M772 156 q14 -26 28 0 z" fill="#eaf0eb"/>
+  </g>
+
+  <!-- Tickets : les appels système -->
+  <g class="t2"><rect x="215" y="198" width="260" height="30" rx="8" fill="#ff84ef"/><text class="ticket" x="345" y="219">appel système : lire un fichier</text></g>
+  <g class="t3"><rect x="555" y="198" width="260" height="30" rx="8" fill="#00eaff"/><text class="ticket" x="685" y="219">appel système : de la mémoire</text></g>
+
+  <!-- Le noyau -->
+  <rect class="boite" x="32" y="238" width="896" height="46" rx="10" stroke="#eeff57"/>
+  <rect class="chef" x="32" y="238" width="896" height="46" rx="10" fill="#eeff57"/>
+  <text class="l18" x="52" y="267" fill="#eeff57">Noyau de l'hôte</text>
+  <text class="petit" x="210" y="267" style="fill:#eaf0eb">le chef d'atelier : un seul, jamais apporté par l'image</text>
+
+  <!-- Les machines -->
+  <path d="M250 284 V304 M480 284 V304 M710 284 V304" stroke="#a0a4a0" stroke-width="2"/>
+  <rect class="boite" x="150" y="304" width="200" height="44" rx="10" stroke="#a0a4a0"/>
+  <rect class="boite" x="380" y="304" width="200" height="44" rx="10" stroke="#a0a4a0"/>
+  <rect class="boite" x="610" y="304" width="200" height="44" rx="10" stroke="#a0a4a0"/>
+  <rect class="memoire" x="380" y="304" width="200" height="44" rx="10" fill="#00eaff" fill-opacity=".25" stroke="#00eaff" stroke-width="2.5"/>
+  <rect class="disque" x="610" y="304" width="200" height="44" rx="10" fill="#ff84ef" fill-opacity=".25" stroke="#ff84ef" stroke-width="2.5"/>
+  <text class="l18 m" x="250" y="332" fill="#eaf0eb">Processeur</text>
+  <text class="l18 m" x="480" y="332" fill="#eaf0eb">Mémoire</text>
+  <text class="l18 m" x="710" y="332" fill="#eaf0eb">Disque</text>
+  <text class="petit" x="826" y="322">machines :</text>
+  <text class="petit" x="826" y="340">noyau seul</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">L'image apporte ouvriers et outils, jamais le chef : <tspan fill="#eeff57" font-weight="700">le noyau est celui de l'hôte</tspan>.</text>
+</svg>

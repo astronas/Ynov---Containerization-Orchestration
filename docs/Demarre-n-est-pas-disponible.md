@@ -18,6 +18,8 @@
 
     Un restaurant qui a **ouvert ses portes** n'est pas forcément **prêt à servir** : la cuisine chauffe encore. Le healthcheck, c'est le serveur qui passe en cuisine toutes les 5 secondes demander « on peut envoyer ? ». `service_healthy`, c'est attendre ce feu vert avant de faire entrer les clients. La limite : si la cuisine prend feu plus tard, le serveur le **constate**, mais il n'appelle personne.
 
+    ![Schéma animé : le healthcheck répond pas encore puis oui, le feu passe au vert et web entre seulement alors](assets/anim/sante-restaurant.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -82,6 +84,8 @@
 !!! quote "En clair"
 
     Le healthcheck est un **thermomètre** : on prend la température à intervalle régulier. Il dit « malade » ou « en forme », il ne soigne rien.
+
+    ![Schéma animé : les mesures passent de starting à healthy puis unhealthy, le conteneur reste running](assets/anim/sante-thermometre.svg){ .anim }
 
 ```yaml
 services:
@@ -172,6 +176,8 @@ Ici `web` a aussi un healthcheck (`curl` sur sa propre page), qui dépend donc d
 !!! quote "En clair"
 
     Comme un médecin : on écoute le symptôme, on lit le dossier (les journaux), on examine organe par organe. On n'opère pas avant d'avoir trouvé.
+
+    ![Schéma animé : une erreur 500, les journaux montrent Connection refused, l'examen couche par couche désigne la disponibilité](assets/anim/sante-medecin.svg){ .anim }
 
 Le même symptôme a eu trois causes différentes sur la même application : pilote PHP absent, base pas encore prête, base arrêtée. On **lit l'erreur dans son contexte** avant de corriger.
 

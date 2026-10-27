@@ -18,6 +18,8 @@
 
     Imagine un **immeuble**. Chaque appartement (un conteneur) a ses murs et ses volets fermés : on ne voit pas chez le voisin. Chacun a son **compteur** d'eau et d'électricité avec un disjoncteur : s'il abuse, c'est chez lui que ça saute. Et chacun a un **badge** qui n'ouvre que certaines portes. Mais tout le monde partage les **mêmes fondations** : le noyau Linux.
 
+    ![Schéma animé : un volet arrête le regard, un disjoncteur ne coupe qu'un appartement, un badge n'ouvre que certaines portes, sur des fondations communes](assets/anim/iso-immeuble.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -58,6 +60,8 @@
 
     Un namespace, ce sont des **œillères** : le noyau montre au conteneur une version filtrée du système. Les autres programmes existent toujours, il ne les voit simplement pas.
 
+    ![Schéma animé : les œillères réduisent la vue à nginx, numéro 1, pendant que les autres programmes tournent toujours](assets/anim/iso-oeilleres.svg){ .anim }
+
 Docker pose six œillères par défaut, une par type de ressource :
 
 | Namespace | Ce qu'il cache | Ce qu'on observe |
@@ -96,6 +100,8 @@ Docker pose six œillères par défaut, une par type de ressource :
 
     Un cgroup, c'est un **compteur avec un disjoncteur**. Le noyau compte ce que le conteneur consomme et coupe au-delà de la limite fixée.
 
+    ![Schéma animé : trois compteurs atteignent leur limite : mémoire coupée, processeur ralenti, nouveaux programmes refusés](assets/anim/iso-disjoncteur.svg){ .anim }
+
 | Si le conteneur dépasse… | … il se passe | L'option à donner à `docker run` |
 |---|---|---|
 | la mémoire | il est **arrêté net** par le noyau (code de sortie 137) | `--memory 256m` |
@@ -133,6 +139,8 @@ docker run -d --name app --memory 256m --cpus 0.5 --pids-limit 64 nginx:stable  
 !!! quote "En clair"
 
     Par défaut, le programme du conteneur tourne en **administrateur** (root). Plutôt que de lui donner le trousseau entier, on ne lui laisse que les **clés** dont il a besoin.
+
+    ![Schéma animé : root perd ses 14 clés, n'en récupère que 2, et seule la porte correspondante s'ouvre](assets/anim/iso-trousseau.svg){ .anim }
 
 | Protection | Ce qu'elle fait | Comment |
 |---|---|---|

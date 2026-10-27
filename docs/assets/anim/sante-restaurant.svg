@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Ouvert n'est pas prêt : web attend le feu vert de la base</title>
+  <desc id="d">Le restaurant (db) a ouvert ses portes, il est running, mais la cuisine chauffe encore. Le serveur (le healthcheck) passe en cuisine à intervalle régulier : pas encore, pas encore, puis oui. Le feu passe au vert, l'état devient healthy, et seulement alors les clients (web) entrent. Limite : si la cuisine prend feu plus tard, le serveur le constate mais n'appelle personne.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : trois passages du serveur (pas encore, pas encore, oui), feu vert, puis les clients entrent. */
+      .serveur { animation: serveur 9s infinite both; }
+      @keyframes serveur {
+        0%, 4% { transform: translate(0, 0); }
+        8%, 18% { transform: translate(62px, 0); } 22% { transform: translate(0, 0); }
+        24%, 34% { transform: translate(62px, 0); } 38% { transform: translate(0, 0); }
+        40%, 52% { transform: translate(62px, 0); } 56%, 100% { transform: translate(0, 0); }
+      }
+      .q { animation: q 9s infinite both; opacity: 0; }
+      @keyframes q { 0%, 6% { opacity: 0; } 8%, 13% { opacity: 1; } 15%, 22% { opacity: 0; } 24%, 29% { opacity: 1; } 31%, 38% { opacity: 0; } 40%, 45% { opacity: 1; } 47%, 100% { opacity: 0; } }
+      .non { animation: non 9s infinite both; opacity: 0; }
+      @keyframes non { 0%, 12% { opacity: 0; } 14%, 20% { opacity: 1; } 22%, 28% { opacity: 0; } 30%, 36% { opacity: 1; } 38%, 100% { opacity: 0; } }
+      .oui { animation: oui 9s infinite both; opacity: 0; }
+      @keyframes oui { 0%, 44% { opacity: 0; } 46%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      .avant { animation: avant 9s infinite both; }
+      @keyframes avant { 0%, 45% { opacity: 1; } 47%, 97% { opacity: 0; } 100% { opacity: 1; } }
+      .apres { animation: apres 9s infinite both; opacity: 0; }
+      @keyframes apres { 0%, 45% { opacity: 0; } 47%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      .rouge { animation: rouge 9s infinite both; }
+      @keyframes rouge { 0%, 45% { fill: #ff1a1a; } 47%, 97% { fill: #3a2a2a; } 100% { fill: #ff1a1a; } }
+      .vert { animation: vert 9s infinite both; }
+      @keyframes vert { 0%, 45% { fill: #24342c; } 47%, 97% { fill: #5affb6; } 100% { fill: #24342c; } }
+      .chauffe { transform-box: fill-box; transform-origin: left center; animation: chauffe 9s infinite both; }
+      @keyframes chauffe { 0% { transform: scaleX(.08); fill: #eeff57; } 44% { transform: scaleX(.9); fill: #eeff57; } 47%, 96% { transform: scaleX(1); fill: #5affb6; } 100% { transform: scaleX(.08); fill: #eeff57; } }
+      .client { animation: client 9s infinite both; }
+      @keyframes client { 0%, 54% { opacity: 1; transform: translate(0, 0); } 74%, 94% { opacity: 1; transform: translate(-650px, 0); } 98% { opacity: 0; transform: translate(-650px, 0); } 100% { opacity: 0; transform: translate(0, 0); } }
+      .limite { animation: limite 9s infinite both; opacity: 0; }
+      @keyframes limite { 0%, 74% { opacity: 0; } 78%, 94% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .q, .non, .avant { animation: none; opacity: 0; }
+        .oui, .apres, .limite { animation: none; opacity: 1; }
+        .serveur { animation: none; }
+        .rouge { animation: none; fill: #3a2a2a; }
+        .vert { animation: none; fill: #5affb6; }
+        .chauffe { animation: none; fill: #5affb6; }
+        .client { animation: none; transform: translate(-650px, 0); }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Ouvert n'est pas prêt</text>
+  <text class="petit" x="32" y="76">restaurant = db · serveur = healthcheck · feu vert = service_healthy · clients = web</text>
+
+  <!-- Restaurant -->
+  <rect class="boite" x="32" y="96" width="520" height="256" rx="14" stroke="#5affb6"/>
+  <rect x="550" y="312" width="4" height="36" fill="#1d1d1d"/>
+  <text class="label" x="52" y="126" fill="#5affb6">Restaurant · db</text>
+  <rect x="52" y="140" width="176" height="44" rx="10" fill="#5affb6" fill-opacity=".14" stroke="#5affb6" stroke-width="2"/>
+  <text class="label" x="68" y="169" fill="#5affb6">Ouvert</text>
+  <text class="petit" x="140" y="168">running</text>
+  <text class="petit" x="52" y="216">le serveur passe</text>
+  <text class="petit" x="52" y="236">toutes les 5 s</text>
+  <circle class="serveur" cx="230" cy="264" r="11" fill="#00eaff"/>
+
+  <!-- Cuisine -->
+  <rect class="boite" x="300" y="140" width="232" height="162" rx="12" stroke="#eeff57"/>
+  <text class="label" x="318" y="168" fill="#eeff57">Cuisine</text>
+  <rect x="318" y="182" width="196" height="18" rx="9" fill="#0a0006" stroke="#a0a4a0" stroke-width="1.5"/>
+  <rect class="chauffe" x="318" y="182" width="196" height="18" rx="9"/>
+  <text class="petit avant" x="318" y="224">chauffe encore</text>
+  <text class="petit apres" x="318" y="224" style="fill:#5affb6">prête à servir</text>
+  <text class="petit q" x="318" y="252" style="fill:#00eaff">« on peut envoyer ? »</text>
+  <text class="label non" x="318" y="284" fill="#ff1a1a">pas encore</text>
+  <text class="label oui" x="318" y="284" fill="#5affb6">oui !</text>
+
+  <!-- Feu -->
+  <rect x="580" y="110" width="56" height="140" rx="16" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2"/>
+  <circle class="rouge" cx="608" cy="148" r="19"/>
+  <circle class="vert" cx="608" cy="212" r="19"/>
+  <text class="label avant" x="566" y="284" fill="#eeff57">starting</text>
+  <text class="label apres" x="566" y="284" fill="#5affb6">healthy</text>
+  <text class="petit" x="566" y="306">état de db</text>
+
+  <!-- Clients : web -->
+  <rect class="boite" x="680" y="96" width="256" height="256" rx="14" stroke="#00eaff" stroke-dasharray="8 6"/>
+  <text class="label" x="700" y="126" fill="#00eaff">Clients · web</text>
+  <text class="petit" x="700" y="150">attendent service_healthy</text>
+  <g class="limite">
+    <text class="petit" x="700" y="200" style="fill:#ff84ef">Limite : si la cuisine</text>
+    <text class="petit" x="700" y="220" style="fill:#ff84ef">prend feu plus tard,</text>
+    <text class="petit" x="700" y="240" style="fill:#ff84ef">le serveur le constate,</text>
+    <text class="petit" x="700" y="260" style="fill:#ff84ef">il n'appelle personne.</text>
+  </g>
+  <g fill="#00eaff">
+    <circle class="client" cx="770" cy="330" r="10"/>
+    <circle class="client" cx="805" cy="330" r="10" style="animation-delay:.12s"/>
+    <circle class="client" cx="840" cy="330" r="10" style="animation-delay:.24s"/>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Ouvert n'est pas prêt : web n'entre qu'au <tspan fill="#5affb6" font-weight="700">feu vert</tspan> du healthcheck.</text>
+</svg>

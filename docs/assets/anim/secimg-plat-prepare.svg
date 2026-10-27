@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Une image, c'est un plat préparé : on le contrôle avant de le servir</title>
+<desc id="d">Trois couches se posent sur le plat : Debian, Apache, puis ton site. Une liste de contrôle se coche ligne par ligne : qui l'a produite, numéro de lot (digest), avis de rappel (CVE). Une clé cachée dans la couche Apache est repérée puis retirée, la dernière case se coche et le plat est prêt à servir.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<g id="ok"><circle r="13" fill="#5affb6"/><path d="M-6 0 l4 5 l8 -9" stroke="#0a0006" stroke-width="3" fill="none" stroke-linecap="round"/></g><g id="cle" fill="none" stroke-width="3" stroke-linecap="round"><circle r="7"/><path d="M7 0 h20 M21 0 v7 M27 0 v6"/></g>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.couche{animation:couche 9s infinite both}
+@keyframes couche{0%{opacity:0;transform:translateY(-40px)}7%,96%{opacity:1;transform:none}100%{opacity:0}}
+.tick{transform-box:fill-box;transform-origin:center;animation:tick 9s infinite both}
+@keyframes tick{0%,31%{opacity:0;transform:scale(.4)}34%{opacity:1;transform:scale(1.15)}37%,96%{opacity:1;transform:none}100%{opacity:0}}
+.cle{opacity:0;transform:translate(70px,-50px);animation:cle 9s infinite both}
+@keyframes cle{0%,4%{opacity:0;transform:none}8%,50%{opacity:1;transform:none}56%,100%{opacity:0;transform:translate(70px,-50px)}}
+.alerte{opacity:0;animation:alerte 9s infinite both}
+@keyframes alerte{0%,38%{opacity:0}41%,52%{opacity:1}55%,100%{opacity:0}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Une image, c'est un plat préparé</text>
+<text class="petit" x="32" y="78">ta garniture (ton site) posée sur une base cuisinée par d'autres</text>
+<ellipse cx="210" cy="330" rx="185" ry="16" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2"/>
+<g class="couche"><rect class="boite" x="70" y="258" width="280" height="62" rx="12" stroke="#859cff"/><text class="label la" x="90" y="288">Debian</text><text class="petit" x="90" y="310">la base</text></g>
+<g class="couche" style="animation-delay:.45s"><rect class="boite" x="70" y="192" width="280" height="60" rx="12" stroke="#00eaff"/><text class="label cy" x="90" y="220">Apache</text><text class="petit" x="90" y="242">cuisiné par d'autres</text><g class="cle"><use href="#cle" x="294" y="222" stroke="#eeff57"/></g></g>
+<g class="couche" style="animation-delay:.9s"><rect class="boite" x="100" y="130" width="230" height="52" rx="12" stroke="#5affb6"/><text class="label mt" x="118" y="162">ton site</text><text class="petit" x="212" y="162">ta garniture</text></g>
+<g class="alerte"><circle cx="306" cy="222" r="24" fill="none" stroke="#ff1a1a" stroke-width="3"/><text class="petit rg gras" x="356" y="214">secret !</text></g>
+<text class="label bl" x="440" y="118">Avant de servir</text>
+<circle cx="456" cy="150" r="13" fill="none" stroke="#a0a4a0" stroke-width="2"/><text class="label bl" x="482" y="156">Qui l'a produite ?</text><text class="petit" x="770" y="156">origine</text><g class="tick" style="animation-delay:0s"><use href="#ok" x="456" y="150"/></g>
+<circle cx="456" cy="198" r="13" fill="none" stroke="#a0a4a0" stroke-width="2"/><text class="label bl" x="482" y="204">Numéro de lot noté</text><text class="petit" x="770" y="204">digest</text><g class="tick" style="animation-delay:.4s"><use href="#ok" x="456" y="198"/></g>
+<circle cx="456" cy="246" r="13" fill="none" stroke="#a0a4a0" stroke-width="2"/><text class="label bl" x="482" y="252">Avis de rappel lus</text><text class="petit" x="770" y="252">CVE</text><g class="tick" style="animation-delay:.8s"><use href="#ok" x="456" y="246"/></g>
+<circle cx="456" cy="294" r="13" fill="none" stroke="#a0a4a0" stroke-width="2"/><text class="label bl" x="482" y="300">Pas de clé dans la sauce</text><text class="petit" x="770" y="300">aucun secret</text><g class="tick" style="animation-delay:2s"><use href="#ok" x="456" y="294"/></g>
+<g class="a3"><rect x="440" y="322" width="190" height="36" rx="18" fill="#5affb6"/><text class="label nr mid" x="535" y="346">Prête à servir</text><text class="petit" x="650" y="336">limite : une image ne se goûte pas,</text><text class="petit" x="650" y="355">on l'inspecte avec des outils</text></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Avant de lancer une image : son origine, son digest, ses CVE, et aucun secret dedans.</text>
+</svg>

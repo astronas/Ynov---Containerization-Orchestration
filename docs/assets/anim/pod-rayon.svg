@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le rayon de supermarché : Pod, ReplicaSet et Deployment</title>
+  <desc id="d">Un rayon contient trois produits, des pods en version v1. Un produit s'abîme : le magasinier, le ReplicaSet, le jette et en pose un neuf, sans le réparer. Puis le chef de rayon, le Deployment, introduit le modèle v2 : à chaque pas, un produit v2 est posé dans la place libre avant qu'un v1 soit retiré, le rayon ne manque jamais de produits. A la fin les trois produits sont en v2 et l'ancien modèle v1 est gardé en réserve, pour un retour arrière.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <g id="v1"><rect width="84" height="100" rx="10" fill="#10272a" stroke="#00eaff" stroke-width="2.5"/><text class="label" x="42" y="40" text-anchor="middle" fill="#eaf0eb">Pod</text><rect x="20" y="60" width="44" height="26" rx="13" fill="#00eaff"/><text class="label" x="42" y="80" text-anchor="middle" fill="#0a0006">v1</text></g>
+    <g id="v2"><rect width="84" height="100" rx="10" fill="#301229" stroke="#ff84ef" stroke-width="2.5"/><text class="label" x="42" y="40" text-anchor="middle" fill="#eaf0eb">Pod</text><rect x="20" y="60" width="44" height="26" rx="13" fill="#ff84ef"/><text class="label" x="42" y="80" text-anchor="middle" fill="#0a0006">v2</text></g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .bl { fill: #eaf0eb; } .ja { fill: #eeff57; } .me { fill: #5affb6; } .rg { fill: #ff1a1a; }
+      /* 9 s : produit abîmé remplacé (0-3 s), passage à v2 un par un (3-6 s), v1 en réserve (6-9 s). Base = état final. */
+      .e1, .e2, .oA, .oB, .rB, .oC { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      /* Rolling update par défaut (3 réplicas : maxSurge 1, maxUnavailable 0) : le v2 est posé dans la place libre AVANT de retirer un v1. */
+      .oA { animation: oA 9s infinite; } @keyframes oA { 0%, 37% { opacity: 1; transform: translateY(0); } 41%, 98% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+      .nA { animation: nA 9s infinite; } @keyframes nA { 0%, 42% { opacity: 0; transform: translateY(-40px); } 46%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+      .oB { transform-box: fill-box; transform-origin: center; animation: oB 9s infinite; } @keyframes oB { 0%, 14% { opacity: 1; transform: scale(1) rotate(0); } 19%, 98% { opacity: 0; transform: scale(.4) rotate(-25deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+      .abime { animation: abime 9s infinite; } @keyframes abime { 0%, 4% { opacity: 0; } 6%, 97% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      .rB { animation: rB 9s infinite; } @keyframes rB { 0%, 19% { opacity: 0; transform: translateY(-40px); } 23%, 47% { opacity: 1; transform: translateY(0); } 51%, 100% { opacity: 0; transform: translateY(-30px); } }
+      .nB { animation: nB 9s infinite; } @keyframes nB { 0%, 52% { opacity: 0; transform: translateY(-40px); } 56%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+      .oC { animation: oC 9s infinite; } @keyframes oC { 0%, 57% { opacity: 1; transform: translateY(0); } 61%, 98% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+      .nC { animation: nC 9s infinite; } @keyframes nC { 0%, 32% { opacity: 0; transform: translateY(-40px); } 36%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le rayon de supermarché</text>
+  <text class="petit" x="32" y="80">Pod = produit, ReplicaSet = magasinier, Deployment = chef de rayon</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#ff1a1a">1 · Abîmé : jeté, remplacé</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#eeff57">2 · Nouveau modèle, un par un</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#859cff">3 · L'ancien modèle en réserve</text>
+
+  <!-- Rôles -->
+  <rect class="boite" x="32" y="100" width="250" height="110" rx="14" stroke="#859cff"/>
+  <text class="label" x="52" y="132" fill="#859cff">Chef de rayon</text>
+  <text class="petit" x="52" y="156">= Deployment</text>
+  <text class="petit e1" x="52" y="188">modèle en rayon : v1</text>
+  <text class="petit ja e2" x="52" y="188">nouveau modèle : v2</text>
+  <text class="petit e3" x="52" y="188">v2 en rayon, v1 gardé</text>
+  <rect class="boite" x="32" y="236" width="250" height="110" rx="14" stroke="#00eaff"/>
+  <text class="label" x="52" y="268" fill="#00eaff">Magasinier</text>
+  <text class="petit" x="52" y="292">= ReplicaSet</text>
+  <text class="petit" x="52" y="324">toujours 3 en rayon</text>
+
+  <!-- Rayon -->
+  <rect x="300" y="100" width="380" height="246" rx="14" fill="#141414" stroke="#3a3a3a" stroke-width="2"/>
+  <text class="petit" x="318" y="128">le rayon</text>
+  <rect x="300" y="270" width="380" height="9" fill="#a0a4a0"/>
+  <rect x="586" y="168" width="84" height="100" rx="10" fill="none" stroke="#5a5a5a" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <use class="oA" href="#v1" x="310" y="168"/>
+  <use class="nA" href="#v2" x="310" y="168"/>
+  <g class="oB"><use href="#v1" x="402" y="168"/><g class="abime"><rect x="402" y="168" width="84" height="100" rx="10" fill="#ff1a1a" fill-opacity=".3" stroke="#ff1a1a" stroke-width="3"/><path d="M416 180 l18 22 l-10 8 l22 24" stroke="#ff1a1a" stroke-width="4" fill="none"/></g></g>
+  <use class="rB" href="#v1" x="402" y="168"/>
+  <use class="nB" href="#v2" x="402" y="168"/>
+  <use class="oC" href="#v1" x="494" y="168"/>
+  <use class="nC" href="#v2" x="586" y="168"/>
+  <text class="petit bl" x="318" y="310">voulu : 3 pods</text>
+  <text class="petit" x="670" y="310" text-anchor="end">+1 place pour l'échange</text>
+
+  <!-- Ce qui se passe -->
+  <rect class="boite" x="690" y="100" width="238" height="110" rx="14" stroke="#3a3a3a"/>
+  <text class="label rg e1" x="710" y="140">produit abîmé</text>
+  <text class="petit e1" x="710" y="166">jeté, pas réparé :</text>
+  <text class="petit e1" x="710" y="188">un neuf prend sa place</text>
+  <text class="label ja e2" x="710" y="140">passage en v2</text>
+  <text class="petit e2" x="710" y="166">le v2 posé d'abord,</text>
+  <text class="petit e2" x="710" y="188">puis un v1 retiré</text>
+  <text class="label me e3" x="710" y="140">rayon en v2</text>
+  <text class="petit e3" x="710" y="166">aucun pod réparé :</text>
+  <text class="petit e3" x="710" y="188">tous remplacés</text>
+
+  <!-- Réserve -->
+  <rect class="boite" x="690" y="236" width="238" height="110" rx="14" stroke="#859cff" stroke-dasharray="8 6"/>
+  <text class="label bl" x="710" y="268">Réserve</text>
+  <text class="petit e3" x="710" y="294">ReplicaSet v1, à 0 pod</text>
+  <text class="petit e3" x="710" y="318">pour revenir en arrière</text>
+  <g class="e3"><rect x="874" y="250" width="40" height="28" rx="14" fill="#00eaff"/><text class="label" x="894" y="270" text-anchor="middle" fill="#0a0006">v1</text></g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Un pod ne se répare pas : <tspan fill="#ff84ef" font-weight="700">on le remplace</tspan>. L'ancienne version reste en réserve.</text>
+</svg>

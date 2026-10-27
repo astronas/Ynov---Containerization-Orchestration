@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le pod, une colocation : une adresse, une boîte aux lettres, des placards partagés</title>
+  <desc id="d">Dans l'immeuble 1, un appartement, le pod, abrite deux colocataires, les conteneurs app et journaux. Ils partagent une adresse IP, une boîte aux lettres, localhost, par laquelle passe une lettre, et un placard, le volume. L'immeuble 1 tremble et s'écroule : le nœud est perdu. Les colocataires sont relogés dans un nouvel appartement de l'immeuble 2, à une nouvelle adresse IP.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <marker id="f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#859cff"/></marker>
+    <g id="coloc">
+      <rect width="352" height="160" rx="12" fill="#241020" stroke="#ff84ef" stroke-width="2.5"/>
+      <text class="label" x="16" y="28" fill="#ff84ef">Appartement = pod</text>
+      <circle cx="66" cy="108" r="18" fill="#00eaff"/><text class="petit bl" x="66" y="148" text-anchor="middle">app</text>
+      <circle cx="176" cy="108" r="18" fill="#eeff57"/><text class="petit bl" x="176" y="148" text-anchor="middle">journaux</text>
+      <rect x="108" y="96" width="26" height="22" rx="3" fill="#859cff"/><text class="petit" x="121" y="86" text-anchor="middle" style="fill:#859cff">localhost</text>
+      <rect x="256" y="66" width="80" height="80" rx="8" fill="#0f2a27" stroke="#1f9e91" stroke-width="2"/>
+      <text class="petit bl" x="296" y="100" text-anchor="middle">placard</text><text class="petit" x="296" y="122" text-anchor="middle">= volume</text>
+    </g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .bl { fill: #eaf0eb; } .ja { fill: #eeff57; } .rg { fill: #ff1a1a; }
+      /* 9 s : la vie en coloc (0-3 s), l'immeuble s'écroule (3-6 s), relogés ailleurs (6-9 s). Base = état final. */
+      .e1, .e2 { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; } .e23 { animation: e23 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e23 { 0%, 35% { opacity: 0; } 40%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .lettre { opacity: 0; animation: lettre 1.5s ease-in-out infinite; }
+      @keyframes lettre { 0% { opacity: 0; transform: translateX(0); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(92px); } }
+      .secoue { transform-box: fill-box; transform-origin: 50% 100%; animation: secoue 9s infinite; }
+      @keyframes secoue { 0%, 33% { transform: rotate(0); } 35% { transform: rotate(-1.6deg); } 37% { transform: rotate(1.6deg); } 39% { transform: rotate(-1.6deg); } 41% { transform: rotate(1.2deg); } 43%, 100% { transform: rotate(0); } }
+      .ouvre { transform-box: fill-box; transform-origin: center; animation: ouvre 9s infinite; }
+      @keyframes ouvre { 0%, 64% { opacity: 0; transform: scale(.6); } 68% { opacity: 1; transform: scale(1.04); } 71%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.6); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le pod, une colocation</text>
+  <text class="petit" x="32" y="80">colocataire = conteneur, adresse = IP du pod, boîte aux lettres = localhost</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#ff84ef">1 · Une coloc : tout est partagé</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · L'immeuble s'écroule</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#5affb6">3 · Relogés, autre adresse</text>
+
+  <!-- Immeuble 1 -->
+  <g class="secoue">
+    <rect class="boite" x="40" y="100" width="400" height="246" rx="14" stroke="#00eaff"/>
+    <text class="label" x="60" y="132" fill="#00eaff">Immeuble 1</text>
+    <text class="petit" x="60" y="156">nœud 1, une machine</text>
+    <use href="#coloc" x="64" y="170"/>
+    <text class="petit ja" x="280" y="198">IP 10.244.1.7</text>
+    <g class="e1"><rect class="lettre" x="146" y="270" width="18" height="12" rx="2" fill="#eaf0eb"/></g>
+  </g>
+  <g class="e23">
+    <rect x="40" y="100" width="400" height="246" rx="14" fill="#1a0505" fill-opacity=".86" stroke="#ff1a1a" stroke-width="3"/>
+    <path d="M150 100 l20 60 l-24 40 l30 70 l-12 76 M330 100 l-16 50 l26 50 l-20 60" stroke="#ff1a1a" stroke-width="3" fill="none" stroke-opacity=".7"/>
+    <text class="label rg" x="240" y="230" text-anchor="middle">nœud perdu</text>
+    <text class="petit bl" x="240" y="256" text-anchor="middle">l'appartement disparaît avec lui</text>
+  </g>
+
+  <!-- Relogement -->
+  <g class="e3">
+    <path d="M446 262 h64" stroke="#859cff" stroke-width="3" marker-end="url(#f)"/>
+    <text class="petit" x="480" y="248" text-anchor="middle" style="fill:#859cff">relogés</text>
+  </g>
+
+  <!-- Immeuble 2 -->
+  <rect class="boite" x="520" y="100" width="408" height="246" rx="14" stroke="#00eaff"/>
+  <text class="label" x="540" y="132" fill="#00eaff">Immeuble 2</text>
+  <text class="petit" x="540" y="156">nœud 2, une autre machine</text>
+  <g class="ouvre">
+    <use href="#coloc" x="548" y="170"/>
+    <text class="petit ja" x="764" y="198">IP 10.244.2.4</text>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Nouvelle machine, nouveau pod, <tspan fill="#eeff57" font-weight="700">nouvelle IP</tspan> : d'où le besoin d'un Service.</text>
+</svg>

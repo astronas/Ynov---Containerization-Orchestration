@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le healthcheck est un thermomètre : il mesure, il ne soigne pas</title>
+  <desc id="d">Une mesure est prise toutes les 5 secondes. Les premières disent starting, les suivantes healthy. Puis les mesures échouent : après plusieurs échecs consécutifs, l'état devient unhealthy. Le conteneur reste running : le thermomètre a dit « malade », personne ne le soigne.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .etat { font-size: 26px; font-weight: 700; }
+      /* 9 s : une mesure toutes les 11 % du cycle ; starting, healthy, puis échecs et unhealthy. */
+      .m { opacity: 0; transform-box: fill-box; transform-origin: center; animation: 9s infinite both; }
+      .m0 { animation-name: m0; } .m1 { animation-name: m1; } .m2 { animation-name: m2; } .m3 { animation-name: m3; }
+      .m4 { animation-name: m4; } .m5 { animation-name: m5; } .m6 { animation-name: m6; } .m7 { animation-name: m7; }
+      @keyframes m0 { 0%, 4% { opacity: 0; transform: scale(0); } 6%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m1 { 0%, 14% { opacity: 0; transform: scale(0); } 16%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m2 { 0%, 24% { opacity: 0; transform: scale(0); } 26%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m3 { 0%, 34% { opacity: 0; transform: scale(0); } 36%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m4 { 0%, 44% { opacity: 0; transform: scale(0); } 46%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m5 { 0%, 54% { opacity: 0; transform: scale(0); } 56%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m6 { 0%, 62% { opacity: 0; transform: scale(0); } 64%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      @keyframes m7 { 0%, 70% { opacity: 0; transform: scale(0); } 72%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; } }
+      .e1, .e2, .e3 { animation: 9s infinite both; opacity: 0; }
+      .e1 { animation-name: e1; } .e2 { animation-name: e2; } .e3 { animation-name: e3; }
+      @keyframes e1 { 0%, 2% { opacity: 0; } 4%, 24% { opacity: 1; } 26%, 100% { opacity: 0; } }
+      @keyframes e2 { 0%, 24% { opacity: 0; } 26%, 70% { opacity: 1; } 72%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 70% { opacity: 0; } 72%, 95% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      .mercure { transform-box: fill-box; transform-origin: center bottom; animation: mercure 9s infinite both; }
+      @keyframes mercure {
+        0% { transform: scaleY(.15); fill: #a0a4a0; }
+        24% { transform: scaleY(.3); fill: #a0a4a0; }
+        27%, 52% { transform: scaleY(.5); fill: #5affb6; }
+        72%, 95% { transform: scaleY(.95); fill: #ff1a1a; }
+        100% { transform: scaleY(.15); fill: #a0a4a0; }
+      }
+      .bulbe { animation: bulbe 9s infinite both; }
+      @keyframes bulbe { 0%, 24% { fill: #a0a4a0; } 27%, 52% { fill: #5affb6; } 72%, 95% { fill: #ff1a1a; } 100% { fill: #a0a4a0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .bulbe { animation: none; fill: #ff1a1a; }
+        .m, .e3 { animation: none; opacity: 1; transform: none; }
+        .e1, .e2 { animation: none; opacity: 0; }
+        .mercure { animation: none; transform: scaleY(.95); fill: #ff1a1a; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Un thermomètre, pas un médecin</text>
+  <text class="petit" x="32" y="76">le healthcheck prend la température de db à intervalle régulier</text>
+
+  <!-- Thermomètre -->
+  <rect x="80" y="110" width="28" height="196" rx="14" fill="#1d1d1d" stroke="#eaf0eb" stroke-width="2.5"/>
+  <circle cx="94" cy="310" r="24" fill="#1d1d1d" stroke="#eaf0eb" stroke-width="2.5"/>
+  <rect class="mercure" x="87" y="124" width="14" height="186" rx="7"/>
+  <circle class="bulbe" cx="94" cy="310" r="17"/>
+  <text class="petit" x="122" y="130">malade</text>
+  <text class="petit" x="122" y="226">en forme</text>
+  <text class="petit" x="122" y="290">démarre</text>
+
+  <!-- État -->
+  <text class="petit" x="200" y="128">état de santé</text>
+  <text class="etat e1" x="200" y="160" fill="#a0a4a0">starting</text>
+  <text class="etat e2" x="200" y="160" fill="#5affb6">healthy</text>
+  <text class="etat e3" x="200" y="160" fill="#ff1a1a">unhealthy</text>
+  <g class="e3"><text class="petit" x="340" y="160" style="fill:#ff1a1a">après plusieurs échecs de suite (retries)</text></g>
+
+  <!-- Frise des mesures -->
+  <path d="M200 210 H900" stroke="#a0a4a0" stroke-width="2"/>
+  <g stroke="#a0a4a0" stroke-width="2"><path d="M220 202 v16 M310 202 v16 M400 202 v16 M490 202 v16 M580 202 v16 M670 202 v16 M760 202 v16 M850 202 v16"/></g>
+  <circle class="m m0" cx="220" cy="210" r="12" fill="#a0a4a0"/>
+  <circle class="m m1" cx="310" cy="210" r="12" fill="#a0a4a0"/>
+  <circle class="m m2" cx="400" cy="210" r="12" fill="#5affb6"/>
+  <circle class="m m3" cx="490" cy="210" r="12" fill="#5affb6"/>
+  <circle class="m m4" cx="580" cy="210" r="12" fill="#5affb6"/>
+  <circle class="m m5" cx="670" cy="210" r="12" fill="#ff1a1a"/>
+  <circle class="m m6" cx="760" cy="210" r="12" fill="#ff1a1a"/>
+  <circle class="m m7" cx="850" cy="210" r="12" fill="#ff1a1a"/>
+  <text class="petit" x="200" y="248">une mesure toutes les 5 s (interval)</text>
+
+  <!-- Le conteneur reste running -->
+  <rect class="boite" x="200" y="270" width="300" height="70" rx="12" stroke="#5affb6"/>
+  <text class="label" x="220" y="300" fill="#5affb6">conteneur db</text>
+  <text class="petit" x="220" y="324">toujours running</text>
+  <g class="e3">
+    <text class="label" x="530" y="300" fill="#ff84ef">Il ne soigne rien :</text>
+    <text class="petit" x="530" y="324" style="fill:#ff84ef">Docker seul ne redémarre pas un conteneur unhealthy.</text>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le healthcheck dit <tspan fill="#5affb6" font-weight="700">« en forme »</tspan> ou <tspan fill="#ff1a1a" font-weight="700">« malade »</tspan> ; il ne soigne rien.</text>
+</svg>

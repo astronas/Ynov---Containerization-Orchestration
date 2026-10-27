@@ -18,6 +18,8 @@
 
     Pense à un **rayon de supermarché**. Le **Pod**, c'est un produit en rayon : un ou quelques articles emballés ensemble. Le **ReplicaSet**, c'est le magasinier qui veille à ce qu'il y en ait toujours, disons, trois : un produit abîmé, il le jette et en met un neuf, il ne le répare pas. Le **Deployment**, c'est le chef de rayon : quand le modèle du produit change, il fait remplacer les anciens un par un, et garde l'ancien modèle en réserve au cas où.
 
+    ![Schéma animé : un produit abîmé est jeté et remplacé, puis les produits passent en v2 un par un, v1 reste en réserve](assets/anim/pod-rayon.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     Un pod, c'est une **colocation** : les conteneurs qui y vivent partagent la même adresse (une seule IP), la même boîte aux lettres (`localhost`) et les mêmes placards (les volumes). Si l'immeuble s'écroule, on ne reconstruit pas l'appartement : on reloge tout le monde ailleurs, à une autre adresse.
+
+    ![Schéma animé : deux colocataires partagent adresse, localhost et placard ; l'immeuble s'écroule, ils sont relogés à une autre IP](assets/anim/pod-colocation.svg){ .anim }
 
 Les conteneurs d'un pod partagent **la même IP**, le même `localhost`, le même nom de machine et les mêmes volumes. C'est le partage de namespaces Linux vu dans [Isolation d'un conteneur](Isolation-des-conteneurs.md), porté par un tout petit conteneur **`pause`** créé en premier. Le cas courant est **un conteneur par pod**. Plusieurs se justifient s'ils sont indissociables, par exemple un « sidecar » (un conteneur d'appoint) qui relaie les journaux.
 
@@ -107,6 +111,8 @@ Les conteneurs d'un pod partagent **la même IP**, le même `localhost`, le mêm
 !!! quote "En clair"
 
     Un **label**, c'est une **étiquette autocollante** posée sur un objet (`app: web`). Un **sélecteur**, c'est la consigne « prends tous ceux qui portent cette étiquette ». Le ReplicaSet ne tient pas une liste de noms : il **compte les étiquettes**.
+
+    ![Schéma animé : on retire l'étiquette d'un pod : le ReplicaSet ne le compte plus et en crée un neuf](assets/anim/pod-etiquettes.svg){ .anim }
 
 Un **label** est une étiquette clé-valeur (`app: web`) ; un **sélecteur** filtre sur ces étiquettes. Le ReplicaSet **compte les pods qui portent ses labels**, et le Service retrouve ses pods de la même façon. Chaque objet sait aussi qui l'a créé : c'est la **chaîne de propriété** Deployment, puis ReplicaSet, puis Pod.
 
@@ -209,6 +215,8 @@ Les autres réglages et leurs valeurs par défaut :
 !!! quote "En clair"
 
     Changer les ampoules d'un long couloir **une par une** : à chaque instant, il reste assez de lumière pour passer. C'est le **rolling update**. L'autre méthode, `Recreate`, éteint tout le couloir, change toutes les ampoules, puis rallume.
+
+    ![Schéma animé : en haut les ampoules changent une par une sans noir, en bas tout s'éteint puis tout se rallume](assets/anim/pod-ampoules.svg){ .anim }
 
 **Seul un changement du `template`** (image, variables, ports…) crée une **révision**, donc un **nouveau ReplicaSet**. L'ancien est ramené à 0 pod mais **conservé**. Le RollingUpdate remplit le nouveau et vide l'ancien pas à pas, sans jamais dépasser `maxSurge` ni passer sous `maxUnavailable`.
 

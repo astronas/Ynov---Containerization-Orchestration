@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">On publie une nouvelle édition au lieu de corriger l'ancienne, et l'empreinte vérifie l'édition reçue</title>
+<desc id="d">L'entrepôt, le registre, stocke l'édition 1.0 d'empreinte 5f3a et en envoie un exemplaire à deux serveurs. Une erreur est trouvée : l'imprimerie produit l'édition 1.1, rangée à côté de la 1.0 qui reste intacte. Puis l'étiquette web:1.0 est recollée sur l'édition 1.1 : le serveur B, qui attend l'empreinte 5f3a, reçoit 9c41 et refuse.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.arrive{animation:arrive 8s infinite both}
+@keyframes arrive{0%,36%{opacity:0;transform:translateX(-330px)}39%{opacity:1;transform:translateX(-330px)}50%,95%{opacity:1;transform:none}100%{opacity:0}}
+.envA,.envB{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.envA{animation-name:envA}.envB{animation-name:envB}
+@keyframes envA{0%{opacity:0;transform:none}4%{opacity:1;transform:none}22%{opacity:1;transform:translate(325px,-100px)}26%,100%{opacity:0;transform:translate(325px,-100px)}}
+@keyframes envB{0%,6%{opacity:0;transform:none}10%{opacity:1;transform:none}28%{opacity:1;transform:translate(325px,30px)}32%,100%{opacity:0;transform:translate(325px,30px)}}
+.recu{animation:recu 8s infinite both}
+@keyframes recu{0%,24%{opacity:0}28%,95%{opacity:1}100%{opacity:0}}
+.recuB{animation:recuB 8s infinite both}
+@keyframes recuB{0%,30%{opacity:0}34%,66%{opacity:1}70%,100%{opacity:0}}
+.etiq{transform-box:fill-box;transform-origin:center;animation:etiq 8s infinite both}
+@keyframes etiq{0%{opacity:0;transform:none}4%,66%{opacity:1;transform:none}71%{transform:translate(50px,-26px) rotate(10deg)}76%,95%{opacity:1;transform:translate(100px,0)}100%{opacity:0;transform:translate(100px,0)}}
+.envC{animation:envC 8s infinite both}
+@keyframes envC{0%,76%{opacity:0;transform:none}79%{opacity:1;transform:none}88%,95%{opacity:1;transform:translate(225px,30px)}100%{opacity:0;transform:translate(225px,30px)}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.arrive{opacity:1;transform:none}.etiq{transform:translate(100px,0)}.recu{opacity:1}.envA,.envB,.envC,.recuB{opacity:0}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Une nouvelle édition, pas une correction</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> L'entrepôt (le registre) stocke l'édition 1.0 et l'envoie à qui la demande</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Une erreur ? On ne corrige pas les exemplaires livrés : on imprime l'édition 1.1</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> L'étiquette 1.0 est recollée sur l'autre édition : l'empreinte le trahit</text>
+<text class="etape rm" x="32" y="84">Les éditions 1.0 et 1.1 cohabitent ; l'empreinte révèle une étiquette recollée</text>
+
+<rect x="32" y="110" width="200" height="200" rx="14" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/>
+<text class="label" x="50" y="140" fill="#eeff57">Imprimerie</text>
+<text class="petit" x="50" y="162">docker build</text>
+<rect x="66" y="196" width="132" height="64" rx="8" fill="none" stroke="#eeff57" stroke-width="2"/>
+<circle cx="100" cy="228" r="16" fill="none" stroke="#eeff57" stroke-width="2"/><circle cx="164" cy="228" r="16" fill="none" stroke="#eeff57" stroke-width="2"/>
+<path d="M300 140 L470 100 L640 140" fill="none" stroke="#859cff" stroke-width="2.5"/>
+<rect x="300" y="140" width="340" height="205" rx="6" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/>
+<text class="label" x="320" y="172" fill="#859cff">Registre</text>
+<text class="petit" x="414" y="172">l'entrepôt</text>
+<path d="M320 302 H620" stroke="#a0a4a0" stroke-width="3"/>
+<g style=""><rect x="350" y="212" width="64" height="90" rx="5" fill="#859cff" fill-opacity=".22" stroke="#859cff" stroke-width="2.5"/><path d="M360 212 V302" stroke="#859cff" stroke-width="2" stroke-opacity=".6"/><text class="label" x="387.0" y="264.0" text-anchor="middle" fill="#eaf0eb">1.0</text></g>
+<text class="petit" x="382" y="326" text-anchor="middle">5f3a…</text>
+<g class="arrive" style=""><rect x="450" y="212" width="64" height="90" rx="5" fill="#5affb6" fill-opacity=".22" stroke="#5affb6" stroke-width="2.5"/><path d="M460 212 V302" stroke="#5affb6" stroke-width="2" stroke-opacity=".6"/><text class="label" x="487.0" y="264.0" text-anchor="middle" fill="#eaf0eb">1.1</text></g>
+<text class="petit f2" x="482" y="326" text-anchor="middle">9c41…</text>
+<g class="etiq"><rect x="340" y="186" width="84" height="24" rx="5" fill="#eeff57"/>
+<text x="382" y="203" text-anchor="middle" font-size="15" font-weight="700" fill="#0a0006">web:1.0</text></g>
+<rect x="700" y="110" width="230" height="96" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/>
+<text class="label" x="716" y="140" fill="#ff84ef">serveur A</text>
+<text class="txt recu" x="716" y="174">reçu : édition 1.0</text>
+<rect x="700" y="238" width="230" height="100" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/>
+<text class="label" x="716" y="268" fill="#ff84ef">serveur B</text>
+<text class="txt recuB" x="716" y="300">reçu : édition 1.0</text>
+<g class="f3"><text x="716" y="298" font-size="17" fill="#ff1a1a">attendu 5f3a, reçu 9c41</text>
+<text x="716" y="324" font-size="15" font-weight="700" fill="#ff1a1a">refusé : autre édition</text></g>
+<rect class="envA" x="371" y="235" width="22" height="30" rx="3" fill="#859cff" fill-opacity=".6" stroke="#859cff" stroke-width="1.5"/><rect class="envB" x="371" y="235" width="22" height="30" rx="3" fill="#859cff" fill-opacity=".6" stroke="#859cff" stroke-width="1.5"/><rect class="envC" x="471" y="235" width="22" height="30" rx="3" fill="#5affb6" fill-opacity=".6" stroke="#5affb6" stroke-width="1.5"/>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Chaque version est une nouvelle édition ; seul le digest garantit l'édition reçue.</text>
+</svg>

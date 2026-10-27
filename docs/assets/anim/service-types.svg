@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">ClusterIP, NodePort, LoadBalancer : trois façons de joindre le standard</title>
+  <desc id="d">ClusterIP : un collègue dans le cluster appelle le Service, le client externe est bloqué à la limite du cluster. NodePort : chaque nœud reçoit le port 30080 et le client externe passe par ce numéro direct. LoadBalancer : l'hébergeur cloud loue une IP publique qui renvoie l'appel vers un nœud, puis vers le Service.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .extA { animation: extA 9s infinite both; }
+      @keyframes extA {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        12% { opacity: 1; transform: translate(246px, 0px); }
+        26% { opacity: 1; transform: translate(246px, 0px); }
+        29%, 100% { opacity: 0; transform: translate(246px, 0px); }
+      }
+      .croixA { animation: croixA 9s infinite both; }
+      @keyframes croixA { 0%, 11% { opacity: 0; } 13%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      .coll { animation: coll 9s infinite both; }
+      @keyframes coll {
+        0%, 4% { opacity: 0; transform: translate(0px, 0px); }
+        6% { opacity: 1; transform: translate(0px, 0px); }
+        18%, 24% { opacity: 1; transform: translate(-214px, -114px); }
+        27%, 100% { opacity: 0; transform: translate(-214px, -114px); }
+      }
+      .extB { animation: extB 9s infinite both; }
+      @keyframes extB {
+        0%, 33% { opacity: 0; transform: translate(0px, 0px); }
+        35% { opacity: 1; transform: translate(0px, 0px); }
+        46% { opacity: 1; transform: translate(480px, -39px); }
+        49% { opacity: 1; transform: translate(480px, -39px); }
+        55%, 58% { opacity: 1; transform: translate(580px, -101px); }
+        61%, 100% { opacity: 0; transform: translate(580px, -101px); }
+      }
+      .extC { animation: extC 9s infinite both; }
+      @keyframes extC {
+        0%, 65% { opacity: 0; transform: translate(0px, 0px); }
+        67% { opacity: 1; transform: translate(0px, 0px); }
+        72% { opacity: 1; transform: translate(140px, 0px); }
+        75% { opacity: 1; transform: translate(140px, 0px); }
+        83% { opacity: 1; transform: translate(785px, -35px); }
+        85% { opacity: 1; transform: translate(785px, -35px); }
+        90%, 93% { opacity: 1; transform: translate(580px, -101px); }
+        96%, 100% { opacity: 0; transform: translate(580px, -101px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .extA, .croixA, .coll, .extB, .extC { animation: none; opacity: 0; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Ligne interne, numéro direct, numéro public</text>
+
+
+  <g class="pa"><text class="l18" x="32" y="84" fill="#00eaff">ClusterIP : une ligne interne, seuls les collègues peuvent appeler</text></g>
+  <g class="pb"><text class="l18" x="32" y="84" fill="#eeff57">NodePort : + un numéro direct sur chaque machine (30000 à 32767)</text></g>
+  <g class="pc"><text class="l18" x="32" y="84" fill="#859cff">LoadBalancer : + un numéro public loué à l'hébergeur cloud</text></g>
+
+  <circle cx="60" cy="230" r="14" fill="#eeff57"/>
+  <text class="petit" x="32" y="270">Client</text>
+  <text class="petit" x="32" y="290">externe</text>
+  <g class="popc pop"><rect x="108" y="180" width="184" height="100" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="l18" x="124" y="210" fill="#859cff">LoadBalancer</text><text class="petit" x="124" y="234">IP publique</text><text class="petit" x="124" y="258">203.0.113.10</text></g>
+
+  <rect x="320" y="100" width="615" height="252" rx="16" fill="none" stroke="#a0a4a0" stroke-width="2" stroke-dasharray="8 6"/>
+  <text class="petit" x="336" y="124">Cluster</text>
+  <path d="M600 148 L420 262 M680 148 L730 262" stroke="#555" stroke-width="2"/>
+  <rect x="520" y="110" width="240" height="38" rx="19" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+  <text class="l18" x="640" y="136" fill="#00eaff" text-anchor="middle">Service web</text>
+
+  <rect x="340" y="164" width="280" height="176" rx="14" fill="#1d1d1d" stroke="#1f9e91" stroke-width="2.5"/>
+  <text class="l18" x="356" y="194" fill="#eaf0eb">Nœud 1</text>
+  <rect x="360" y="262" width="120" height="56" rx="10" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="380" y="296" fill="#5affb6">pod web</text>
+  <rect x="650" y="164" width="270" height="176" rx="14" fill="#1d1d1d" stroke="#1f9e91" stroke-width="2.5"/>
+  <text class="l18" x="666" y="194" fill="#eaf0eb">Nœud 2</text>
+  <rect x="670" y="262" width="120" height="56" rx="10" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="690" y="296" fill="#5affb6">pod web</text>
+  <rect x="804" y="262" width="100" height="56" rx="10" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="petit" x="816" y="295" fill="#859cff" style="fill:#859cff">collègue</text>
+
+  <g class="popb pop"><rect x="476" y="176" width="132" height="30" rx="15" fill="#eeff57"/><text class="l18" x="490" y="197" fill="#0a0006" style="font-size:16px">port 30080</text></g>
+  <g class="popb pop"><rect x="778" y="176" width="132" height="30" rx="15" fill="#eeff57"/><text class="l18" x="792" y="197" fill="#0a0006" style="font-size:16px">port 30080</text></g>
+
+  <g class="croixA"><path d="M310 220 l20 20 M330 220 l-20 20" stroke="#ff1a1a" stroke-width="4"/><text class="petit" x="110" y="212" fill="#ff1a1a" style="fill:#ff1a1a">pas de ligne externe</text></g>
+  <circle class="extA" cx="60" cy="230" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <circle class="coll" cx="854" cy="262" r="9" fill="#859cff" stroke="#0a0006" stroke-width="2"/>
+  <circle class="extB" cx="60" cy="230" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <circle class="extC" cx="60" cy="230" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Chaque type <tspan fill="#eeff57" font-weight="700">ajoute une porte</tspan> au précédent : interne, puis machine, puis cloud.</text>
+</svg>

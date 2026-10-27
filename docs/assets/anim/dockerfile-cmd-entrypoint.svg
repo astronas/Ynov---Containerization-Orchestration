@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">CMD est une suggestion remplaçable, ENTRYPOINT un programme fixe qui reçoit des arguments</title>
+<desc id="d">Deux images. Pour la première, CMD propose python app.py ; on tape python --version après le nom de l'image et ces mots remplacent toute la suggestion. Pour la seconde, ENTRYPOINT fixe python et CMD propose app.py ; on tape --version : python reste en place et --version remplace seulement app.py, comme argument.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.inA{animation:inA 8s infinite both}
+@keyframes inA{0%{opacity:0;transform:none}5%,38%{opacity:1;transform:none}47%,95%{opacity:1;transform:translate(-135px,-50px)}100%{opacity:0;transform:translate(-135px,-50px)}}
+.inB{animation:inB 8s infinite both}
+@keyframes inB{0%{opacity:0;transform:none}5%,68%{opacity:1;transform:none}77%,95%{opacity:1;transform:translate(-37px,-50px)}100%{opacity:0;transform:translate(-37px,-50px)}}
+.outA{animation:outA 8s infinite both}
+@keyframes outA{0%,38%{opacity:1;transform:none}46%,100%{opacity:0;transform:translateY(34px)}}
+.outB{animation:outB 8s infinite both}
+@keyframes outB{0%,68%{opacity:1;transform:none}76%,100%{opacity:0;transform:translateY(34px)}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.inA{transform:translate(-135px,-50px)}.inB{transform:translate(-37px,-50px)}.outA,.outB{opacity:0}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">CMD propose, ENTRYPOINT impose</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Dans les deux cas, tu tapes quelque chose après le nom de l'image</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Avec CMD : ta commande remplace toute la suggestion</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Avec ENTRYPOINT : python reste, tes mots deviennent ses arguments</text>
+<text class="etape rm" x="32" y="84">CMD remplacé en entier ; ENTRYPOINT conservé, tes mots deviennent ses arguments</text>
+
+<rect x="24" y="98" width="912" height="122" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/><text x="44" y="134" font-size="22" font-weight="700" fill="#00eaff">CMD</text><text class="petit" x="44" y="158">une suggestion</text><text x="44" y="186" font-size="15" fill="#a0a4a0">CMD ["python", "app.py"]</text><text class="petit" x="262" y="135">lancé :</text><text class="petit" x="262" y="185">tu tapes : docker run img</text>
+<g class="outA"><rect x="320" y="112" width="90" height="34" rx="7" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text x="365.0" y="135.1" text-anchor="middle" font-size="17" font-weight="700" fill="#00eaff">python</text></g>
+<g class="outA"><rect x="418" y="112" width="90" height="34" rx="7" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text x="463.0" y="135.1" text-anchor="middle" font-size="17" font-weight="700" fill="#00eaff">app.py</text></g>
+<g class="inA"><rect x="455" y="162" width="90" height="34" rx="7" fill="#eeff57" stroke="#eeff57" stroke-width="2"/><text x="500.0" y="185.1" text-anchor="middle" font-size="17" font-weight="700" fill="#0a0006">python</text></g>
+<g class="inA"><rect x="553" y="162" width="110" height="34" rx="7" fill="#eeff57" stroke="#eeff57" stroke-width="2"/><text x="608.0" y="185.1" text-anchor="middle" font-size="17" font-weight="700" fill="#0a0006">--version</text></g>
+<text class="label f2" x="700" y="135" fill="#5affb6">→ python --version</text>
+<text class="petit f2" x="700" y="158">ta commande remplace CMD</text>
+<rect x="24" y="232" width="912" height="122" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/><text x="44" y="268" font-size="22" font-weight="700" fill="#ff84ef">ENTRYPOINT</text><text class="petit" x="44" y="292">un programme fixe</text><text x="44" y="320" font-size="15" fill="#a0a4a0">ENTRYPOINT ["python"]</text><text x="44" y="340" font-size="15" fill="#a0a4a0">CMD ["app.py"]</text><text class="petit" x="262" y="269">lancé :</text><text class="petit" x="262" y="319">tu tapes : docker run img</text>
+<g><rect x="320" y="246" width="90" height="34" rx="7" fill="#0a0006" stroke="#ff84ef" stroke-width="2"/><text x="365.0" y="269.1" text-anchor="middle" font-size="17" font-weight="700" fill="#ff84ef">python</text></g>
+<g class="outB"><rect x="418" y="246" width="90" height="34" rx="7" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text x="463.0" y="269.1" text-anchor="middle" font-size="17" font-weight="700" fill="#00eaff">app.py</text></g>
+<g class="inB"><rect x="455" y="296" width="110" height="34" rx="7" fill="#eeff57" stroke="#eeff57" stroke-width="2"/><text x="510.0" y="319.1" text-anchor="middle" font-size="17" font-weight="700" fill="#0a0006">--version</text></g>
+<text class="label f3" x="700" y="269" fill="#5affb6">→ python --version</text>
+<text class="petit f3" x="700" y="292">tes mots = ses arguments</text>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">CMD = suggestion qu'on remplace ; ENTRYPOINT = programme fixe qui reçoit tes mots.</text>
+</svg>

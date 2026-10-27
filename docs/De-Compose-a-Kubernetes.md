@@ -18,6 +18,8 @@
 
     Avec Compose, ton application vit dans une **maison** : tout est sous le même toit, avec un seul trousseau. Passer à Kubernetes, c'est emménager dans un **immeuble géré par un syndic** : le bail (le Deployment), la boîte aux lettres (le Service), le panneau d'affichage (la ConfigMap), l'enveloppe cachetée (le Secret) et la cave louée (la PVC) deviennent des choses séparées. Le syndic applique ce qui est écrit, rien de plus : si ton ancien plan avait une erreur, il la reproduit.
 
+    ![Schéma animé : chaque ligne du compose.yaml part vers son étage et devient un objet Kubernetes, erreur comprise](assets/anim/traduction-maison.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -154,6 +156,8 @@ minikube image ls | grep demo-web     # (3)!
 
     La **ConfigMap**, c'est le **panneau d'affichage** du hall : tout le monde peut le lire. Le **Secret**, c'est une **enveloppe cachetée** : on ne la lit pas par accident, mais quiconque a le droit de la prendre peut l'ouvrir. Ce n'est pas un coffre-fort.
 
+    ![Schéma animé : tout le monde lit le panneau ; l'enveloppe ne s'ouvre que pour qui en a le droit, et son contenu base64 se décode aussitôt](assets/anim/traduction-configmap-secret.svg){ .anim }
+
 | | ConfigMap | Secret |
 |---|---|---|
 | Contenu | réglages non sensibles (`DB_HOST`, `DB_USER`) | mots de passe, jetons, certificats |
@@ -243,6 +247,8 @@ stringData:                   # (5)!
 
     Un service Compose, c'est « lance ce conteneur ». Un **Deployment**, c'est un **chef d'équipe** à qui l'on dit « je veux toujours deux pods comme celui-ci » : il les crée, les remplace s'ils tombent et les met à jour un par un.
 
+    ![Schéma animé : un pod tombe, le chef d'équipe en recrée un pour revenir à deux, puis met les pods à jour un par un](assets/anim/traduction-deployment.svg){ .anim }
+
 Voici le service `web` du Compose, traduit. Le Deployment est détaillé champ par champ dans [Pod, Deployment, ReplicaSet](Pod-Deployment-ReplicaSet.md) ; on ne regarde ici que ce qui vient du Compose.
 
 ```yaml
@@ -325,6 +331,8 @@ spec:
 !!! quote "En clair"
 
     Un `emptyDir`, c'est le **tableau blanc** d'une salle de réunion : il est effacé quand on rend la salle. Une **PVC**, c'est un **casier loué** au gardien de l'immeuble : tu changes de salle, le casier reste. Attention : si tu rends la clé (tu supprimes la PVC), le gardien vide le casier.
+
+    ![Schéma animé : le pod change de salle : le tableau est effacé, le casier garde ses données, jusqu'à ce qu'on rende la clé](assets/anim/traduction-volumes.svg){ .anim }
 
 Trois objets se partagent le travail :
 
@@ -418,6 +426,8 @@ En production, une base se déploie plutôt avec un **StatefulSet**, qui donne �
 !!! quote "En clair"
 
     Trois questions posées régulièrement au conteneur. « As-tu fini de t'installer ? » (démarrage). « Peux-tu recevoir des clients **maintenant** ? » (disponibilité). « Es-tu encore en vie ? » (vivacité). Selon la réponse, Kubernetes attend, retire le pod du trafic ou le redémarre.
+
+    ![Schéma animé : démarrage, disponibilité, vivacité : à chaque réponse, Kubernetes attend, retire du trafic ou redémarre](assets/anim/traduction-sondes.svg){ .anim }
 
 | Sonde | Question | Si elle échoue | Côté Compose |
 |---|---|---|---|

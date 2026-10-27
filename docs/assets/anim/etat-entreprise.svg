@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Tout passe par le secrétariat : le parcours d'une fiche dans Kubernetes</title>
+  <desc id="d">Une fiche part de toi, avec kubectl, vers le secrétariat, l'API server, qui en range une copie dans l'armoire, etcd. La direction, le plan de contrôle, lit la fiche au secrétariat, décide « atelier 2 » et la redépose. L'atelier 2, un nœud, lit la fiche au secrétariat et lance le pod. Aucune flèche ne relie directement la direction aux ateliers.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <g id="doc"><rect width="30" height="38" rx="4" fill="#eeff57"/><path d="M6 10 h18 M6 17 h18 M6 24 h12" stroke="#0a0006" stroke-width="2"/></g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .bl { fill: #eaf0eb; } .ja { fill: #eeff57; } .me { fill: #5affb6; }
+      /* 9 s : dépôt (0-3 s), décision (3-6 s), exécution (6-9 s). Base = état final. */
+      .e1, .e2 { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .fiche { transform: translate(670px, 132px); animation: fiche 9s infinite; }
+      @keyframes fiche {
+        0% { opacity: 0; transform: translate(0, 0); } 3% { opacity: 1; transform: translate(0, 0); }
+        13%, 31% { transform: translate(342px, 48px); } 39%, 50% { transform: translate(0, 96px); }
+        58%, 65% { transform: translate(342px, 48px); } 75%, 97% { opacity: 1; transform: translate(670px, 132px); }
+        100% { opacity: 0; transform: translate(670px, 132px); }
+      }
+      .tampon, .decide { animation: tampon 9s infinite; }
+      @keyframes tampon { 0%, 44% { opacity: 0; } 47%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .copie { transform: translate(-41px, 124px); animation: copie 9s infinite; }
+      @keyframes copie { 0%, 13% { opacity: 0; transform: translate(0, 0); } 14% { opacity: 1; } 22%, 97% { opacity: 1; transform: translate(-41px, 124px); } 100% { opacity: 0; transform: translate(-41px, 124px); } }
+      .nait { transform-box: fill-box; transform-origin: center; animation: nait 9s infinite; }
+      @keyframes nait { 0%, 76% { opacity: 0; transform: scale(.5); } 80% { opacity: 1; transform: scale(1.12); } 83%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Tout passe par le secrétariat</text>
+  <text class="petit" x="32" y="80">direction = plan de contrôle, atelier = nœud, secrétariat = API server, armoire = etcd</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#eeff57">1 · Tu déposes une fiche</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff84ef">2 · La direction décide</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#5affb6">3 · L'atelier fabrique</text>
+
+  <!-- Liaisons : toutes passent par le secrétariat -->
+  <g stroke="#a0a4a0" stroke-opacity=".55" stroke-width="2"><path d="M262 140 L360 182"/><path d="M262 272 L360 226"/><path d="M600 182 L700 156"/><path d="M600 226 L700 290"/><path d="M480 250 v26"/></g>
+
+  <!-- Toi -->
+  <rect class="boite" x="32" y="100" width="230" height="76" rx="14" stroke="#eeff57"/>
+  <text class="label ja" x="52" y="132">Toi</text>
+  <text class="petit" x="52" y="156">kubectl apply</text>
+
+  <!-- Direction -->
+  <rect class="boite" x="32" y="200" width="230" height="146" rx="14" stroke="#ff84ef"/>
+  <text class="label" x="52" y="232" fill="#ff84ef">Direction</text>
+  <text class="petit" x="52" y="256">plan de contrôle</text>
+  <text class="petit" x="52" y="286">scheduler, contrôleurs</text>
+  <text class="label ja decide" x="52" y="324">« atelier 2 »</text>
+
+  <!-- Secrétariat et armoire -->
+  <rect class="boite" x="360" y="150" width="240" height="100" rx="14" stroke="#00eaff"/>
+  <text class="label" x="380" y="182" fill="#00eaff">Secrétariat</text>
+  <text class="petit" x="380" y="206">API server</text>
+  <text class="petit" x="380" y="230">seule porte d'entrée</text>
+  <rect class="boite" x="405" y="276" width="150" height="70" rx="14" stroke="#859cff"/>
+  <text class="label" x="425" y="306" fill="#859cff">Armoire</text>
+  <text class="petit" x="425" y="330">etcd</text>
+  <use class="copie" href="#doc" x="556" y="166"/>
+
+  <!-- Ateliers -->
+  <rect class="boite" x="700" y="100" width="228" height="110" rx="14" stroke="#5affb6"/>
+  <text class="label me" x="720" y="132">Atelier 1</text>
+  <text class="petit" x="720" y="156">nœud · kubelet</text>
+  <rect x="720" y="170" width="54" height="28" rx="6" fill="#12301f" stroke="#5affb6" stroke-width="2"/><text class="petit bl" x="747" y="189" text-anchor="middle">pod</text>
+  <rect class="boite" x="700" y="236" width="228" height="110" rx="14" stroke="#5affb6"/>
+  <text class="label me" x="720" y="268">Atelier 2</text>
+  <text class="petit" x="720" y="292">nœud · kubelet</text>
+  <g class="nait"><rect x="720" y="306" width="54" height="28" rx="6" fill="#12301f" stroke="#5affb6" stroke-width="2"/><text class="petit bl" x="747" y="325" text-anchor="middle">pod</text></g>
+  <text class="petit me e3" x="786" y="325">lance le pod</text>
+
+  <!-- La fiche qui circule -->
+  <g class="fiche"><use href="#doc" x="214" y="118"/><circle class="tampon" cx="238" cy="148" r="8" fill="#ff84ef"/></g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Personne ne se parle directement : <tspan fill="#00eaff" font-weight="700">tout passe par l'API server</tspan>.</text>
+</svg>

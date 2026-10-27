@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le restaurant se remplit : HPA et Cluster Autoscaler</title>
+  <desc id="d">Le chef de rang (le HPA) ajoute des tables dans la salle 1 jusqu'à la remplir. Une nouvelle table attend dehors : le pod est Pending, faute de place. Le gérant (le Cluster Autoscaler) ouvre la salle 2, une nouvelle VM, et la table y est installée.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .t3 { animation: t3 9s infinite both; } .t4 { animation: t4 9s infinite both; }
+      @keyframes t3 { 0%, 7% { opacity: 0; transform: scale(.5); } 10% { opacity: 1; transform: scale(1.12); } 12%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      @keyframes t4 { 0%, 15% { opacity: 0; transform: scale(.5); } 18% { opacity: 1; transform: scale(1.12); } 20%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      .attente { animation: attente 9s infinite both; }
+      @keyframes attente { 0%, 33% { opacity: 0; } 36%, 67% { opacity: 1; } 71%, 100% { opacity: 0; } }
+      .place { animation: place 9s infinite both; }
+      @keyframes place { 0%, 70% { opacity: 0; transform: scale(.5); } 73% { opacity: 1; transform: scale(1.12); } 75%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .t3, .t4, .place { animation: none; opacity: 1; transform: none; }
+        .attente { animation: none; opacity: 0; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le restaurant se remplit</text>
+  <text class="petit" x="32" y="80">ajouter des tables (des pods) ou ouvrir une salle (une VM) : deux métiers différents</text>
+
+  <rect x="40" y="104" width="290" height="240" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+  <text class="label" x="58" y="134" fill="#00eaff">Salle 1 = une VM</text>
+  <rect x="60" y="154" width="110" height="56" rx="10" fill="#0a0006" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="115" y="189" fill="#5affb6" text-anchor="middle">pod</text><rect x="200" y="154" width="110" height="56" rx="10" fill="#0a0006" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="255" y="189" fill="#5affb6" text-anchor="middle">pod</text>
+  <g class="t3 pop"><rect x="60" y="236" width="110" height="56" rx="10" fill="#0a0006" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="115" y="271" fill="#5affb6" text-anchor="middle">pod</text></g>
+  <g class="t4 pop"><rect x="200" y="236" width="110" height="56" rx="10" fill="#0a0006" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="255" y="271" fill="#5affb6" text-anchor="middle">pod</text></g>
+  <g class="pbc"><text class="l18" x="58" y="330" fill="#ff1a1a">salle pleine</text></g>
+
+  <g class="pab"><rect x="360" y="104" width="300" height="240" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="8 6"/><text class="petit" x="378" y="134">salle fermée</text></g>
+  <g class="popc pop"><rect x="360" y="104" width="300" height="240" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="label" x="378" y="134" fill="#859cff">Salle 2 = nouvelle VM</text></g>
+  <g class="attente"><rect x="380" y="160" width="110" height="56" rx="10" fill="#0a0006" stroke="#ff1a1a" stroke-width="2.5" stroke-dasharray="6 5"/><text class="l18" x="435" y="195" fill="#ff1a1a" text-anchor="middle">pod</text><text class="l18" x="504" y="186" fill="#ff1a1a">en attente</text><text class="petit" x="504" y="208">(Pending)</text></g>
+  <g class="place pop"><rect x="380" y="160" width="110" height="56" rx="10" fill="#0a0006" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="435" y="195" fill="#5affb6" text-anchor="middle">pod</text></g>
+
+  <g class="pab"><rect x="690" y="104" width="240" height="112" rx="14" fill="none" stroke="#5affb6" stroke-width="4"/></g>
+  <rect x="690" y="104" width="240" height="112" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="1.5"/>
+  <text class="label" x="708" y="134" fill="#5affb6">Chef de rang</text>
+  <text class="petit" x="708" y="158">HPA, orchestration</text>
+  <text class="petit" x="708" y="190" fill="#eaf0eb" style="fill:#eaf0eb">ajoute des tables</text>
+  <g class="pc"><rect x="690" y="232" width="240" height="112" rx="14" fill="none" stroke="#859cff" stroke-width="4"/></g>
+  <rect x="690" y="232" width="240" height="112" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="1.5"/>
+  <text class="label" x="708" y="262" fill="#859cff">Gérant</text>
+  <text class="petit" x="708" y="286">Cluster Autoscaler,</text>
+  <text class="petit" x="708" y="306">virtualisation</text>
+  <text class="petit" x="708" y="334" fill="#eaf0eb" style="fill:#eaf0eb">ouvre une salle</text>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Plus de pods : <tspan fill="#5affb6" font-weight="700">l'orchestration</tspan>. Plus de machines : <tspan fill="#859cff" font-weight="700">la virtualisation</tspan>.</text>
+</svg>

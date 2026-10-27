@@ -18,6 +18,8 @@
 
     Un conteneur, c'est une **chambre d'hôtel**. Quand tu rends la clé (`docker rm`), le ménage efface tout ce que tu y as laissé. Ce qui doit durer va dans un **casier à la consigne** (un volume) : la prochaine chambre peut l'ouvrir. Tu peux aussi apporter **ton propre classeur** de la maison (un bind mount), ou écrire sur un **tableau blanc** effacé à chaque départ (un tmpfs). Limite de l'image : la consigne est dans le même hôtel. S'il brûle, le casier brûle aussi.
 
+    ![Schéma animé : docker rm efface la chambre, le casier (volume) et le classeur (bind mount) restent et la chambre suivante les rouvre](assets/anim/stockage-hotel.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -92,6 +94,8 @@ docker run --rm -v donnees:/data alpine:3.22 cat /data/note.txt  # (1)!
 !!! quote "En clair"
 
     Un bind mount, c'est **ton propre classeur** posé dans la chambre : le conteneur lit et écrit directement dans un dossier de ton poste. Pratique pour du code ou de la configuration, mais il dépend de ton poste et de ses droits.
+
+    ![Schéma animé : une modification sur le poste apparaît aussitôt dans le conteneur, sur un autre poste le dossier manque](assets/anim/stockage-classeur.svg){ .anim }
 
 | Critère | Volume nommé | Bind mount |
 |---|---|---|
@@ -185,6 +189,8 @@ volumes:
 !!! quote "En clair"
 
     Ton casier à la consigne garde tes affaires d'un séjour à l'autre : c'est la **persistance**. Une **sauvegarde**, c'est une photocopie rangée dans **un autre bâtiment**. Et elle ne vaut que si tu as déjà vérifié qu'elle se relit.
+
+    ![Schéma animé : le volume survit au conteneur, une copie relue part ailleurs, l'hôte brûle et seule la copie survit](assets/anim/stockage-sauvegarde.svg){ .anim }
 
 | Notion | Définition | Protège contre |
 |---|---|---|

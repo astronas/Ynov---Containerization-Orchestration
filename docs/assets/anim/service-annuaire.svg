@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le standard tient la liste des présents</title>
+  <desc id="d">Un client appelle le standard db. Le standard consulte sa liste des présents (l'EndpointSlice) et transmet au pod 2, bureau 10.0.0.7. Le pod 2 tombe : il est rayé de la liste et le pod 3 arrive au bureau 10.0.0.9. Le client rappelle le même numéro, le standard l'envoie au pod 3 sans que le client connaisse le bureau.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .appel1 { animation: appel1 9s infinite both; }
+      @keyframes appel1 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        10% { opacity: 1; transform: translate(90px, 0px); }
+        11% { opacity: 0; transform: translate(90px, 0px); }
+        12% { opacity: 0; transform: translate(405px, 2px); }
+        16% { opacity: 1; transform: translate(405px, 2px); }
+        22%, 28% { opacity: 1; transform: translate(515px, 4px); }
+        30%, 100% { opacity: 0; transform: translate(515px, 4px); }
+      }
+      .appel3 { animation: appel3 9s infinite both; }
+      @keyframes appel3 {
+        0%, 66% { opacity: 0; transform: translate(0px, 0px); }
+        69% { opacity: 1; transform: translate(0px, 0px); }
+        75% { opacity: 1; transform: translate(90px, 0px); }
+        76% { opacity: 0; transform: translate(90px, 0px); }
+        77% { opacity: 0; transform: translate(405px, 44px); }
+        80% { opacity: 1; transform: translate(405px, 44px); }
+        86%, 93% { opacity: 1; transform: translate(515px, 88px); }
+        96%, 100% { opacity: 0; transform: translate(515px, 88px); }
+      }
+      .cherche1 { animation: cherche1 9s infinite both; }
+      @keyframes cherche1 { 0%, 9% { opacity: 0; } 11%, 22% { opacity: 1; } 25%, 100% { opacity: 0; } }
+      .cherche3 { animation: cherche3 9s infinite both; }
+      @keyframes cherche3 { 0%, 74% { opacity: 0; } 76%, 86% { opacity: 1; } 89%, 100% { opacity: 0; } }
+      .dimb { animation: dimb 9s infinite both; }
+      @keyframes dimb { 0%, 32% { opacity: 1; } 36%, 95% { opacity: 0.3; } 99%, 100% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .appel1, .appel3, .cherche1, .cherche3 { animation: none; opacity: 0; }
+        .dimb { animation: none; opacity: .3; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Personne ne retient les numéros de bureau</text>
+  <text class="petit" x="32" y="80">un pod remplacé = un nouvel employé dans un nouveau bureau (une nouvelle IP) ; la liste s'appelle EndpointSlice</text>
+
+  <rect x="14" y="160" width="112" height="32" rx="16" fill="#1d1d1d" stroke="#eeff57" stroke-width="2"/>
+  <text class="petit" x="26" y="182" fill="#eeff57" style="fill:#eeff57">appelle db</text>
+  <circle cx="60" cy="215" r="14" fill="#eeff57"/>
+  <text class="petit" x="36" y="256">Client</text>
+  <path d="M74 215 H150" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <rect x="150" y="100" width="310" height="240" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+  <text class="label" x="170" y="134" fill="#00eaff">Standard « db »</text>
+  <text class="petit" x="170" y="156">le Service : son numéro ne bouge pas</text>
+  <rect x="170" y="172" width="270" height="152" rx="10" fill="#0a0006" stroke="#00eaff" stroke-opacity=".5" stroke-width="2"/>
+  <text class="petit" x="184" y="198">liste des présents</text>
+  <g class="pbc"><rect x="336" y="180" width="94" height="26" rx="13" fill="#eeff57"/><text class="petit" x="346" y="199" fill="#0a0006" style="fill:#0a0006;font-size:15px">mise à jour</text></g>
+  <rect class="cherche1" x="178" y="246" width="254" height="28" rx="6" fill="#00eaff" fill-opacity=".22"/>
+  <rect class="cherche3" x="178" y="280" width="254" height="28" rx="6" fill="#00eaff" fill-opacity=".22"/>
+  <text class="l18" x="186" y="232" fill="#eaf0eb">Pod 1 · 10.0.0.4</text>
+  <g class="dimb"><text class="l18" x="186" y="266" fill="#eaf0eb">Pod 2 · 10.0.0.7</text></g>
+  <g class="pbc"><path d="M182 259 H356" stroke="#ff1a1a" stroke-width="3"/></g>
+  <g class="pbc"><text class="l18" x="186" y="300" fill="#5affb6">Pod 3 · 10.0.0.9</text></g>
+  <path d="M460 220 H560" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <rect x="560" y="104" width="350" height="62" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/><rect x="560" y="188" width="350" height="62" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/><rect x="560" y="272" width="350" height="62" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+  <rect x="560" y="104" width="350" height="62" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="580" y="142" fill="#5affb6">Pod 1</text><text class="petit" x="690" y="141">bureau 10.0.0.4</text>
+  <g class="pa"><rect x="560" y="188" width="350" height="62" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="580" y="226" fill="#5affb6">Pod 2</text><text class="petit" x="690" y="225">bureau 10.0.0.7</text></g>
+  <g class="pbc"><text class="l18" x="580" y="226" fill="#ff1a1a">Pod 2 est tombé</text></g>
+  <g class="pa"><text class="petit" x="580" y="310">bureau vide</text></g>
+  <g class="popb pop"><rect x="560" y="272" width="350" height="62" rx="14" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/><text class="l18" x="580" y="310" fill="#eeff57">Pod 3</text><text class="petit" x="690" y="309">bureau 10.0.0.9</text></g>
+
+  <circle class="appel1" cx="60" cy="215" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <circle class="appel3" cx="60" cy="215" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le client appelle toujours « db » ; <tspan fill="#00eaff" font-weight="700">le standard suit seul</tspan> les changements de bureau.</text>
+</svg>

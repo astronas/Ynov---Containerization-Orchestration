@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">--privileged ou le socket Docker monté ouvrent les murs du conteneur</title>
+<desc id="d">Un attaquant enfermé dans le conteneur bute contre ses murs. Avec --privileged ou le socket Docker monté, les murs s'effacent : il atteint le disque, les programmes et les autres conteneurs de l'hôte. L'option retirée, les murs reviennent et l'arrêtent de nouveau.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.intrus{transform:translateX(100px);animation:intrus 9s infinite both}
+@keyframes intrus{0%{opacity:0;transform:none}4%{opacity:1;transform:none}12%{transform:translateX(126px)}15%{transform:translateX(100px)}20%{transform:translateX(126px)}24%,34%{transform:translateX(100px)}48%,59%{opacity:1;transform:translate(385px,-100px)}62%{opacity:0;transform:translate(385px,-100px)}64%{opacity:0;transform:none}67%{opacity:1;transform:none}73%{transform:translateX(126px)}77%,96%{opacity:1;transform:translateX(100px)}100%{opacity:0;transform:translateX(100px)}}
+.murs{animation:murs 9s infinite both}
+@keyframes murs{0%,32%{opacity:1}36%,60%{opacity:.12}64%,100%{opacity:1}}
+.breche{opacity:0;animation:breche 9s infinite both}
+@keyframes breche{0%,42%{opacity:0}46%,59%{opacity:1}63%,100%{opacity:0}}
+.tiennent{animation:tiennent 9s infinite both}
+@keyframes tiennent{0%,10%{opacity:0}14%,30%{opacity:1}34%,73%{opacity:0}77%,96%{opacity:1}100%{opacity:0}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Les options qui ouvrent les murs</text>
+<text class="petit" x="32" y="78">le conteneur devient une pièce de plus de la maison de l'hôte</text>
+<rect class="boite" x="50" y="110" width="300" height="230" rx="12" stroke="none"/>
+<rect class="murs" x="50" y="110" width="300" height="230" rx="12" fill="none" stroke="#00eaff" stroke-width="6"/>
+<g class="s2"><rect x="50" y="110" width="300" height="230" rx="12" fill="none" stroke="#ff1a1a" stroke-width="3" stroke-dasharray="10 10"/></g>
+<rect class="boite" x="400" y="110" width="240" height="100" rx="12" stroke="#859cff"/><rect class="breche" x="400" y="110" width="240" height="100" rx="12" fill="#ff1a1a" fill-opacity=".18" stroke="#ff1a1a" stroke-width="2.5"/><text class="label la" x="420" y="146">Disque</text><text class="petit" x="420" y="168">de l'hôte</text>
+<rect class="boite" x="400" y="230" width="240" height="110" rx="12" stroke="#859cff"/><rect class="breche" x="400" y="230" width="240" height="110" rx="12" fill="#ff1a1a" fill-opacity=".18" stroke="#ff1a1a" stroke-width="2.5"/><text class="label la" x="420" y="266">Programmes</text><text class="petit" x="420" y="288">de l'hôte</text>
+<rect class="boite" x="670" y="110" width="250" height="230" rx="12" stroke="#859cff"/><rect class="breche" x="670" y="110" width="250" height="230" rx="12" fill="#ff1a1a" fill-opacity=".18" stroke="#ff1a1a" stroke-width="2.5"/><text class="label la" x="690" y="146">Autres conteneurs</text><text class="petit" x="690" y="168">et leurs données</text>
+<g class="s1"><text class="label cy" x="70" y="146">Conteneur</text><text class="petit" x="70" y="168">un appartement fermé</text></g><g class="s2"><text class="label rg" x="70" y="146">--privileged</text><text class="petit bl" x="70" y="168">ou socket Docker monté (même :ro) :</text><text class="petit bl" x="70" y="188">la clé de tout l'immeuble</text></g><g class="a3"><text class="label mt" x="70" y="146">Option retirée</text><text class="petit" x="70" y="168">les murs sont revenus</text></g><g class="tiennent"><rect x="70" y="300" width="200" height="32" rx="16" fill="#5affb6"/><text class="label nr mid" x="170" y="322">les murs tiennent</text></g><g class="intrus"><circle cx="200" cy="262" r="15" fill="#ff1a1a"/></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">--privileged, socket Docker monté, -v /:/host : autant donner les clés de l'hôte.</text>
+</svg>

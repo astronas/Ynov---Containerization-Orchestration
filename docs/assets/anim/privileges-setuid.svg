@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">no-new-privileges : le tampon setuid est ignoré, l'attaquant reste un simple utilisateur</title>
+<desc id="d">Un attaquant entré en UID 1000 lance passwd, un programme qui porte le tampon setuid et appartient à root : il en ressort root. Avec no-new-privileges, le noyau ignore le tampon : il lance le même programme et en ressort toujours UID 1000.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.tokA,.tokB,.tokR{opacity:0}
+.tokA{animation:tokA 9s infinite both}
+@keyframes tokA{0%{opacity:0;transform:none}4%{opacity:1;transform:none}22%{transform:translateX(200px)}29%{opacity:1;transform:translateX(330px)}30%,100%{opacity:0;transform:translateX(330px)}}
+.tokR{animation:tokR 9s infinite both}
+@keyframes tokR{0%,29%{opacity:0;transform:translateX(-50px)}36%,48%{opacity:1;transform:none}52%,100%{opacity:0;transform:none}}
+.tokB{animation:tokB 9s infinite both}
+@keyframes tokB{0%,52%{opacity:0;transform:none}55%{opacity:1;transform:none}67%{opacity:1;transform:translateX(330px)}69%,100%{opacity:0;transform:translateX(330px)}}
+.tokM{animation:tokM 9s infinite both}
+@keyframes tokM{0%,69%{opacity:0;transform:translateX(-50px)}76%,96%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+.nnp{animation:nnp 9s infinite both}
+@keyframes nnp{0%,48%{opacity:0}52%,96%{opacity:1}100%{opacity:0}}
+.bit{opacity:0;animation:bit 9s infinite both}
+@keyframes bit{0%,48%{opacity:1}52%,100%{opacity:0}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le tampon setuid et no-new-privileges</text>
+<text class="petit" x="32" y="78">un programme tamponné s'exécute avec les droits de son propriétaire</text>
+<g class="tokA"><rect x="60" y="198" width="130" height="42" rx="21" fill="#eeff57"/><text class="label nr mid" x="125" y="225">UID 1000</text></g>
+<g class="tokB"><rect x="60" y="198" width="130" height="42" rx="21" fill="#eeff57"/><text class="label nr mid" x="125" y="225">UID 1000</text></g>
+<text class="petit" x="60" y="270">attaquant entré</text><text class="petit" x="60" y="290">en UID 1000</text>
+<rect class="boite" x="390" y="150" width="190" height="130" rx="14" stroke="#859cff"/><text class="label la" x="410" y="188">passwd</text><text class="petit" x="410" y="212">propriétaire : root</text><circle cx="548" cy="182" r="18" fill="#eeff57"/><text class="label nr mid" x="548" y="189">s</text>
+<g class="bit"><text class="petit ja gras" x="410" y="262">tampon setuid</text></g>
+<g class="nnp"><rect x="375" y="98" width="220" height="36" rx="18" fill="#5affb6"/><text class="label nr mid" x="485" y="122">no-new-privileges</text><path d="M532 166 L564 198" stroke="#0a0006" stroke-width="4"/><path d="M532 166 L564 198" stroke="#5affb6" stroke-width="2"/><text class="petit mt gras" x="410" y="262">tampon ignoré</text></g>
+<g class="tokR"><text class="petit" x="610" y="184">sans protection</text><rect x="610" y="198" width="160" height="42" rx="21" fill="#ff1a1a"/><text class="label bl mid" x="690" y="225">UID 0 : root</text><text class="petit rg gras" x="610" y="270">le tampon a donné</text><text class="petit rg gras" x="610" y="290">les droits de root</text></g>
+<g class="tokM"><rect x="610" y="198" width="160" height="42" rx="21" fill="#5affb6"/><text class="label nr mid" x="690" y="225">UID 1000</text><text class="petit mt gras" x="610" y="270">reste UID 1000 :</text><text class="petit mt gras" x="610" y="290">aucun droit gagné</text></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">no-new-privileges : le noyau ignore le tampon setuid, personne ne gagne de droits.</text>
+</svg>

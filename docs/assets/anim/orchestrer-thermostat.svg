@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Un ordre ou un objectif : Docker exécute une fois, l'orchestrateur tient la consigne</title>
+  <desc id="d">Deux lignes de trois copies. En haut, Docker a reçu l'ordre de démarrer trois conteneurs ; en bas, l'orchestrateur a pour objectif trois copies. Une copie tombe dans chaque ligne. En haut, personne ne réagit et il en reste deux. En bas, l'écart entre voulu et mesuré est vu, une nouvelle copie est créée et l'on revient à trois.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .num { font-size: 22px; font-weight: 700; fill: #eaf0eb; }
+      .rg { fill: #ff1a1a; } .me { fill: #5affb6; }
+      /* 9 s : 3 copies (0-3 s), une tombe (3-6 s), réaction ou non (6-9 s). Base = état final. */
+      .e1, .e2, .e12 { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; }
+      .e13 { animation: e13 9s infinite; } .e23 { animation: e23 9s infinite; } .e12 { animation: e12 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e13 { 0%, 30% { opacity: 1; } 33%, 62% { opacity: 0; } 65%, 100% { opacity: 1; } }
+      @keyframes e23 { 0%, 31% { opacity: 0; } 34%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e12 { 0%, 61% { opacity: 1; } 64%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .nait { transform-box: fill-box; transform-origin: center; animation: nait 9s infinite; }
+      @keyframes nait { 0% { opacity: 0; transform: scale(.5); } 4% { opacity: 1; transform: scale(1.08); } 6%, 100% { opacity: 1; transform: scale(1); } }
+      .tombe { transform-box: fill-box; transform-origin: center; animation: tombe 9s infinite; }
+      @keyframes tombe { 0%, 35% { opacity: 0; transform: scale(1.3); } 38%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+      .tombe2 { transform-box: fill-box; transform-origin: center; opacity: 0; animation: tombe2 9s infinite; }
+      @keyframes tombe2 { 0%, 35% { opacity: 0; transform: scale(1.3); } 38%, 62% { opacity: 1; transform: scale(1); } 65%, 100% { opacity: 0; } }
+      .recree { transform-box: fill-box; transform-origin: center; animation: recree 9s infinite; }
+      @keyframes recree { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+      .aiguille { transform-origin: 312px 300px; animation: aiguille 1.8s ease-in-out infinite alternate; }
+      @keyframes aiguille { from { transform: rotate(-28deg); } to { transform: rotate(28deg); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Un ordre ou un objectif</text>
+  <text class="petit" x="32" y="80">un thermostat ne reçoit pas l'ordre « chauffe » : il tient une consigne</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#eaf0eb">1 · Trois copies tournent</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · Une copie tombe</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#eeff57">3 · Qui réagit ?</text>
+
+  <!-- Ligne Docker -->
+  <rect class="boite" x="32" y="100" width="320" height="110" rx="14" stroke="#00eaff"/>
+  <text class="label" x="52" y="132" fill="#00eaff">Docker : un ordre</text>
+  <text class="petit" x="52" y="158">« démarre 3 conteneurs »</text>
+  <text class="petit" x="52" y="182">exécuté une fois, puis oublié</text>
+  <g class="nait"><rect class="boite" x="392" y="125" width="76" height="60" rx="10" stroke="#00eaff"/><text class="num" x="430" y="163" text-anchor="middle">1</text></g>
+  <g class="nait" style="animation-delay:.15s"><rect class="boite" x="492" y="125" width="76" height="60" rx="10" stroke="#00eaff"/><text class="num" x="530" y="163" text-anchor="middle">2</text></g>
+  <g class="nait" style="animation-delay:.3s"><rect class="boite" x="592" y="125" width="76" height="60" rx="10" stroke="#00eaff"/><text class="num" x="630" y="163" text-anchor="middle">3</text></g>
+  <g class="tombe"><rect x="492" y="125" width="76" height="60" rx="10" fill="#1a0a0a" stroke="#ff1a1a" stroke-width="2.5"/><path d="M516 141 l28 28 M544 141 l-28 28" stroke="#ff1a1a" stroke-width="4" stroke-linecap="round"/></g>
+  <text class="label e1" x="700" y="150" fill="#eaf0eb">3 lancés</text>
+  <text class="label rg e23" x="700" y="150">2 restants</text>
+  <text class="petit e2" x="700" y="176">une copie s'arrête</text>
+  <text class="petit e3" x="700" y="176" style="fill:#ff1a1a">personne ne réagit</text>
+
+  <!-- Ligne orchestrateur -->
+  <rect class="boite" x="32" y="236" width="320" height="110" rx="14" stroke="#5affb6"/>
+  <text class="label" x="52" y="268" fill="#5affb6">Orchestrateur : un objectif</text>
+  <text class="petit" x="52" y="294">« je veux 3 copies »</text>
+  <text class="petit" x="52" y="318">tenu en continu</text>
+  <circle cx="312" cy="300" r="22" fill="none" stroke="#5affb6" stroke-width="2"/>
+  <path class="aiguille" d="M312 300 v-17" stroke="#eeff57" stroke-width="3" stroke-linecap="round"/>
+  <g class="nait"><rect class="boite" x="392" y="261" width="76" height="60" rx="10" stroke="#5affb6"/><text class="num" x="430" y="299" text-anchor="middle">1</text></g>
+  <g class="nait" style="animation-delay:.15s"><rect class="boite" x="492" y="261" width="76" height="60" rx="10" stroke="#5affb6"/><text class="num" x="530" y="299" text-anchor="middle">2</text></g>
+  <g class="nait" style="animation-delay:.3s"><rect class="boite" x="592" y="261" width="76" height="60" rx="10" stroke="#5affb6"/><text class="num" x="630" y="299" text-anchor="middle">3</text></g>
+  <g class="tombe2"><rect x="492" y="261" width="76" height="60" rx="10" fill="#1a0a0a" stroke="#ff1a1a" stroke-width="2.5"/><path d="M516 277 l28 28 M544 277 l-28 28" stroke="#ff1a1a" stroke-width="4" stroke-linecap="round"/></g>
+  <g class="recree"><rect x="492" y="261" width="76" height="60" rx="10" fill="#12301f" stroke="#5affb6" stroke-width="3"/><text class="num" x="530" y="299" text-anchor="middle" style="fill:#5affb6">4</text></g>
+  <text class="label me e13" x="700" y="286">voulu 3 · mesuré 3</text>
+  <text class="label e2" x="700" y="286" fill="#eeff57">voulu 3 · mesuré 2</text>
+  <text class="petit e1" x="700" y="312">rien à corriger</text>
+  <text class="petit e2" x="700" y="312" style="fill:#eeff57">écart vu : il recrée</text>
+  <text class="petit e3" x="700" y="312" style="fill:#5affb6">écart comblé, copie n° 4</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Un ordre s'exécute une fois ; <tspan fill="#5affb6" font-weight="700">un objectif est tenu en continu</tspan>, comme un thermostat.</text>
+</svg>

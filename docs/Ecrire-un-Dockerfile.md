@@ -18,6 +18,8 @@
 
     Le Dockerfile est une **recette de cuisine**. `docker build` la suit et produit un **bocal scellé** : l'image, qu'on peut ranger et transporter. `docker run` **sert une assiette** à partir du bocal : c'est le conteneur. Limite de l'image : contrairement à un vrai bocal, on peut servir autant d'assiettes qu'on veut sans jamais le vider.
 
+    ![Schéma animé : la recette remplit un bocal scellé, qui sert ensuite plusieurs assiettes sans se vider](assets/anim/dockerfile-recette.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -146,6 +148,8 @@ docker run -d --name web -p 127.0.0.1:8080:8080 atelier:1.0    # (2)!
 
     `CMD` est une **suggestion** : si tu tapes une autre commande après le nom de l'image, elle la remplace. `ENTRYPOINT` est le **programme fixe** : ce que tu tapes après le nom de l'image devient ses arguments.
 
+    ![Schéma animé : avec CMD la commande tapée remplace tout, avec ENTRYPOINT elle devient l'argument du programme fixe](assets/anim/dockerfile-cmd-entrypoint.svg){ .anim }
+
 | Dockerfile | `docker run img` | `docker run img python --version` |
 |---|---|---|
 | `CMD ["python", "app.py"]` | `python app.py` | `python --version` : la commande **remplace** `CMD` |
@@ -177,6 +181,8 @@ docker run -d --name web -p 127.0.0.1:8080:8080 atelier:1.0    # (2)!
 !!! quote "En clair"
 
     `ARG` est une **note sur le brouillon** de la recette : elle sert pendant la fabrication, puis disparaît. `ENV` est une **mention imprimée sur l'étiquette** : chaque conteneur la retrouve.
+
+    ![Schéma animé : la note ARG part à la poubelle après le build, ENV est imprimé sur l'image et retrouvé par chaque conteneur](assets/anim/dockerfile-env-arg.svg){ .anim }
 
 | | `ENV` | `ARG` |
 |---|---|---|

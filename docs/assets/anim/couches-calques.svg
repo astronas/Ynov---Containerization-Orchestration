@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Une image, ce sont des calques transparents empilés</title>
+<desc id="d">Trois calques transparents (Debian, Python, appli) se posent l'un sur l'autre et forment l'image, en lecture seule. Un calque vierge, celui du conteneur, se pose tout en haut : le fichier log.txt n'est écrit que sur lui. Le conteneur supprime /etc/conf : une marque le cache dans la vue du conteneur, mais le fichier reste dans le calque Debian.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Des calques transparents</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Chaque calque n'ajoute que ses fichiers ; empilés, ils forment l'image</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Le conteneur reçoit un calque vierge, tout en haut, et n'écrit que dessus</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Il supprime /etc/conf ? Le fichier est caché, mais reste dans son calque</text>
+<text class="etape rm" x="32" y="84">Calques figés empilés, un calque d'écriture pour le conteneur ; supprimer ne fait que cacher</text>
+
+<polygon class="a1" style="" points="70,340 370,340 420,300 120,300" fill="#859cff" fill-opacity=".14" stroke="#859cff" stroke-width="2"/>
+<g class="a1" style=""><rect x="135" y="309" width="84" height="22" rx="6" fill="#0a0006" stroke="#859cff" stroke-width="1.5"/><text x="143" y="325" font-size="15" fill="#859cff">/etc/conf</text></g>
+<text class="label a1" x="438" y="326" fill="#859cff">Debian</text>
+<polygon class="a1" style="animation-delay:.3s" points="70,292 370,292 420,252 120,252" fill="#00eaff" fill-opacity=".14" stroke="#00eaff" stroke-width="2"/>
+<g class="a1" style="animation-delay:.3s"><rect x="200" y="261" width="124" height="22" rx="6" fill="#0a0006" stroke="#00eaff" stroke-width="1.5"/><text x="208" y="277" font-size="15" fill="#00eaff">/usr/bin/python</text></g>
+<text class="label a1" x="438" y="278" fill="#00eaff" style="animation-delay:.3s">Python</text>
+<polygon class="a1" style="animation-delay:.6s" points="70,244 370,244 420,204 120,204" fill="#5affb6" fill-opacity=".14" stroke="#5affb6" stroke-width="2"/>
+<g class="a1" style="animation-delay:.6s"><rect x="270" y="213" width="98" height="22" rx="6" fill="#0a0006" stroke="#5affb6" stroke-width="1.5"/><text x="278" y="229" font-size="15" fill="#5affb6">/app/app.py</text></g>
+<text class="label a1" x="438" y="230" fill="#5affb6" style="animation-delay:.6s">Appli</text>
+<path d="M530 214 h10 v128 h-10" fill="none" stroke="#a0a4a0" stroke-width="2"/>
+<text class="label" x="552" y="272" fill="#eaf0eb">image</text>
+<text class="petit" x="552" y="294">lecture seule</text>
+<polygon class="a2" style="" points="70,196 370,196 420,156 120,156" fill="#eeff57" fill-opacity=".14" stroke="#eeff57" stroke-width="2" stroke-dasharray="7 5"/>
+<text class="label a2" x="438" y="182" fill="#eeff57">Conteneur</text>
+<text class="petit a2" x="438" y="202">seul calque modifiable</text>
+<g class="p2" style=""><rect x="280" y="165" width="80" height="22" rx="6" fill="#0a0006" stroke="#eeff57" stroke-width="1.5"/><text x="288" y="181" font-size="15" fill="#eeff57">+ log.txt</text></g>
+<g class="p3" style=""><rect x="132" y="165" width="98" height="22" rx="6" fill="#0a0006" stroke="#ff1a1a" stroke-width="1.5"/><text x="140" y="181" font-size="15" fill="#ff1a1a">✕ /etc/conf</text></g>
+<path class="f3" d="M178 190 V302" stroke="#ff1a1a" stroke-width="2" stroke-dasharray="4 5"/>
+<text class="f3" x="226" y="325" font-size="15" font-weight="700" fill="#859cff">toujours là</text>
+<rect x="650" y="104" width="280" height="236" rx="14" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/>
+<text class="label" x="668" y="134" fill="#eaf0eb">Vue du conteneur</text>
+<text class="petit" x="668" y="156">une seule racine /</text>
+<text class="txt a1" x="668" y="192" style="fill:#859cff">/etc/conf</text>
+<text class="txt a1" x="668" y="224" style="fill:#00eaff;animation-delay:.3s">/usr/bin/python</text>
+<text class="txt a1" x="668" y="256" style="fill:#5affb6;animation-delay:.6s">/app/app.py</text>
+<text class="txt p2" x="668" y="288" style="fill:#eeff57">/app/log.txt</text>
+<path class="f3" d="M664 186 H748" stroke="#ff1a1a" stroke-width="3"/>
+<text class="label p3" x="764" y="192" fill="#ff1a1a">caché</text>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">L'image = des calques figés ; le conteneur n'écrit que sur le sien, posé au-dessus.</text>
+</svg>

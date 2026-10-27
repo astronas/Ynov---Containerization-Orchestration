@@ -18,6 +18,8 @@
 
     Dans un immeuble de bureaux, le **directeur** a un passe-partout qui ouvre toutes les portes : c'est root. Plutôt que de prêter ce passe-partout à chaque employé, on le **découpe en clés séparées** (salle serveur, caisse, archives) et on ne donne à chacun que celles de son travail : ce sont les capabilities. Et on interdit de se faire **promouvoir en cours de journée** : c'est `no-new-privileges`. Limite de l'image : même sans clés, root reste propriétaire des fichiers de root ; ce n'est pas un employé ordinaire.
 
+    ![Schéma animé : le passe-partout de root est découpé en clés, Apache n'en garde que deux](assets/anim/privileges-passe-partout.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     Dans un hôtel, il y a le **client** d'une chambre (le programme du conteneur), le **gérant** qui attribue les chambres (le démon Docker) et le **registre officiel** de l'accueil (l'identité que voit le noyau de l'hôte). Par défaut, il n'y a pas de traduction : le client n° 0 de la chambre est inscrit au registre comme le n° 0 de l'hôtel, le propriétaire.
+
+    ![Schéma animé : le client n° 0 est inscrit tel quel au registre comme propriétaire, puis devient n° 33 avec USER](assets/anim/privileges-hotel.svg){ .anim }
 
 Trois identités à ne pas mélanger :
 
@@ -118,6 +122,8 @@ Un `USER app` dans le Dockerfile change la première, pas les deux autres.
 
     Root, c'est un trousseau d'une quarantaine de clés. Docker en retire déjà une partie et en laisse 14. Ton travail : retirer **toutes** les clés, regarder quelle porte ne s'ouvre plus, et rendre **seulement** la clé de cette porte.
 
+    ![Schéma animé : le trousseau passe de 40 à 14 puis 0 clé, la porte reste fermée jusqu'au retour de SETUID et SETGID](assets/anim/privileges-trousseau.svg){ .anim }
+
 | Capability | Ce qu'elle permet | Par défaut ? |
 |---|---|---|
 | `SETUID`, `SETGID` | changer d'utilisateur (Apache vers `www-data`, `gosu` vers `mysql`) | oui |
@@ -161,6 +167,8 @@ Le piège côté Apache est montré dans [Isolation d'un conteneur](Isolation-de
 
     Certains programmes Linux portent un tampon spécial, le bit **setuid** : quiconque les lance les exécute avec les droits de leur propriétaire, souvent root. C'est ainsi que `passwd` peut modifier le fichier des mots de passe. `no-new-privileges` dit au noyau : « dans ce conteneur, ignore ce tampon ».
 
+    ![Schéma animé : le tampon setuid rend l'attaquant root, puis no-new-privileges le laisse en UID 1000](assets/anim/privileges-setuid.svg){ .anim }
+
 | Mesure | Ce qu'elle fait | Ce qu'elle ne fait pas |
 |---|---|---|
 | **UID non root** | le programme n'est plus root | n'empêche pas de lancer un programme setuid |
@@ -201,6 +209,8 @@ AppArmor et SELinux sont des contrôles d'accès **obligatoires** (MAC) : la rè
 !!! quote "En clair"
 
     Certaines options ne retirent pas une clé : elles **ouvrent les murs**. Le conteneur n'est plus un appartement, c'est une pièce de plus dans la maison de l'hôte.
+
+    ![Schéma animé : avec --privileged ou le socket Docker monté, les murs du conteneur s'effacent et l'attaquant atteint l'hôte](assets/anim/privileges-murs.svg){ .anim }
 
 ???+ danger "En vrai : ce que lève `--privileged`"
 

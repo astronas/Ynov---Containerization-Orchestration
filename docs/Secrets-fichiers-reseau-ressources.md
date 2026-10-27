@@ -18,6 +18,8 @@
 
     Ton conteneur est un **intérimaire** que tu accueilles. Tu lui donnes la clé de la seule pièce où il travaille, le code du coffre seulement s'il en a besoin, la liste des seuls collègues qu'il doit appeler, et un budget. S'il se fait manipuler par un escroc, les dégâts s'arrêtent à ce que tu lui as confié. Toute la page consiste à réduire ce qu'on lui confie.
 
+    ![Schéma animé : un escroc manipule l'intérimaire, mais les dégâts restent limités à ce qu'on lui a confié](assets/anim/secrets-interimaire.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     Une variable d'environnement, c'est un **post-it collé sur l'écran** : quiconque passe devant le lit. Un secret monté, c'est une **enveloppe remise en main propre** à un seul destinataire, qui ne peut pas la réécrire.
+
+    ![Schéma animé : le post-it est lu par trois curieux, l'enveloppe n'est remise qu'au service db](assets/anim/secrets-enveloppe.svg){ .anim }
 
 Un **secret** est une donnée sensible : mot de passe, clé d'API, certificat. Au **build**, un secret passe par `RUN --mount=type=secret` (voir [Sécurité des images](Securite-des-images.md)). À l'**exécution**, sa valeur est fournie au seul service concerné, sans être écrite dans l'image.
 
@@ -116,6 +120,8 @@ secrets:                                                        # (4)!
 
     `--read-only`, c'est **plastifier** le système de fichiers du conteneur : on lit tout, on n'écrit rien. On laisse juste un **tableau blanc** (le tmpfs) pour les notes du jour, effacé chaque soir à l'arrêt.
 
+    ![Schéma animé : l'attaquant ne peut pas écrire sur le système plastifié, nginx écrit sur le tableau blanc tmpfs](assets/anim/secrets-plastifie.svg){ .anim }
+
 `--read-only` rend tout le système de fichiers du conteneur non modifiable ; un `tmpfs` (un dossier en mémoire) garde les seuls dossiers où le programme doit écrire. On les découvre **en lisant les erreurs**, pas en devinant.
 
 **Le scénario :** un attaquant qui a pris la main sur nginx voudrait modifier sa configuration pour rediriger tes visiteurs vers un faux site. Avec `--read-only`, il ne peut pas.
@@ -159,6 +165,8 @@ Quiconque parle à ce socket a l'**API complète** du démon : il peut lui deman
 
     Un réseau Docker dédié, c'est un **couloir privé** : seuls ceux qui y ont un bureau s'y croisent. Mais quiconque est dans le couloir peut frapper à la porte de la base. C'est la **serrure** de la base (mot de passe, droits du compte) qui décide ensuite.
 
+    ![Schéma animé : un conteneur hors du couloir est ignoré, app ouvre la serrure de la base, un voisin compromis est refusé](assets/anim/secrets-couloir.svg){ .anim }
+
 Un réseau dédié limite les échanges ordinaires, mais ne remplace ni l'authentification, ni les droits, ni le chiffrement. On ne publie que les services destinés à être joints, sur l'adresse la plus étroite (détails dans [Réseaux Docker et publication de ports](Reseaux-et-ports.md)).
 
 ![Quatre cercles d'exposition autour de MariaDB : 0.0.0.0, 127.0.0.1, réseau Docker, réseau internal](assets/illustrations/cercles-exposition.png)
@@ -191,6 +199,8 @@ Avec `ports: "3306:3306"`, la base aurait en plus écouté sur `0.0.0.0`, donc �
 
     Les limites de ressources sont le **disjoncteur** de chaque appartement : si un conteneur s'emballe, c'est chez lui que ça saute, pas dans tout l'immeuble.
 
+    ![Schéma animé : le conteneur web atteint son plafond de programmes, son disjoncteur saute, les voisins restent en service](assets/anim/secrets-disjoncteur.svg){ .anim }
+
 **Le scénario :** un attaquant (ou un simple bug) fait lancer des milliers de programmes à ton conteneur pour saturer la machine. Sans limite, tous les autres services tombent avec lui.
 
 ???+ example "En vrai : un service limité qui encaisse une saturation"
@@ -213,6 +223,8 @@ Avec `ports: "3306:3306"`, la base aurait en plus écouté sur `0.0.0.0`, donc �
 !!! quote "En clair"
 
     Un audit de conformité, c'est le **contrôle technique** d'une voiture : il vérifie une liste de points. Il ne dit pas si tu conduis bien, ni si la voiture résistera à un choc précis.
+
+    ![Schéma animé : les points de l'audit se cochent, mais la résistance à une vraie attaque reste non vérifiée](assets/anim/secrets-controle-technique.svg){ .anim }
 
 | Activité | Ce qu'elle cherche | Exemple d'outil |
 |---|---|---|

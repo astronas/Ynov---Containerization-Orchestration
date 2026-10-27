@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">On retire toutes les clés du trousseau, puis on ne rend que les deux nécessaires</title>
+<desc id="d">Le trousseau de root compte une quarantaine de clés ; Docker en retire 26 et en laisse 14. On les retire toutes (cap_drop: ALL) : la porte « passer en www-data » reste fermée, les workers d'Apache restent root. On ne rend que SETUID et SETGID : la porte s'ouvre, avec deux clés seulement.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<g id="k" fill="none" stroke-width="2.5" stroke-linecap="round"><circle r="5"/><path d="M0 5 v19 M0 16 h5 M0 22 h4"/></g><g id="cadenas"><path d="M-6 -2 v-6 a6 6 0 0 1 12 0 v6" fill="none" stroke-width="3"/><rect x="-10" y="-3" width="20" height="16" rx="3" stroke="none"/></g><g id="perso"><circle cy="-20" r="12"/><path d="M-19 18 v-6 a19 17 0 0 1 38 0 v6 z"/></g>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.t1,.t2{opacity:0}
+.t1{animation:t1 9s infinite both}
+@keyframes t1{0%,11%{opacity:1;transform:none}15%,100%{opacity:0;transform:translateY(36px)}}
+.t2{animation:t2 9s infinite both}
+@keyframes t2{0%,32%{opacity:1;transform:none}38%,100%{opacity:0;transform:translateY(36px)}}
+.c1{opacity:0;animation:c1 9s infinite both}@keyframes c1{0%,12%{opacity:1}13%,100%{opacity:0}}
+.c2{opacity:0;animation:c2 9s infinite both}@keyframes c2{0%,12%{opacity:0}13%,32%{opacity:1}34%,100%{opacity:0}}
+.c3{opacity:0;animation:c3 9s infinite both}@keyframes c3{0%,33%{opacity:0}35%,62%{opacity:1}64%,100%{opacity:0}}
+.retour{transform-box:fill-box;transform-origin:center;animation:retour 9s infinite both}
+@keyframes retour{0%,63%{opacity:0;transform:scale(.4)}68%{opacity:1;transform:scale(1.2)}71%,96%{opacity:1;transform:none}100%{opacity:0}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le trousseau de root</text>
+<text class="petit" x="32" y="78">une quarantaine de clés, les capabilities : Docker en laisse 14</text>
+<circle cx="70" cy="140" r="16" fill="none" stroke="#eeff57" stroke-width="4"/>
+<use class="t2" href="#k" x="60" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="96" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="132" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="168" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="204" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="240" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="276" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="312" y="196" stroke="#eeff57"/>
+<use class="t2" href="#k" x="60" y="228" stroke="#eeff57"/>
+<use class="t2" href="#k" x="96" y="228" stroke="#eeff57"/>
+<use class="t2" href="#k" x="132" y="228" stroke="#eeff57"/>
+<use class="t2" href="#k" x="168" y="228" stroke="#eeff57"/>
+<use class="t2" href="#k" x="204" y="228" stroke="#eeff57"/>
+<use class="t2" href="#k" x="240" y="228" stroke="#eeff57"/>
+<use class="t1" href="#k" x="276" y="228" stroke="#eeff57"/>
+<use class="t1" href="#k" x="312" y="228" stroke="#eeff57"/>
+<use class="t1" href="#k" x="60" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="96" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="132" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="168" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="204" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="240" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="276" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="312" y="260" stroke="#eeff57"/>
+<use class="t1" href="#k" x="60" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="96" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="132" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="168" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="204" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="240" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="276" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="312" y="292" stroke="#eeff57"/>
+<use class="t1" href="#k" x="60" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="96" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="132" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="168" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="204" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="240" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="276" y="324" stroke="#eeff57"/>
+<use class="t1" href="#k" x="312" y="324" stroke="#eeff57"/>
+<g class="retour"><use href="#k" x="60" y="196" stroke="#5affb6"/><use href="#k" x="96" y="196" stroke="#5affb6"/></g><g class="a3"><text class="label mt" x="122" y="214">SETUID + SETGID</text></g>
+<g class="c1"><text class="gros bl" x="102" y="148">40 clés</text><text class="petit" x="102" y="172">root : une quarantaine</text></g>
+<g class="c2"><text class="gros bl" x="102" y="148">14 clés</text><text class="petit" x="102" y="172">le défaut Docker</text></g>
+<g class="c3"><text class="gros bl" x="102" y="148">0 clé</text><text class="petit" x="102" y="172">cap_drop: ALL</text></g>
+<g class="a3"><text class="gros bl" x="102" y="148">2 clés</text><text class="petit" x="102" y="172">cap_add: SETUID, SETGID</text></g>
+<use href="#perso" x="410" y="262" fill="#00eaff"/><text class="petit cy mid gras" x="410" y="306">Apache</text><rect class="boite" x="470" y="130" width="110" height="170" rx="6" stroke="#a0a4a0"/><circle cx="560" cy="218" r="5" fill="#a0a4a0"/><text class="petit bl mid" x="525" y="120">Passer en www-data</text><g class="s2"><rect x="470" y="130" width="110" height="170" rx="6" fill="#ff1a1a" fill-opacity=".15" stroke="#ff1a1a" stroke-width="2.5"/><use href="#cadenas" x="525" y="210" fill="#ff1a1a" stroke="#ff1a1a"/></g><g class="a3"><rect x="470" y="130" width="110" height="170" rx="6" fill="#5affb6" fill-opacity=".22" stroke="#5affb6" stroke-width="2.5"/><path d="M580 130 l26 14 v170 l-26 -14 z" fill="#1d1d1d" stroke="#5affb6" stroke-width="2"/></g>
+<g class="s1"><text class="label bl" x="620" y="190">Docker retire déjà 26 clés</text><text class="petit" x="620" y="214">il en reste 14 : c'est encore beaucoup</text></g><g class="s2"><text class="label rg" x="620" y="190">Porte fermée</text><text class="petit" x="620" y="214">les workers restent root : lire l'erreur</text></g><g class="a3"><text class="label mt" x="620" y="190">Porte ouverte</text><text class="petit" x="620" y="214">workers en www-data, avec 2 clés</text></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Tout retirer, voir quelle porte reste fermée, et ne rendre que cette clé-là.</text>
+</svg>

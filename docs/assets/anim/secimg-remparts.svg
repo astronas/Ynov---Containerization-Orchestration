@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Défense en profondeur : l'attaquant franchit un rempart et bute sur le suivant</title>
+<desc id="d">Un attaquant entre par une faille du site. Il franchit le premier rempart, l'image, qui se fissure. Il bute ensuite sur le deuxième, l'utilisateur non root, qui l'arrête. Les remparts suivants (montages, réseau) restent debout et l'hôte est intact.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.intrus{transform:translateX(256px);animation:intrus 9s infinite both}
+@keyframes intrus{0%{opacity:0;transform:none}5%{opacity:1;transform:none}20%,27%{transform:translateX(96px)}40%{transform:translateX(256px)}44%{transform:translateX(268px)}49%,96%{opacity:1;transform:translateX(254px)}100%{opacity:0;transform:translateX(254px)}}
+.casse{animation:casse 9s infinite both}
+@keyframes casse{0%,19%{opacity:0}23%,96%{opacity:1}100%{opacity:0}}
+.tient{animation:tient 9s infinite both}
+@keyframes tient{0%,43%{opacity:0}47%,96%{opacity:1}100%{opacity:0}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Plusieurs remparts, pas un seul mur</text>
+<text class="petit" x="32" y="78">un attaquant a trouvé une faille dans ton site : jusqu'où va-t-il ?</text>
+<path d="M220 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/><text class="label bl mid" x="232" y="118">Image</text><text class="petit mid" x="232" y="344">contenu de l'image</text>
+<path d="M380 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/><text class="label bl mid" x="392" y="118">Utilisateur</text><text class="petit mid" x="392" y="344">non root</text>
+<path d="M540 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/><text class="label bl mid" x="552" y="118">Montages</text><text class="petit mid" x="552" y="344">montages limités</text>
+<path d="M700 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/><text class="label bl mid" x="712" y="118">Réseau</text><text class="petit mid" x="712" y="344">réseau dédié</text>
+<g class="casse"><path d="M220 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#ff1a1a" fill-opacity=".25" stroke="#ff1a1a" stroke-width="2.5"/><path d="M232 160 l-6 22 l8 18 l-7 24 l6 20" fill="none" stroke="#ff1a1a" stroke-width="3"/><text class="petit rg gras" x="256" y="300">franchi</text></g>
+<g class="tient"><path d="M380 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#5affb6" fill-opacity=".25" stroke="#5affb6" stroke-width="3"/><rect x="286" y="164" width="110" height="34" rx="17" fill="#5affb6"/><text class="label nr mid" x="341" y="187">Bloqué !</text></g>
+<g class="a3"><path d="M540 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#5affb6" fill-opacity=".18" stroke="#5affb6" stroke-width="3"/></g>
+<g class="a3"><path d="M700 320 V142 h6 v-12 h12 v12 h6 V320 z" fill="#5affb6" fill-opacity=".18" stroke="#5affb6" stroke-width="3"/></g>
+<rect class="boite" x="790" y="140" width="140" height="180" rx="14" stroke="#859cff"/><text class="label la mid" x="860" y="190">Hôte</text><text class="petit mid" x="860" y="214">noyau, données,</text><text class="petit mid" x="860" y="234">autres services</text><g class="a3"><rect x="812" y="262" width="96" height="34" rx="17" fill="#5affb6"/><text class="label nr mid" x="860" y="285">intact</text></g>
+<text class="petit" x="36" y="292">point d'entrée :</text><text class="petit" x="36" y="312">une faille du site</text>
+<g class="intrus"><circle cx="104" cy="225" r="15" fill="#ff1a1a"/><text class="petit rg fin gras" x="119" y="264">attaquant</text></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Chaque rempart est indépendant : si l'un cède, le suivant arrête l'attaque.</text>
+</svg>

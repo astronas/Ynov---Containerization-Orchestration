@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Sans traduction, le client n° 0 de la chambre est inscrit comme propriétaire de l'hôtel</title>
+<desc id="d">Dans la chambre, le programme du conteneur est le client n° 0, root du conteneur. Son numéro est recopié tel quel au registre du noyau : n° 0, le propriétaire de l'hôtel. Après USER www-data, le client devient le n° 33 et le registre l'inscrit comme simple client ; le gérant, le démon Docker, reste root.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<g id="perso"><circle cy="-20" r="12"/><path d="M-19 18 v-6 a19 17 0 0 1 38 0 v6 z"/></g>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.voyage{opacity:0;animation:voyage 9s infinite both}
+@keyframes voyage{0%,31%{opacity:0;transform:none}33%{opacity:1;transform:none}42%{opacity:1;transform:translateX(270px)}45%,100%{opacity:0;transform:translateX(270px)}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Trois identités dans l'hôtel</text>
+<text class="petit" x="32" y="78">le client (programme), le gérant (démon Docker), le registre (noyau de l'hôte)</text>
+<rect class="boite" x="40" y="110" width="290" height="220" rx="14" stroke="#00eaff"/><text class="label cy" x="60" y="144">Chambre</text><text class="petit" x="60" y="166">le programme du conteneur</text><use href="#perso" x="92" y="252" fill="#00eaff"/>
+<g class="s12"><text class="gros bl" x="134" y="250">n° 0</text><text class="petit" x="134" y="274">root du conteneur</text></g>
+<g class="a3"><text class="gros mt" x="134" y="250">n° 33</text><text class="petit" x="134" y="274">après USER www-data</text></g>
+<rect class="boite" x="360" y="100" width="240" height="96" rx="14" stroke="#859cff"/><text class="label la mid" x="480" y="132">Gérant</text><text class="petit mid" x="480" y="156">le démon Docker, root</text><text class="petit mid" x="480" y="178">attribue les chambres</text>
+<rect class="boite" x="630" y="110" width="290" height="220" rx="14" stroke="#eeff57"/><text class="label ja" x="650" y="144">Registre</text><text class="petit" x="650" y="166">ce que voit le noyau de l'hôte</text>
+<g class="s1"><text class="gros gr" x="650" y="250">?</text></g>
+<g class="s2"><text class="gros rg" x="650" y="250">n° 0</text><text class="petit rg gras" x="650" y="274">le propriétaire de l'hôtel !</text><path d="M338 290 H616" stroke="#ff1a1a" stroke-width="3"/><path d="M616 282 l12 8 l-12 8 z" fill="#ff1a1a"/></g>
+<g class="a3"><text class="gros mt" x="650" y="250">n° 33</text><text class="petit mt gras" x="650" y="274">un simple client</text><path d="M338 290 H616" stroke="#5affb6" stroke-width="3"/><path d="M616 282 l12 8 l-12 8 z" fill="#5affb6"/><text class="petit mid" x="480" y="322">avec userns-remap : 0 deviendrait 165536</text></g>
+<g class="a2"><text class="petit bl mid" x="480" y="276">même numéro, sans traduction</text></g>
+<g class="voyage"><circle cx="345" cy="290" r="8" fill="#eeff57"/></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Sans traduction, le n° 0 du conteneur est le n° 0 de l'hôte : USER change le client.</text>
+</svg>

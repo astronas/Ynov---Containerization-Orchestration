@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Le tag est une étiquette qui se recolle, le digest une empreinte du contenu</title>
+<desc id="d">Un carton porte l'étiquette web:1.0 et son empreinte sha256:5f3a. On reconstruit un second carton dont un seul octet change : son empreinte devient sha256:9c41. L'étiquette web:1.0 se décolle et se recolle sur le nouveau carton, tandis que chaque empreinte reste attachée à son contenu.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<marker id="fg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#a0a4a0"/></marker>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.tag{transform-box:fill-box;transform-origin:center;animation:tag 8s infinite both}
+@keyframes tag{0%{opacity:0;transform:none}4%,66%{opacity:1;transform:none}74%{transform:translate(225px,-70px) rotate(8deg)}82%,95%{opacity:1;transform:translate(450px,0)}100%{opacity:0;transform:translate(450px,0)}}
+.anneau{transform-box:fill-box;transform-origin:center;animation:anneau 1.3s infinite}
+@keyframes anneau{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.4}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.tag{transform:translate(450px,0)}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Tag et digest</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Le tag web:1.0 est collé sur un carton ; le digest est l'empreinte de son contenu</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> On reconstruit : un seul octet change, donc l'empreinte change</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Le tag se décolle et se recolle sur le nouveau carton ; les empreintes ne bougent pas</text>
+<text class="etape rm" x="32" y="84">Le tag web:1.0 a changé de carton ; chaque empreinte est restée attachée à son contenu</text>
+
+<g style=""><path d="M110 150 l-22 -24 h112 l10 24 M350 150 l22 -24 h-112 l-10 24" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="110" y="150" width="240" height="142" rx="6" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/><rect x="146" y="202" width="44" height="30" rx="5" fill="#00eaff" fill-opacity=".55"/><rect x="208" y="202" width="44" height="30" rx="5" fill="#5affb6" fill-opacity=".55"/><rect x="270" y="202" width="44" height="30" rx="5" fill="#859cff" fill-opacity=".55"/><rect x="146" y="240" width="44" height="30" rx="5" fill="#5affb6" fill-opacity=".55"/><rect x="208" y="240" width="44" height="30" rx="5" fill="#00eaff" fill-opacity=".55"/><rect x="270" y="240" width="44" height="30" rx="5" fill="#859cff" fill-opacity=".55"/></g>
+<text class="petit" x="126" y="288">construite lundi</text>
+<g><rect x="110" y="304" width="240" height="34" rx="7" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text x="230.0" y="327.1" text-anchor="middle" font-size="17" font-weight="700" fill="#00eaff">empreinte sha256:5f3a…</text></g>
+<text class="f3" x="126" y="182" font-size="15" font-weight="700" fill="#a0a4a0">plus d'étiquette</text>
+<g class="a2">
+<path d="M378 222 H530" stroke="#a0a4a0" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#fg)"/>
+<text class="petit" x="392" y="210">on reconstruit</text>
+<g style=""><path d="M560 150 l-22 -24 h112 l10 24 M800 150 l22 -24 h-112 l-10 24" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="560" y="150" width="240" height="142" rx="6" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/><rect x="596" y="202" width="44" height="30" rx="5" fill="#00eaff" fill-opacity=".55"/><rect x="658" y="202" width="44" height="30" rx="5" fill="#5affb6" fill-opacity=".55"/><rect x="720" y="202" width="44" height="30" rx="5" fill="#859cff" fill-opacity=".55"/><rect x="596" y="240" width="44" height="30" rx="5" fill="#5affb6" fill-opacity=".55"/><rect x="658" y="240" width="44" height="30" rx="5" fill="#ff84ef" fill-opacity=".55"/><rect x="720" y="240" width="44" height="30" rx="5" fill="#859cff" fill-opacity=".55"/></g>
+<text class="petit" x="576" y="288">reconstruite mardi</text>
+<circle class="anneau" cx="680" cy="255" r="27" fill="none" stroke="#ff84ef" stroke-width="2.5"/>
+<text x="814" y="250" font-size="15" font-weight="700" fill="#ff84ef">1 octet</text><text x="814" y="270" font-size="15" font-weight="700" fill="#ff84ef">a changé</text>
+<g><rect x="560" y="304" width="240" height="34" rx="7" fill="#0a0006" stroke="#ff84ef" stroke-width="2"/><text x="680.0" y="327.1" text-anchor="middle" font-size="17" font-weight="700" fill="#ff84ef">empreinte sha256:9c41…</text></g>
+</g>
+<g class="tag">
+<rect x="128" y="154" width="112" height="36" rx="6" fill="#eeff57"/>
+<circle cx="140" cy="172" r="4" fill="#0a0006"/>
+<text x="152" y="179" font-size="19" font-weight="700" fill="#0a0006">web:1.0</text>
+</g>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Le tag peut changer de carton ; le digest désigne un contenu précis, octet pour octet.</text>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Le contexte de build est le dossier désigné, envoyé en entier, et rien d'autre</title>
+<desc id="d">Le point à la fin de docker build désigne le dossier projet, le contexte. Ce dossier est envoyé en entier à BuildKit avant que la recette ne soit lue. Ensuite, COPY app.py réussit, mais COPY ../secrets échoue : ce dossier est resté hors du contexte.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<marker id="fj" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#eeff57"/></marker>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.vol{animation:vol 8s infinite both}
+.recu{animation:recu 8s infinite both}
+@keyframes recu{0%,49%{opacity:0}53%,95%{opacity:1}100%{opacity:0}}
+@keyframes vol{0%,35%{opacity:0;transform:none}37%{opacity:1;transform:none}46%{opacity:1;transform:translate(500px,-50px)}49%,100%{opacity:0;transform:translate(500px,-50px)}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.vol{opacity:0}.recu{opacity:1}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le contexte : tout le dossier, rien d'autre</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Le point à la fin de la commande désigne le dossier contexte</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Tout le dossier part chez BuildKit, avant la première ligne de la recette</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Ce qui est hors du dossier n'existe pas pour BuildKit</text>
+<text class="etape rm" x="32" y="84">Le point désigne le contexte ; il est envoyé en entier ; le reste du disque est inaccessible</text>
+
+<rect x="32" y="98" width="290" height="40" rx="14" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/>
+<text x="48" y="125" font-size="19" fill="#eaf0eb">$ docker build -t web:1.0</text>
+<g><rect x="334" y="101" width="34" height="34" rx="7" fill="#eeff57" stroke="#eeff57" stroke-width="2"/><text x="351.0" y="126.6" text-anchor="middle" font-size="24" font-weight="700" fill="#0a0006">.</text></g>
+<path class="f1" d="M351 140 C351 165 300 160 290 182" fill="none" stroke="#eeff57" stroke-width="2.5" marker-end="url(#fj)"/>
+<rect x="32" y="152" width="470" height="193" rx="14" fill="none" stroke="#a0a4a0" stroke-width="1.5" stroke-dasharray="3 5"/>
+<text class="petit" x="48" y="174">ton disque</text>
+<rect x="48" y="186" width="250" height="146" rx="10" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="8 5"/>
+<text class="label" x="64" y="214" fill="#5affb6">projet/</text>
+<text class="petit" x="140" y="214" style="fill:#5affb6">= le contexte</text>
+<text class="txt" x="64" y="246">Dockerfile</text>
+<text class="txt" x="64" y="274">app.py</text>
+<text class="txt" x="64" y="302">static/</text>
+<text class="petit" x="322" y="214">en dehors :</text>
+<text x="322" y="246" font-size="17" fill="#a0a4a0">../secrets/</text>
+<text x="322" y="274" font-size="17" fill="#a0a4a0">~/notes.txt</text>
+<text class="f3" x="322" y="310" font-size="15" font-weight="700" fill="#ff1a1a">✕ inaccessibles</text>
+<rect x="560" y="98" width="370" height="247" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/>
+<text class="label" x="578" y="128" fill="#859cff">BuildKit</text>
+<text class="petit" x="578" y="150">le constructeur</text>
+<g class="vol"><rect x="80" y="220" width="120" height="30" rx="7" fill="#5affb6" stroke="#5affb6" stroke-width="2"/><text x="140.0" y="240.4" text-anchor="middle" font-size="15" font-weight="700" fill="#0a0006">projet/</text></g>
+<g class="recu"><text class="txt" x="578" y="186" style="fill:#5affb6;font-weight:700">reçu : projet/ en entier</text>
+<text class="petit" x="578" y="208">Dockerfile, app.py, static/</text></g>
+<text class="petit e2" x="578" y="240">recette pas encore lue</text>
+<g class="f3"><text class="txt" x="578" y="250">COPY app.py /app/</text>
+<text x="900" y="250" font-size="19" font-weight="700" fill="#5affb6">✓</text>
+<text class="txt" x="578" y="290">COPY ../secrets/ .</text>
+<text x="900" y="290" font-size="19" font-weight="700" fill="#ff1a1a">✕</text>
+<text x="578" y="318" font-size="15" font-weight="700" fill="#ff1a1a">introuvable : hors du contexte</text></g>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Tout ce qui est dans le contexte voyage ; rien de ce qui est dehors n'est accessible.</text>
+</svg>

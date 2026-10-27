@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Le contexte de build est un colis, le cache un frigo de préparations</title>
+<desc id="d">Dans le dossier du projet, .git et le fichier .env sont barrés par .dockerignore ; les autres fichiers partent dans un colis. Le colis est envoyé au cuisinier, BuildKit, qui ne travaille qu'avec son contenu. Dans son frigo, les préparations déjà faites (FROM, pip install, COPY) sont marquées CACHED : rien à refaire.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<marker id="fm" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#5affb6"/></marker>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+.tk{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.tk1{animation-name:tk1}.tk2{animation-name:tk2}.tk3{animation-name:tk3}
+@keyframes tk1{0%{opacity:0;transform:none}6%{opacity:1;transform:none}24%{opacity:1;transform:translate(150px,52px)}28%,100%{opacity:0;transform:translate(150px,52px)}}
+@keyframes tk2{0%{opacity:0;transform:none}6%{opacity:1;transform:none}24%{opacity:1;transform:translate(150px,24px)}28%,100%{opacity:0;transform:translate(150px,24px)}}
+@keyframes tk3{0%{opacity:0;transform:none}6%{opacity:1;transform:none}24%{opacity:1;transform:translate(150px,-4px)}28%,100%{opacity:0;transform:translate(150px,-4px)}}
+.envoi{animation:envoi 8s infinite both}
+@keyframes envoi{0%{opacity:0;transform:none}5%,36%{opacity:1;transform:none}50%,95%{opacity:1;transform:translateX(250px)}100%{opacity:0;transform:translateX(250px)}}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+.envoi{transform:translateX(250px)}.tk{opacity:0}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le colis et le frigo</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Le dossier part en colis ; .dockerignore retient ce qui ne doit pas voyager</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Le cuisinier (BuildKit) ne travaille qu'avec le contenu du colis</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Les préparations déjà faites et inchangées sortent du frigo : CACHED</text>
+<text class="etape rm" x="32" y="84">Le colis filtré par .dockerignore, et les étapes déjà faites ressorties du frigo</text>
+
+<rect x="32" y="100" width="230" height="245" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/>
+<text class="label" x="50" y="130" fill="#859cff">Dossier .</text>
+<text class="petit" x="50" y="152">le contexte</text>
+<text x="56" y="184" font-size="17" fill="#eaf0eb">Dockerfile</text><text x="56" y="212" font-size="17" fill="#eaf0eb">app.py</text><text x="56" y="240" font-size="17" fill="#eaf0eb">requirements.txt</text><text x="56" y="268" font-size="17" fill="#a0a4a0">.git/</text><g class="f1"><path d="M52 262 H94" stroke="#ff1a1a" stroke-width="2.5"/><text x="196" y="268" font-size="15" font-weight="700" fill="#ff1a1a">exclu</text></g><text x="56" y="296" font-size="17" fill="#a0a4a0">.env (secret)</text><g class="f1"><path d="M52 290 H155" stroke="#ff1a1a" stroke-width="2.5"/><text x="196" y="296" font-size="15" font-weight="700" fill="#ff1a1a">exclu</text></g>
+<g><rect x="48" y="310" width="130" height="26" rx="7" fill="#0a0006" stroke="#ff1a1a" stroke-width="2"/><text x="113.0" y="328.4" text-anchor="middle" font-size="15" font-weight="700" fill="#ff1a1a">.dockerignore</text></g>
+<rect x="540" y="100" width="200" height="245" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/>
+<text class="label" x="556" y="130" fill="#ff84ef">Cuisinier</text>
+<text class="petit" x="556" y="152">BuildKit</text>
+<text class="f3" x="556" y="322" font-size="15" font-weight="700" fill="#5affb6">rien à refaire</text>
+<g class="envoi">
+<text class="label" x="322" y="172" fill="#eeff57">colis</text>
+<rect x="320" y="180" width="140" height="110" rx="6" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/>
+<path d="M390 180 V290 M320 235 H460" stroke="#eeff57" stroke-width="5" stroke-opacity=".5"/>
+</g>
+<rect class="tk tk1" style="animation-delay:0.0s" x="212" y="169" width="20" height="20" rx="4" fill="#5affb6"/><rect class="tk tk2" style="animation-delay:0.35s" x="212" y="197" width="20" height="20" rx="4" fill="#5affb6"/><rect class="tk tk3" style="animation-delay:0.7s" x="212" y="225" width="20" height="20" rx="4" fill="#5affb6"/>
+<rect x="760" y="100" width="170" height="245" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+<text class="label" x="776" y="130" fill="#00eaff">Frigo</text>
+<text class="petit" x="776" y="152">le cache</text>
+<rect x="772" y="166" width="146" height="30" rx="6" fill="#0a0006" stroke="#00eaff" stroke-width="1.5"/><text x="784" y="187" font-size="15" fill="#00eaff">FROM python</text><text class="p3" style="animation-delay:" x="784" y="214" font-size="15" font-weight="700" fill="#5affb6">✓ CACHED</text>
+<rect x="772" y="226" width="146" height="30" rx="6" fill="#0a0006" stroke="#00eaff" stroke-width="1.5"/><text x="784" y="247" font-size="15" fill="#00eaff">pip install</text><text class="p3" style="animation-delay:.2s" x="784" y="274" font-size="15" font-weight="700" fill="#5affb6">✓ CACHED</text>
+<rect x="772" y="286" width="146" height="30" rx="6" fill="#0a0006" stroke="#00eaff" stroke-width="1.5"/><text x="784" y="307" font-size="15" fill="#00eaff">COPY app.py</text><text class="p3" style="animation-delay:.4s" x="784" y="334" font-size="15" font-weight="700" fill="#5affb6">✓ CACHED</text>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Contexte = le colis ; .dockerignore = la liste des exclus ; cache = le frigo.</text>
+</svg>

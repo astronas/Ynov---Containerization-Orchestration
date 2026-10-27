@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">FROM : une faille dans une brique du dessous fissure toute l'image</title>
+<desc id="d">Une pile de briques : Debian, Apache, puis ta brique de 24 ko. Une fissure apparaît dans Apache et remonte jusqu'à ta brique. La brique Apache est remplacée par une version corrigée et l'image est reconstruite.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.gros{font-size:24px;font-weight:700}
+.petit{font-size:15px;fill:#a0a4a0}
+.legende{font-size:19px;fill:#eaf0eb}
+.boite{fill:#1d1d1d;stroke-width:2.5}
+.mid{text-anchor:middle}.fin{text-anchor:end}.gras{font-weight:700}
+.cy{fill:#00eaff}.mt{fill:#5affb6}.ja{fill:#eeff57}.ro{fill:#ff84ef}.la{fill:#859cff}.tq{fill:#1f9e91}.rg{fill:#ff1a1a}.bl{fill:#eaf0eb}.nr{fill:#0a0006}.gr{fill:#a0a4a0}
+.s1,.s2,.s12{opacity:0}
+.s1{animation:s1 9s infinite both}@keyframes s1{0%{opacity:0}4%,29%{opacity:1}33%,100%{opacity:0}}
+.s2{animation:s2 9s infinite both}@keyframes s2{0%,31%{opacity:0}35%,59%{opacity:1}63%,100%{opacity:0}}
+.s12{animation:s12 9s infinite both}@keyframes s12{0%{opacity:0}4%,59%{opacity:1}63%,100%{opacity:0}}
+.a2{animation:a2 9s infinite both}@keyframes a2{0%,31%{opacity:0}35%,96%{opacity:1}100%{opacity:0}}
+.a3{animation:a3 9s infinite both}@keyframes a3{0%,62%{opacity:0}66%,96%{opacity:1}100%{opacity:0}}
+
+.fissure{opacity:0;stroke-dasharray:100;animation:fissure 9s infinite both}
+@keyframes fissure{0%,31%{stroke-dashoffset:100;opacity:1}44%,58%{stroke-dashoffset:0;opacity:1}62%,100%{stroke-dashoffset:0;opacity:0}}
+.neuf{animation:neuf 9s infinite both}
+@keyframes neuf{0%,61%{opacity:0;transform:translateX(90px)}67%,96%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">FROM : ta brique sur celles des autres</text>
+<text class="petit" x="32" y="78">ton image hérite de tout ce qui est dessous</text>
+<rect class="boite" x="90" y="120" width="300" height="56" rx="10" stroke="#5affb6"/><text class="label mt" x="110" y="146">ta brique : COPY site/</text><text class="petit" x="110" y="166">24 ko, écrite par toi</text>
+<g class="s12"><rect class="boite" x="90" y="184" width="300" height="56" rx="10" stroke="#00eaff"/><text class="label cy" x="110" y="210">Apache httpd</text><text class="petit" x="110" y="230">écrite par d'autres</text></g>
+<g class="neuf"><rect class="boite" x="90" y="184" width="300" height="56" rx="10" stroke="#5affb6" stroke-dasharray="0"/><text class="label cy" x="110" y="210">Apache corrigé</text><text class="petit mt" x="110" y="230">nouvelle version de la base</text></g>
+<rect class="boite" x="90" y="248" width="300" height="56" rx="10" stroke="#859cff"/><text class="label la" x="110" y="274">Debian</text><text class="petit" x="110" y="294">écrite par d'autres</text>
+<text class="petit" x="90" y="332">dessous : 175 Mo hérités, avec leurs failles</text>
+<g class="s2"><rect x="84" y="114" width="312" height="196" rx="14" fill="#ff1a1a" fill-opacity=".1" stroke="#ff1a1a" stroke-width="2" stroke-dasharray="8 6"/></g>
+<path class="fissure" pathLength="100" d="M352 236 l-10 -14 l12 -12 l-12 -14 l10 -14 l-12 -10 l12 -12 l-8 -12 l10 -12" fill="none" stroke="#ff1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+<g class="s1"><text class="label mt" x="450" y="190">Ta brique est parfaite…</text><text class="petit" x="450" y="216">24 ko écrits par toi, posés sur 175 Mo d'autres</text></g>
+<g class="s2"><text class="label rg" x="450" y="190">… mais Apache a une faille</text><text class="petit" x="450" y="216">toute la pile est fissurée, ta brique aussi</text></g>
+<g class="a3"><text class="label mt" x="450" y="190">Base corrigée, image reconstruite</text><text class="petit" x="450" y="216">on vérifie qui produit la base, on reconstruit</text><text class="label ja" x="450" y="256">docker build --pull</text></g>
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Ton image hérite des failles de sa base : choisis-la avec soin et reconstruis souvent.</text>
+</svg>

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">De la maison Compose à l'immeuble Kubernetes</title>
+  <desc id="d">Dans la maison compose.yaml, tout est sous un toit : image et replicas, ports, environment, mot de passe, volume. Chaque élément part vers son étage de l'immeuble et devient un objet : Deployment (le bail), Service (la boîte aux lettres), ConfigMap (le panneau), Secret (l'enveloppe), PVC (la cave). L'erreur que portait la ligne des ports est recopiée telle quelle.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .vol0 { animation: vol0 9s infinite both; }
+      @keyframes vol0 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        33% { opacity: 1; transform: translate(0px, 0px); }
+        43%, 95% { opacity: 1; transform: translate(610px, -19px); }
+        98%, 100% { opacity: 0; transform: translate(610px, -19px); }
+      }
+      .vol1 { animation: vol1 9s infinite both; }
+      @keyframes vol1 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        35% { opacity: 1; transform: translate(0px, 0px); }
+        45%, 95% { opacity: 1; transform: translate(610px, -15px); }
+        98%, 100% { opacity: 0; transform: translate(610px, -15px); }
+      }
+      .vol2 { animation: vol2 9s infinite both; }
+      @keyframes vol2 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        37% { opacity: 1; transform: translate(0px, 0px); }
+        47%, 95% { opacity: 1; transform: translate(610px, -11px); }
+        98%, 100% { opacity: 0; transform: translate(610px, -11px); }
+      }
+      .vol3 { animation: vol3 9s infinite both; }
+      @keyframes vol3 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        39% { opacity: 1; transform: translate(0px, 0px); }
+        49%, 95% { opacity: 1; transform: translate(610px, -7px); }
+        98%, 100% { opacity: 0; transform: translate(610px, -7px); }
+      }
+      .vol4 { animation: vol4 9s infinite both; }
+      @keyframes vol4 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        41% { opacity: 1; transform: translate(0px, 0px); }
+        51%, 95% { opacity: 1; transform: translate(610px, -3px); }
+        98%, 100% { opacity: 0; transform: translate(610px, -3px); }
+      }
+      .txc { animation: txc 9s infinite both; }
+      @keyframes txc { 0%, 40% { opacity: 1; } 46%, 100% { opacity: 0; } }
+      .txk { animation: txk 9s infinite both; }
+      @keyframes txk { 0%, 42% { opacity: 0; } 48%, 100% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .vol0 { animation: none; opacity: 1; transform: translate(610px, -19px); }
+        .vol1 { animation: none; opacity: 1; transform: translate(610px, -15px); }
+        .vol2 { animation: none; opacity: 1; transform: translate(610px, -11px); }
+        .vol3 { animation: none; opacity: 1; transform: translate(610px, -7px); }
+        .vol4 { animation: none; opacity: 1; transform: translate(610px, -3px); }
+        .txc { animation: none; opacity: 0; }
+        .txk { animation: none; opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">De la maison à l'immeuble</text>
+  <text class="petit" x="32" y="80">Compose : tout sous un toit. Kubernetes : un objet séparé par fonction</text>
+
+  <polygon points="30,152 170,98 310,152" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5" stroke-linejoin="round"/>
+  <text class="l18" x="170" y="140" fill="#eaf0eb" text-anchor="middle" style="font-size:17px">compose.yaml</text>
+  <rect x="40" y="152" width="260" height="200" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/>
+  <g class="pc"><text class="l18" x="60" y="222" fill="#ff1a1a">Erreur recopiée</text><text class="petit" x="60" y="250">le syndic applique</text><text class="petit" x="60" y="274">le plan tel quel</text></g>
+
+  <rect x="400" y="96" width="520" height="256" rx="14" fill="#1d1d1d" stroke="#a0a4a0" stroke-width="2.5"/>
+  <text class="l18" x="420" y="126" fill="#eaf0eb">Immeuble Kubernetes</text>
+  <text class="petit" x="640" y="126">géré par un syndic</text>
+  <rect x="420" y="140" width="480" height="38" rx="8" fill="#0a0006" stroke="#3a3a3a" stroke-width="2"/><text class="petit" x="436" y="165">Bail</text><rect x="420" y="182" width="480" height="38" rx="8" fill="#0a0006" stroke="#3a3a3a" stroke-width="2"/><text class="petit" x="436" y="207">Boîte aux lettres</text><rect x="420" y="224" width="480" height="38" rx="8" fill="#0a0006" stroke="#3a3a3a" stroke-width="2"/><text class="petit" x="436" y="249">Panneau d'affichage</text><rect x="420" y="266" width="480" height="38" rx="8" fill="#0a0006" stroke="#3a3a3a" stroke-width="2"/><text class="petit" x="436" y="291">Enveloppe cachetée</text><rect x="420" y="308" width="480" height="38" rx="8" fill="#0a0006" stroke="#3a3a3a" stroke-width="2"/><text class="petit" x="436" y="333">Cave louée</text>
+  <g class="pc"><rect x="414" y="178" width="492" height="50" rx="10" fill="none" stroke="#ff1a1a" stroke-width="3"/></g>
+  <g class="vol0"><rect x="60" y="162" width="220" height="32" rx="8" fill="#0a0006" stroke="#5affb6" stroke-width="2"/><text class="l18 txc" x="74" y="184" fill="#5affb6" style="font-size:17px">image, replicas</text><text class="l18 txk" x="74" y="184" fill="#5affb6" style="font-size:17px">Deployment</text></g><g class="vol1"><rect x="60" y="200" width="220" height="32" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18 txc" x="74" y="222" fill="#00eaff" style="font-size:17px">ports</text><text class="l18 txk" x="74" y="222" fill="#00eaff" style="font-size:17px">Service</text><circle cx="262" cy="216" r="10" fill="#ff1a1a"/><text class="l18" x="258" y="222" fill="#0a0006">!</text></g><g class="vol2"><rect x="60" y="238" width="220" height="32" rx="8" fill="#0a0006" stroke="#eeff57" stroke-width="2"/><text class="l18 txc" x="74" y="260" fill="#eeff57" style="font-size:17px">environment</text><text class="l18 txk" x="74" y="260" fill="#eeff57" style="font-size:17px">ConfigMap</text></g><g class="vol3"><rect x="60" y="276" width="220" height="32" rx="8" fill="#0a0006" stroke="#ff84ef" stroke-width="2"/><text class="l18 txc" x="74" y="298" fill="#ff84ef" style="font-size:17px">mot de passe</text><text class="l18 txk" x="74" y="298" fill="#ff84ef" style="font-size:17px">Secret</text></g><g class="vol4"><rect x="60" y="314" width="220" height="32" rx="8" fill="#0a0006" stroke="#859cff" stroke-width="2"/><text class="l18 txc" x="74" y="336" fill="#859cff" style="font-size:17px">volume</text><text class="l18 txk" x="74" y="336" fill="#859cff" style="font-size:17px">PVC</text></g>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Chaque ligne devient un objet, <tspan fill="#ff1a1a" font-weight="700">défauts compris</tspan> : traduire ne corrige pas.</text>
+</svg>

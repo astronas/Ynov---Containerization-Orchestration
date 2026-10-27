@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Commander une omelette : décrire le plat, pas la recette</title>
+  <desc id="d">D'abord, à gauche, on dicte la recette geste par geste : allume le feu, prends une poêle, casse deux œufs, comme des commandes kubectl run ou scale. Ensuite ces gestes s'effacent et un bon de commande « 1 omelette » apparaît, c'est le manifeste ; il glisse vers la cuisine Kubernetes. Enfin l'omelette sort : la cuisine a choisi elle-même les gestes.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .bl { fill: #eaf0eb; } .me { fill: #5affb6; } .la { fill: #859cff; } .cy { fill: #00eaff; }
+      /* 9 s : la recette (0-3 s), la commande (3-6 s), le plat (6-9 s). Base = état final. */
+      .e1, .e2, .bon { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .g1, .g2, .g3 { opacity: .25; }
+      .g1 { animation: g1 9s infinite; } .g2 { animation: g2 9s infinite; } .g3 { animation: g3 9s infinite; }
+      @keyframes g1 { 0%, 1% { opacity: 0; } 3%, 31% { opacity: 1; } 35%, 98% { opacity: .25; } 100% { opacity: 0; } }
+      @keyframes g2 { 0%, 6% { opacity: 0; } 8%, 31% { opacity: 1; } 35%, 98% { opacity: .25; } 100% { opacity: 0; } }
+      @keyframes g3 { 0%, 11% { opacity: 0; } 13%, 31% { opacity: 1; } 35%, 98% { opacity: .25; } 100% { opacity: 0; } }
+      .geste { opacity: 0; animation: geste 3s infinite; }
+      @keyframes geste { 0% { opacity: 0; transform: translateX(0); } 10% { opacity: 1; } 80% { opacity: 1; transform: translateX(290px); } 90%, 100% { opacity: 0; transform: translateX(290px); } }
+      .sansgeste { animation: sansgeste 9s infinite; }
+      @keyframes sansgeste { 0%, 33% { opacity: 1; } 34%, 100% { opacity: 0; } }
+      .bon { animation: bon 9s infinite; }
+      @keyframes bon { 0%, 33% { opacity: 0; transform: translate(0, -20px); } 37% { opacity: 1; transform: translate(0, 0); } 47% { opacity: 1; transform: translate(0, 0); } 57% { opacity: 1; transform: translate(276px, 0); } 61%, 100% { opacity: 0; transform: translate(276px, 0); } }
+      .plat { transform-box: fill-box; transform-origin: center; animation: plat 9s infinite; }
+      @keyframes plat { 0%, 62% { opacity: 0; transform: scale(.5); } 66% { opacity: 1; transform: scale(1.1); } 69%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } .geste { opacity: 0; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Commander une omelette</text>
+  <text class="petit" x="32" y="80">le manifeste décrit le plat (spec), pas la recette</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#eeff57">1 · Impératif : la recette</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#859cff">2 · Déclaratif : la commande</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#5affb6">3 · Le plat arrive</text>
+
+  <!-- Impératif : la recette dictée -->
+  <rect class="boite" x="32" y="100" width="300" height="246" rx="14" stroke="#eeff57"/>
+  <text class="label" x="52" y="132" fill="#eeff57">Impératif</text>
+  <text class="petit" x="52" y="156">tu dictes chaque geste</text>
+  <text class="label bl g1" x="52" y="200">1. allume le feu</text>
+  <text class="label bl g2" x="52" y="234">2. prends une poêle</text>
+  <text class="label bl g3" x="52" y="268">3. casse deux œufs</text>
+  <text class="petit cy" x="52" y="320">kubectl run, scale, delete…</text>
+  <g class="sansgeste"><circle class="geste" cx="345" cy="234" r="7" fill="#eeff57"/></g>
+
+  <!-- Déclaratif : le bon de commande -->
+  <g class="bon">
+    <rect x="380" y="172" width="160" height="86" rx="8" fill="#eaf0eb"/>
+    <path d="M380 186 h160" stroke="#859cff" stroke-width="3"/>
+    <text class="petit" x="394" y="210" style="fill:#4a4a4a">Commande</text>
+    <text class="label" x="394" y="240" fill="#0a0006">1 omelette</text>
+  </g>
+  <text class="petit la e2" x="380" y="290">ton manifeste : la spec</text>
+
+  <!-- La cuisine Kubernetes -->
+  <rect class="boite" x="640" y="100" width="288" height="246" rx="14" stroke="#5affb6"/>
+  <text class="label" x="660" y="132" fill="#5affb6">Kubernetes</text>
+  <text class="petit" x="660" y="156">la cuisine</text>
+  <text class="petit e1" x="660" y="240">exécute geste par geste</text>
+  <text class="petit e2" x="660" y="240">reçoit l'objectif</text>
+  <g class="plat">
+    <ellipse cx="784" cy="226" rx="74" ry="24" fill="#eaf0eb"/>
+    <ellipse cx="784" cy="222" rx="50" ry="14" fill="#eeff57"/>
+    <path d="M748 222 q36 -10 72 0" stroke="#c9b400" stroke-width="2" fill="none"/>
+  </g>
+  <text class="label me e3" x="660" y="300">servi</text>
+  <text class="petit e3" x="660" y="324">les gestes, c'est son affaire</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Tu décris <tspan fill="#859cff" font-weight="700">le résultat voulu</tspan> ; Kubernetes choisit les gestes pour y arriver.</text>
+</svg>

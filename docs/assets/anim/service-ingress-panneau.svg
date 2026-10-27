@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le panneau et la personne à l'accueil : Ingress et contrôleur d'Ingress</title>
+  <desc id="d">Deux visiteurs, web.local et api.local, arrivent devant le panneau (l'objet Ingress) mais personne n'est à l'accueil : ils restent bloqués. Le contrôleur d'Ingress (Traefik) prend son poste et lit le panneau. Les visiteurs sont orientés : web.local au 3e étage (Service web), api.local au 5e (Service api).</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .v1 { animation: v1 9s infinite both; }
+      @keyframes v1 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        12%, 66% { opacity: 1; transform: translate(60px, 0px); }
+        80%, 94% { opacity: 1; transform: translate(594px, 0px); }
+        98%, 100% { opacity: 0; transform: translate(594px, 0px); }
+      }
+      .v2 { animation: v2 9s infinite both; }
+      @keyframes v2 {
+        0%, 2% { opacity: 0; transform: translate(0px, 0px); }
+        5% { opacity: 1; transform: translate(0px, 0px); }
+        14%, 69% { opacity: 1; transform: translate(60px, 0px); }
+        83%, 94% { opacity: 1; transform: translate(594px, -174px); }
+        98%, 100% { opacity: 0; transform: translate(594px, -174px); }
+      }
+      .doute { animation: doute 9s infinite both; }
+      @keyframes doute { 0%, 12% { opacity: 0; } 15%, 40% { opacity: 1; } 44%, 100% { opacity: 0; } }
+      .rayon { animation: rayon 9s infinite both; }
+      @keyframes rayon { 0%, 38% { opacity: 0; } 41% { opacity: 1; } 45% { opacity: 0.4; } 49% { opacity: 1; } 53% { opacity: 0.4; } 57%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .v1 { animation: none; transform: translate(594px, 0); }
+        .v2 { animation: none; transform: translate(594px, -174px); }
+        .doute { animation: none; opacity: 0; }
+        .rayon { animation: none; opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Un panneau sans personne pour le lire</text>
+  <text class="petit" x="32" y="80">l'objet Ingress = le panneau ; le contrôleur d'Ingress = la personne qui le lit et oriente</text>
+
+  <rect x="150" y="100" width="320" height="106" rx="14" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/>
+  <text class="l18" x="168" y="130" fill="#eeff57">Panneau (objet Ingress)</text>
+  <text class="l18" x="168" y="162" fill="#eaf0eb">web.local → 3e étage</text>
+  <text class="l18" x="168" y="192" fill="#eaf0eb">api.local → 5e étage</text>
+
+  <rect x="150" y="224" width="320" height="122" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/>
+  <text class="label" x="168" y="256" fill="#ff84ef">Accueil</text>
+  <text class="petit" x="168" y="280">contrôleur d'Ingress</text>
+  <g class="pa"><text class="l18" x="168" y="326" fill="#ff1a1a">personne au poste</text></g>
+  <g class="pbc"><text class="l18" x="168" y="326" fill="#5affb6">Traefik lit le panneau</text></g>
+  <path class="rayon" d="M420 246 V210" stroke="#eeff57" stroke-width="3" stroke-dasharray="5 5"/>
+  <g class="popb pop"><circle cx="420" cy="262" r="13" fill="#ff84ef"/><rect x="402" y="280" width="36" height="40" rx="14" fill="#ff84ef"/></g>
+
+  <rect x="600" y="100" width="310" height="56" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="l18" x="694" y="135" fill="#859cff">5e étage</text><text class="petit" x="800" y="134">Service api</text>
+  <rect x="600" y="162" width="310" height="56" rx="14" fill="#1d1d1d" stroke="#555" stroke-width="2.5"/><text class="l18" x="694" y="197" fill="#555">4e étage</text>
+  <rect x="600" y="224" width="310" height="56" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/><text class="l18" x="694" y="259" fill="#00eaff">3e étage</text><text class="petit" x="800" y="258">Service web</text>
+  <rect x="600" y="286" width="310" height="56" rx="14" fill="#1d1d1d" stroke="#555" stroke-width="2.5"/><text class="petit" x="694" y="320">hall</text>
+
+  <g class="doute"><text class="label" x="128" y="276" fill="#ff1a1a" style="font-size:24px">?</text><text class="label" x="128" y="326" fill="#ff1a1a" style="font-size:24px">?</text></g>
+  <g class="v1"><circle cx="50" cy="268" r="12" fill="#eeff57"/><text class="petit" x="14" y="248" style="fill:#eeff57;font-size:15px">web.local</text></g>
+  <g class="v2"><circle cx="50" cy="318" r="12" fill="#eeff57"/><text class="petit" x="14" y="298" style="fill:#eeff57;font-size:15px">api.local</text></g>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Sans <tspan fill="#ff84ef" font-weight="700">contrôleur d'Ingress</tspan>, le panneau ne sert à rien : personne ne le lit.</text>
+</svg>

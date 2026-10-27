@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Étiquettes et sélecteur : le ReplicaSet compte les étiquettes, pas les noms</title>
+  <desc id="d">Un ReplicaSet de sélecteur app: web en veut 3. Un trait balaie les pods : trois portent l'étiquette app: web, un porte app: db et n'est pas compté. L'étiquette d'un pod web est retirée : le ReplicaSet n'en compte plus que 2 et crée un pod neuf avec l'étiquette. Le pod sans étiquette tourne toujours, mais il est ignoré.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <g id="carte"><rect width="104" height="150" rx="12" fill="#1d1d1d" stroke="#5a5a5a" stroke-width="2"/><text class="label bl" x="52" y="36" text-anchor="middle">pod</text></g>
+    <g id="web"><rect width="84" height="28" rx="14" fill="#00eaff"/><text class="eti" x="42" y="19" text-anchor="middle">app: web</text></g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .eti { font-size: 15px; font-weight: 700; fill: #0a0006; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .bl { fill: #eaf0eb; } .ja { fill: #eeff57; } .me { fill: #5affb6; } .rg { fill: #ff1a1a; }
+      .sel { fill: none; stroke: #00eaff; stroke-width: 3; stroke-dasharray: 8 5; }
+      /* 9 s : comptage (0-3 s), étiquette retirée (3-6 s), nouveau pod (6-9 s). Base = état final. */
+      .e1, .e2, .s4, .colle { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; } .e13 { animation: e13 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e13 { 0%, 30% { opacity: 1; } 33%, 62% { opacity: 0; } 65%, 100% { opacity: 1; } }
+      .colle { transform-box: fill-box; transform-origin: 0 0; animation: colle 9s infinite; }
+      @keyframes colle { 0%, 35% { opacity: 1; transform: translate(0, 0) rotate(0); } 39% { opacity: 1; transform: translate(4px, 6px) rotate(18deg); } 45%, 98% { opacity: 0; transform: translate(10px, 60px) rotate(40deg); } 100% { opacity: 1; transform: translate(0, 0) rotate(0); } }
+      .s4 { animation: s4 9s infinite; } @keyframes s4 { 0%, 37% { opacity: 1; } 41%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .nait { transform-box: fill-box; transform-origin: center; animation: nait 9s infinite; }
+      @keyframes nait { 0%, 63% { opacity: 0; transform: scale(.5); } 67% { opacity: 1; transform: scale(1.06); } 70%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.5); } }
+      .scan { animation: scan 3s linear infinite; }
+      @keyframes scan { 0% { opacity: 0; transform: translateX(0); } 8% { opacity: .45; } 92% { opacity: .45; } 100% { opacity: 0; transform: translateX(612px); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } .scan { opacity: 0; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Étiquettes et sélecteur</text>
+  <text class="petit" x="32" y="80">label = étiquette autocollante, sélecteur = « prends ceux qui portent app: web »</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#00eaff">1 · Il compte les étiquettes</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · Une étiquette retirée</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#5affb6">3 · Un pod de plus</text>
+
+  <!-- ReplicaSet -->
+  <rect class="boite" x="32" y="100" width="250" height="246" rx="14" stroke="#00eaff"/>
+  <text class="label" x="52" y="132" fill="#00eaff">ReplicaSet</text>
+  <text class="petit" x="52" y="160">sélecteur :</text>
+  <use href="#web" x="136" y="142"/>
+  <text class="label ja" x="52" y="214">voulu : 3</text>
+  <text class="label me e13" x="52" y="246">compté : 3</text>
+  <text class="label rg e2" x="52" y="246">compté : 2</text>
+  <text class="petit e13" x="52" y="276">rien à faire</text>
+  <text class="label ja e2" x="52" y="278">crée 1 pod</text>
+  <text class="petit" x="52" y="322">il ne retient aucun nom</text>
+
+  <!-- Pods -->
+  <use href="#carte" x="312" y="150"/><text class="petit bl" x="364" y="212" text-anchor="middle">web-x7k</text><use href="#web" x="322" y="246"/>
+  <use href="#carte" x="434" y="150"/><text class="petit bl" x="486" y="212" text-anchor="middle">web-2bq</text><use href="#web" x="444" y="246"/>
+  <use href="#carte" x="556" y="150"/><text class="petit bl" x="608" y="212" text-anchor="middle">db-0</text>
+  <rect x="566" y="246" width="84" height="28" rx="14" fill="#859cff"/><text class="eti" x="608" y="265" text-anchor="middle">app: db</text>
+  <use href="#carte" x="678" y="150"/><text class="petit bl" x="730" y="212" text-anchor="middle">web-9fz</text>
+  <rect x="688" y="246" width="84" height="28" rx="14" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-dasharray="4 4"/>
+  <use class="colle" href="#web" x="688" y="246"/>
+  <g class="nait"><use href="#carte" x="800" y="150"/><text class="petit me" x="852" y="212" text-anchor="middle">web-m4c</text><use href="#web" x="810" y="246"/></g>
+
+  <!-- Ce que le sélecteur retient -->
+  <rect class="sel" x="306" y="144" width="116" height="162" rx="15"/>
+  <rect class="sel" x="428" y="144" width="116" height="162" rx="15"/>
+  <rect class="sel s4" x="672" y="144" width="116" height="162" rx="15"/>
+  <rect class="sel nait" x="794" y="144" width="116" height="162" rx="15"/>
+  <rect class="scan" x="300" y="138" width="4" height="174" rx="2" fill="#00eaff"/>
+  <text class="petit rg e2" x="730" y="332" text-anchor="middle" style="fill:#ff1a1a">étiquette retirée</text>
+  <text class="petit e3" x="730" y="332" text-anchor="middle">tourne, mais ignoré</text>
+  <text class="petit e13" x="608" y="332" text-anchor="middle">pas compté</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le ReplicaSet compte <tspan fill="#00eaff" font-weight="700">les étiquettes</tspan> : un pod sans étiquette ne compte plus.</text>
+</svg>

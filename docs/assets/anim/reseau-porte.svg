@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Publier un port : percer une porte dans la façade de l'hôte</title>
+  <desc id="d">Sans publication, la requête de ton poste bute contre le mur de l'hôte, alors que le conteneur voisin joint le site sans peine. L'option -p 127.0.0.1:8080:80 perce une porte 8080 reliée au port 80 du conteneur. La requête de ton poste passe et la page est servie ; celle d'un collègue reste bloquée, car la porte n'est ouverte que sur 127.0.0.1.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) pas de porte, la requête bute ; 2) -p perce la porte ; 3) la requête passe, le collègue reste dehors. */
+      .s1 { animation: s1 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      .d2 { animation: d2 9s infinite both; opacity: 0; }
+      @keyframes s1 { 0% { opacity: 0; } 12%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 72% { opacity: 0; } 75%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes d2 { 0%, 33% { opacity: 0; } 38%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      .porte { animation: porte 9s infinite both; transform-box: fill-box; transform-origin: center; opacity: 0; }
+      @keyframes porte { 0%, 36% { opacity: 0; transform: scaleY(.1); } 42% { opacity: 1; transform: scaleY(1.15); } 46%, 93% { opacity: 1; transform: scaleY(1); } 97%, 100% { opacity: 0; } }
+      .bute { animation: bute 9s infinite both; opacity: 0; }
+      @keyframes bute {
+        0% { opacity: 0; transform: translate(0, 0); fill: #eeff57; }
+        3% { opacity: 1; transform: translate(0, 0); fill: #eeff57; }
+        11% { transform: translate(98px, 0); fill: #eeff57; }
+        13% { transform: translate(84px, 0); fill: #ff1a1a; }
+        28% { opacity: 1; transform: translate(84px, 0); fill: #ff1a1a; }
+        31%, 100% { opacity: 0; transform: translate(84px, 0); fill: #ff1a1a; }
+      }
+      .passe { animation: passe 9s infinite both; opacity: 0; }
+      @keyframes passe {
+        0%, 60% { opacity: 0; transform: translate(0, 0); }
+        62% { opacity: 1; transform: translate(0, 0); }
+        67% { transform: translate(110px, 0); }
+        75% { opacity: 1; transform: translate(388px, 0); }
+        93% { opacity: 1; transform: translate(388px, 0); }
+        97%, 100% { opacity: 0; transform: translate(388px, 0); }
+      }
+      .collegue { animation: collegue 9s infinite both; opacity: 0; }
+      @keyframes collegue {
+        0%, 64% { opacity: 0; transform: translate(0, 0); fill: #eeff57; }
+        66% { opacity: 1; transform: translate(0, 0); fill: #eeff57; }
+        73% { transform: translate(96px, -40px); fill: #eeff57; }
+        75% { transform: translate(84px, -36px); fill: #ff1a1a; }
+        93% { opacity: 1; transform: translate(84px, -36px); fill: #ff1a1a; }
+        97%, 100% { opacity: 0; transform: translate(84px, -36px); fill: #ff1a1a; }
+      }
+      .vu { animation: vu 9s infinite both; }
+      @keyframes vu { 0%, 72% { stroke-width: 2.5; } 76%, 90% { stroke-width: 6; } 94%, 100% { stroke-width: 2.5; } }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .bute, .passe, .vu { animation: none; opacity: 0; }
+        .vu { opacity: 1; }
+        .s3, .d2, .porte { animation: none; opacity: 1; }
+        .collegue { animation: none; opacity: 1; transform: translate(84px, -36px); fill: #ff1a1a; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Publier un port : percer une porte</text>
+  <text class="petit" x="32" y="76">la façade = l'hôte · la porte = le port publié · la pièce = le conteneur</text>
+
+  <!-- Dehors -->
+  <g fill="#eeff57"><circle cx="60" cy="200" r="10"/><rect x="48" y="213" width="24" height="30" rx="8"/></g>
+  <text class="petit" x="24" y="268">ton poste</text>
+  <g fill="#a0a4a0"><circle cx="60" cy="296" r="9"/><rect x="49" y="308" width="22" height="26" rx="8"/></g>
+  <text class="petit" x="24" y="356">un collègue</text>
+
+  <!-- Hôte -->
+  <rect class="boite" x="200" y="96" width="736" height="256" rx="14" stroke="#1f9e91"/>
+  <text class="label" x="220" y="126" fill="#1f9e91">Hôte</text>
+  <g class="d2"><text class="label" x="290" y="126" fill="#eeff57">-p 127.0.0.1:8080:80</text></g>
+
+  <!-- Porte percée -->
+  <g class="porte">
+    <rect x="196" y="200" width="9" height="50" fill="#0a0006"/>
+    <rect x="194" y="200" width="12" height="50" rx="3" fill="none" stroke="#5affb6" stroke-width="3"/>
+  </g>
+  <g class="d2">
+    <text class="label" x="216" y="192" fill="#5affb6">8080</text>
+  </g>
+
+  <!-- Réseau et conteneurs -->
+  <rect class="boite" x="460" y="146" width="456" height="192" rx="12" stroke="#859cff"/>
+  <text class="label" x="478" y="172" fill="#859cff">Réseau</text>
+  <rect class="boite vu" x="520" y="188" width="180" height="78" rx="12" stroke="#00eaff"/>
+  <text class="label" x="550" y="220" fill="#00eaff">site</text>
+  <text class="petit" x="550" y="244">nginx écoute</text>
+  <path class="d2" d="M206 225 H504" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <circle cx="520" cy="225" r="16" fill="#5affb6"/>
+  <text x="510" y="231" font-size="15" font-weight="700" fill="#0a0006">80</text>
+
+  <rect class="boite" x="740" y="256" width="156" height="66" rx="12" stroke="#ff84ef"/>
+  <text class="label" x="758" y="285" fill="#ff84ef">voisin</text>
+  <text class="petit" x="758" y="308">même réseau</text>
+  <path d="M760 256 L700 240" stroke="#ff84ef" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <text class="petit" x="736" y="220" style="fill:#5affb6">✓ joint le site</text>
+
+  <!-- Étape 1 : bloqué -->
+  <circle class="bute" cx="96" cy="225" r="9"/>
+  <g class="s1"><text class="label" x="220" y="290" fill="#ff1a1a">✗ sans -p : pas de porte</text></g>
+
+  <!-- Étape 3 : ça passe, sauf pour le collègue -->
+  <circle class="passe" cx="96" cy="225" r="9" fill="#eeff57"/>
+  <circle class="collegue" cx="96" cy="300" r="9"/>
+  <g class="s3">
+    <text class="label" x="220" y="270" fill="#5affb6">✓ page servie</text>
+    <text class="petit" x="220" y="306" style="fill:#ff1a1a">✗ collègue : la porte</text>
+    <text class="petit" x="220" y="326" style="fill:#ff1a1a">ne s'ouvre que sur 127.0.0.1</text>
+  </g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400"><tspan fill="#eeff57" font-weight="700">-p</tspan> perce une porte dans la façade de l'hôte ; sans elle, seuls les voisins entrent.</text>
+</svg>

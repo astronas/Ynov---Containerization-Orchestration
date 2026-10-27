@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le calque et le classeur : la couche inscriptible et le volume</title>
+  <desc id="d">Un conteneur écrit le fichier trace.txt sur un calque transparent posé sur l'image en lecture seule ; un volume, classeur rangé à part, lui est branché. On arrête puis on relance le conteneur : le calque et trace.txt sont toujours là. On supprime le conteneur avec docker rm : le calque est jeté avec trace.txt. Un nouveau conteneur repart d'un calque vide sur la même image, et le volume se rebranche avec ses données intactes.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .code { font-size: 17px; font-weight: 700; fill: #eaf0eb; font-family: Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; }
+      .couche { font-size: 15px; font-weight: 700; fill: #0a0006; text-anchor: middle; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .etape { font-size: 18px; font-weight: 700; text-anchor: end; }
+      .m { text-anchor: middle; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 8 s : 1 on écrit, 2 stop puis start, 3 rm puis nouveau run */
+      .a1, .a2, .a3 { animation: 8s infinite both; opacity: 0; }
+      .a1 { animation-name: a1; } .a2 { animation-name: a2; } .a3 { animation-name: a3; }
+      @keyframes a1 { 0%, 31% { opacity: 1; } 34%, 100% { opacity: 0; } }
+      @keyframes a2 { 0%, 31% { opacity: 0; } 34%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      @keyframes a3 { 0%, 64% { opacity: 0; } 67%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .ecrit { transform-box: fill-box; transform-origin: center; animation: ecrit 8s infinite both; opacity: 0; }
+      @keyframes ecrit { 0%, 6% { opacity: 0; transform: scale(.4); } 12% { opacity: 1; transform: scale(1.1); } 15%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+      .jete { transform-box: fill-box; transform-origin: center; animation: jete 8s infinite both; }
+      @keyframes jete { 0%, 68% { opacity: 1; transform: none; } 77%, 97% { opacity: 0; transform: scale(.35) rotate(-14deg); } 100% { opacity: 0; transform: none; } }
+      .pause { animation: pause 8s infinite both; }
+      @keyframes pause { 0%, 36% { opacity: 1; } 38%, 48% { opacity: .35; } 51%, 100% { opacity: 1; } }
+      .arr { animation: arr 8s infinite both; opacity: 0; }
+      @keyframes arr { 0%, 35% { opacity: 0; } 37%, 48% { opacity: 1; } 50%, 100% { opacity: 0; } }
+      .rel { animation: rel 8s infinite both; opacity: 0; }
+      @keyframes rel { 0%, 49% { opacity: 0; } 51%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      .perdu { animation: perdu 8s infinite both; opacity: 0; }
+      @keyframes perdu { 0%, 69% { opacity: 0; } 72%, 82% { opacity: 1; } 85%, 100% { opacity: 0; } }
+      .neuf { animation: neuf 8s infinite both; opacity: 0; }
+      @keyframes neuf { 0%, 80% { opacity: 0; } 85%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .lien { animation: lien 8s infinite both; }
+      @keyframes lien { 0%, 68% { opacity: 1; } 71%, 83% { opacity: 0; } 87%, 100% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .a1, .a2, .jete, .arr, .rel, .perdu { animation: none; opacity: 0; }
+        .a3, .neuf, .lien { animation: none; opacity: 1; }
+        .ecrit, .pause { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le calque et le classeur</text>
+  <text class="petit" x="32" y="78">où vont les fichiers écrits par un conteneur</text>
+  <text class="etape a1" x="928" y="52" fill="#5affb6">1 · le conteneur écrit sur le calque</text>
+  <text class="etape a2" x="928" y="52" fill="#eeff57">2 · stop puis start : le calque reste</text>
+  <text class="etape a3" x="928" y="52" fill="#ff1a1a">3 · rm : calque jeté, volume gardé</text>
+
+  <!-- Ce qu'on fait -->
+  <rect class="boite" x="32" y="100" width="210" height="244" rx="14" stroke="#a0a4a0"/>
+  <text class="petit" x="50" y="128">ce qu'on fait</text>
+  <g class="a1"><text class="code" x="50" y="166">docker run</text><text class="petit" x="50" y="194">le programme écrit</text><text class="petit" x="50" y="214">trace.txt</text></g>
+  <g class="a2"><text class="code" x="50" y="166">docker stop</text><text class="code" x="50" y="192">docker start</text><text class="petit" x="50" y="222">même conteneur</text></g>
+  <g class="a3"><text class="code" x="50" y="166">docker rm</text><text class="code" x="50" y="192">docker run</text><text class="petit" x="50" y="222">nouveau conteneur</text></g>
+  <path d="M50 250 H224" stroke="#a0a4a0" stroke-width="1"/>
+  <g class="petit" style="font-weight:700">
+    <text class="a1" x="50" y="282" style="fill:#5affb6">trace.txt : écrit</text>
+    <text class="a2" x="50" y="282" style="fill:#5affb6">trace.txt : toujours là</text>
+    <text class="a3" x="50" y="282" style="fill:#ff1a1a">trace.txt : perdu</text>
+    <text x="50" y="310" style="fill:#859cff">données du volume :</text>
+    <text x="50" y="330" style="fill:#859cff">toujours là</text>
+  </g>
+
+  <!-- Image en lecture seule -->
+  <text class="l18" x="286" y="128" fill="#eaf0eb">Conteneur</text>
+  <text class="petit a1" x="600" y="128" style="fill:#5affb6;text-anchor:end">en marche</text>
+  <text class="petit arr" x="600" y="128" style="text-anchor:end">arrêté</text>
+  <text class="petit rel" x="600" y="128" style="fill:#5affb6;text-anchor:end">relancé</text>
+  <text class="petit neuf" x="600" y="128" style="fill:#5affb6;text-anchor:end">nouveau, en marche</text>
+  <rect x="286" y="262" width="314" height="24" rx="5" fill="#00eaff"/>
+  <rect x="286" y="290" width="314" height="24" rx="5" fill="#00eaff" fill-opacity=".75"/>
+  <rect x="286" y="318" width="314" height="24" rx="5" fill="#00eaff" fill-opacity=".5"/>
+  <text class="couche" x="443" y="279">image : lecture seule</text>
+  <text class="couche" x="443" y="307">couche</text>
+  <text class="couche" x="443" y="335">couche</text>
+
+  <!-- Le calque du conteneur -->
+  <g class="jete">
+    <g class="pause">
+      <rect x="286" y="146" width="314" height="104" rx="8" fill="#5affb6" fill-opacity=".1" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="8 6"/>
+      <text class="petit" x="300" y="170" style="fill:#5affb6;font-weight:700">calque : couche inscriptible</text>
+      <g class="ecrit"><rect x="300" y="188" width="118" height="44" rx="6" fill="#eeff57"/><text class="couche" x="359" y="216">trace.txt</text></g>
+    </g>
+  </g>
+  <text class="l18 m perdu" x="443" y="210" fill="#ff1a1a">jeté avec trace.txt</text>
+  <g class="neuf">
+    <rect x="286" y="146" width="314" height="104" rx="8" fill="#5affb6" fill-opacity=".1" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="8 6"/>
+    <text class="petit" x="300" y="170" style="fill:#5affb6;font-weight:700">nouveau calque : vide</text>
+  </g>
+
+  <!-- Le volume -->
+  <path class="lien" d="M600 214 H690" stroke="#859cff" stroke-width="3" stroke-dasharray="6 5"/>
+  <rect class="boite" x="690" y="146" width="238" height="196" rx="12" stroke="#859cff"/>
+  <rect x="690" y="146" width="22" height="196" rx="8" fill="#859cff"/>
+  <text class="l18" x="728" y="178" fill="#859cff">Volume</text>
+  <text class="petit" x="728" y="200">un classeur rangé à part</text>
+  <rect x="728" y="222" width="150" height="56" rx="6" fill="#859cff" fill-opacity=".25" stroke="#859cff" stroke-width="2"/>
+  <text class="l18 m" x="803" y="257" fill="#eaf0eb">données</text>
+  <text class="petit a1" x="728" y="318">branché au conteneur</text>
+  <text class="petit a2" x="728" y="318">branché au conteneur</text>
+  <text class="petit neuf" x="728" y="318" style="fill:#5affb6;font-weight:700">rebranché au nouveau</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le calque vit et meurt avec le conteneur ; <tspan fill="#859cff" font-weight="700">le volume, rangé à part, se rebranche</tspan>.</text>
+</svg>

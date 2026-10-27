@@ -18,6 +18,8 @@
 
     Avec Docker et Compose, tu tiens un restaurant avec **une seule cuisine**. Si un cuisinier se blesse, on le remplace sur place. Si la cuisine prend feu, plus aucun plat ne sort. Un orchestrateur, c'est le **gérant d'une chaîne** : il a plusieurs cuisines, sait combien de plats il doit servir, et envoie les commandes ailleurs quand une cuisine ferme. Limite de l'image : les provisions restées dans la cuisine brûlée (tes **données**) ne déménagent pas toutes seules.
 
+    ![Schéma animé : une seule cuisine sert, elle prend feu, le gérant envoie les commandes vers deux autres cuisines ; les données restent bloquées](assets/anim/orchestrer-restaurant.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -76,6 +78,8 @@ Un fichier `compose.yaml` est déjà une **déclaration** : on décrit les servi
 
     Redémarrer, c'est **rallumer la même lampe** après une coupure. Replanifier, c'est **allumer une lampe dans une autre pièce** parce que la première pièce n'a plus de courant.
 
+    ![Schéma animé : la lampe se rallume sur place, puis la pièce n'a plus de courant et une lampe s'allume dans l'autre pièce](assets/anim/orchestrer-lampe.svg){ .anim }
+
 Une **politique de redémarrage** (`restart: unless-stopped` dans Compose, `--restart` avec `docker run`) relance un conteneur **sur la même machine**, à condition que la machine et le moteur Docker fonctionnent encore. **Replanifier**, c'est recréer le conteneur **ailleurs**.
 
 ???+ example "En vrai : le moteur relance, puis abandonne"
@@ -119,6 +123,8 @@ Avec Compose, mettre à jour, c'est **recréer le conteneur** : s'il est seul à
 !!! quote "En clair"
 
     Avec Docker, tu donnes des **ordres** (« démarre ce conteneur »), exécutés une fois. Avec un orchestrateur, tu donnes un **objectif** (« je veux trois copies disponibles »), et il le tient jour et nuit, comme un thermostat tient une température.
+
+    ![Schéma animé : une copie tombe dans chaque ligne ; l'ordre Docker reste à 2, l'objectif de l'orchestrateur recrée la troisième](assets/anim/orchestrer-thermostat.svg){ .anim }
 
 On passe de l'**exécution impérative** (des ordres, exécutés une fois) à la **gestion déclarative** (un objectif, tenu en continu par un **contrôleur**, un programme qui compare et corrige). La plateforme de référence, **Kubernetes**, répond besoin par besoin :
 

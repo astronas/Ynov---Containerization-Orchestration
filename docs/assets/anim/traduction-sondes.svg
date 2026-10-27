@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Trois questions posées au conteneur : les sondes</title>
+  <desc id="d">Kubernetes pose trois questions l'une après l'autre. Démarrage : « As-tu fini de t'installer ? », pas encore, Kubernetes attend. Disponibilité : « Peux-tu recevoir des clients maintenant ? », non, le pod est retiré du trafic sans redémarrer. Vivacité : « Es-tu encore en vie ? », aucune réponse, le conteneur est redémarré.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .q0 { animation: q0 9s infinite both; }
+      @keyframes q0 { 0%, 2% { opacity: 0; transform: translateX(-30px); } 6%, 95% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; } }
+      .r0 { animation: r0 9s infinite both; }
+      @keyframes r0 { 0%, 7% { opacity: 0; transform: scale(.5); } 9% { opacity: 1; transform: scale(1.12); } 11%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      .a0 { animation: a0 9s infinite both; }
+      @keyframes a0 { 0%, 11% { opacity: 0; transform: translateX(-24px); } 14%, 95% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; } }
+      .q1 { animation: q1 9s infinite both; }
+      @keyframes q1 { 0%, 35% { opacity: 0; transform: translateX(-30px); } 39%, 95% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; } }
+      .r1 { animation: r1 9s infinite both; }
+      @keyframes r1 { 0%, 40% { opacity: 0; transform: scale(.5); } 42% { opacity: 1; transform: scale(1.12); } 44%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      .a1 { animation: a1 9s infinite both; }
+      @keyframes a1 { 0%, 44% { opacity: 0; transform: translateX(-24px); } 47%, 95% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; } }
+      .q2 { animation: q2 9s infinite both; }
+      @keyframes q2 { 0%, 67% { opacity: 0; transform: translateX(-30px); } 71%, 95% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; } }
+      .r2 { animation: r2 9s infinite both; }
+      @keyframes r2 { 0%, 72% { opacity: 0; transform: scale(.5); } 74% { opacity: 1; transform: scale(1.12); } 76%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      .a2 { animation: a2 9s infinite both; }
+      @keyframes a2 { 0%, 76% { opacity: 0; transform: translateX(-24px); } 79%, 95% { opacity: 1; transform: translateX(0); } 99%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .q0, .r0, .a0, .q1, .r1, .a1, .q2, .r2, .a2 { animation: none; opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Trois questions posées au conteneur</text>
+  <text class="petit" x="32" y="80">Kubernetes les repose régulièrement et agit selon la réponse</text>
+
+  <rect x="30" y="100" width="900" height="70" rx="12" fill="#1d1d1d" stroke="#333" stroke-width="2"/>
+  <g class="pa"><rect x="30" y="100" width="900" height="70" rx="12" fill="none" stroke="#00eaff" stroke-width="3"/></g>
+  <text class="l18" x="50" y="130" fill="#00eaff">Démarrage</text>
+  <g class="q0"><text class="petit" x="50" y="155" fill="#eaf0eb" style="fill:#eaf0eb">« As-tu fini de t'installer ? »</text></g>
+  <g class="r0 pop"><rect x="442" y="117" width="176" height="36" rx="18" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18" x="530" y="141" fill="#00eaff" text-anchor="middle" style="font-size:17px">pas encore</text></g>
+  <g class="a0"><text class="l18" x="648" y="130" fill="#eaf0eb">Kubernetes attend</text><text class="petit" x="648" y="154">les autres sondes patientent</text></g>
+  <rect x="30" y="182" width="900" height="70" rx="12" fill="#1d1d1d" stroke="#333" stroke-width="2"/>
+  <g class="pb"><rect x="30" y="182" width="900" height="70" rx="12" fill="none" stroke="#eeff57" stroke-width="3"/></g>
+  <text class="l18" x="50" y="212" fill="#eeff57">Disponibilité</text>
+  <g class="q1"><text class="petit" x="50" y="237" fill="#eaf0eb" style="fill:#eaf0eb">« Peux-tu recevoir des clients maintenant ? »</text></g>
+  <g class="r1 pop"><rect x="442" y="199" width="176" height="36" rx="18" fill="#0a0006" stroke="#eeff57" stroke-width="2"/><text class="l18" x="530" y="223" fill="#eeff57" text-anchor="middle" style="font-size:17px">non, occupé</text></g>
+  <g class="a1"><text class="l18" x="648" y="212" fill="#eaf0eb">retire le pod du trafic</text><text class="petit" x="648" y="236">sans le redémarrer</text></g>
+  <rect x="30" y="264" width="900" height="70" rx="12" fill="#1d1d1d" stroke="#333" stroke-width="2"/>
+  <g class="pc"><rect x="30" y="264" width="900" height="70" rx="12" fill="none" stroke="#ff84ef" stroke-width="3"/></g>
+  <text class="l18" x="50" y="294" fill="#ff84ef">Vivacité</text>
+  <g class="q2"><text class="petit" x="50" y="319" fill="#eaf0eb" style="fill:#eaf0eb">« Es-tu encore en vie ? »</text></g>
+  <g class="r2 pop"><rect x="442" y="281" width="176" height="36" rx="18" fill="#0a0006" stroke="#ff84ef" stroke-width="2"/><text class="l18" x="530" y="305" fill="#ff84ef" text-anchor="middle" style="font-size:17px">(aucune réponse)</text></g>
+  <g class="a2"><text class="l18" x="648" y="294" fill="#eaf0eb">redémarre le conteneur</text><text class="petit" x="648" y="318">il repart de zéro</text></g>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Démarrage : on attend. Disponibilité : <tspan fill="#eeff57" font-weight="700">on retire du trafic</tspan>. Vivacité : on redémarre.</text>
+</svg>

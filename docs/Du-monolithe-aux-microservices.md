@@ -18,6 +18,8 @@
 
     Imagine une **petite boutique tenue par une seule personne** : elle conseille, encaisse et gère la réserve. C'est simple et rien ne se perd entre collègues, mais si elle tombe malade, la boutique ferme : c'est le **monolithe**. Un **grand magasin** a une équipe par rayon, une pour les caisses, une pour la réserve, qui se parlent au talkie-walkie : une caisse en panne n'empêche pas de flâner dans les rayons, mais personne ne peut payer. Ce sont les **microservices**. Limite de l'image : un monolithe peut être très bien rangé à l'intérieur, ce n'est pas forcément du désordre.
 
+    ![Schéma animé : une panne ferme toute la petite boutique, alors que dans le grand magasin seules les caisses s'arrêtent](assets/anim/mono-boutique.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -79,6 +81,8 @@ Toutes les fonctions sont livrées et mises à jour **ensemble**. Elles s'appell
 !!! quote "En clair"
 
     Chaque rayon du grand magasin a son équipe et son **guichet**. Les autres rayons ne passent jamais par l'arrière-boutique : ils s'adressent au guichet, selon des règles connues de tous. Ce guichet, c'est l'API du service ; ces règles, son contrat.
+
+    ![Schéma animé : la demande refusée par la porte de service passe par le guichet et revient avec la réponse](assets/anim/mono-guichet.svg){ .anim }
 
 Un microservice est conçu pour **tourner et se mettre à jour seul**, **exposer une interface claire** (son API) et **évoluer ou grandir sans toucher aux autres**. Cette autonomie ne vient pas du seul fait de lancer plusieurs programmes : il faut aussi maîtriser qui dépend de qui, et qui possède quelles données.
 

@@ -18,6 +18,8 @@
 
     Pense à un **livre imprimé**. On ne corrige pas les exemplaires déjà vendus : on imprime une **nouvelle édition**, avec un nouveau numéro. Le **registre**, c'est l'entrepôt qui stocke les éditions et les envoie à qui les demande. Limite de l'image : l'étiquette d'une image (le tag) peut être recollée sur une autre édition, ce qui n'arrive pas à un numéro d'édition. C'est pour cela qu'on vérifie aussi l'**empreinte** (le digest).
 
+    ![Schéma animé : l'entrepôt garde l'édition 1.0, reçoit l'édition 1.1, et l'empreinte révèle une étiquette recollée](assets/anim/publier-editions.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -80,6 +82,8 @@
 
     Un tag, c'est un **marque-page** : tu peux le déplacer. Certains doivent rester fixes (`1.2.0`, la version exacte), d'autres sont faits pour bouger (`latest`, « la plus récente »). Pour désigner un contenu sans ambiguïté, on utilise l'empreinte, le digest.
 
+    ![Schéma animé : à chaque nouvelle édition, latest et 1.2 se déplacent tandis que 1.2.0 reste en place](assets/anim/publier-marque-page.svg){ .anim }
+
 | Type | Exemple | Règle |
 |---|---|---|
 | Version précise, **immuable** | `1.2.0` | jamais réécrit |
@@ -107,6 +111,8 @@ Version (tag), lien vers le code (étiquette, tag de révision) et identité (di
 !!! quote "En clair"
 
     Le registre est une **bibliothèque d'images** : on y dépose (`push`), on y emprunte (`pull`). Il ne fait rien tourner. Et comme sur une adresse postale, c'est le **nom de l'image** qui dit dans quelle bibliothèque elle va.
+
+    ![Schéma animé : le nom de l'image l'envoie vers Docker Hub ou ghcr.io, puis un serveur l'emprunte et la lance](assets/anim/publier-registre.svg){ .anim }
 
 | Registre | Nom de l'image |
 |---|---|

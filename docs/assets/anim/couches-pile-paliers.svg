@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Monter les paliers : moins de points de panne uniques, plus d'exploitation</title>
+  <desc id="d">Un marcheur monte quatre marches. P0, un poste : s'il tombe, tout tombe. P1, plusieurs nœuds : on survit à la perte d'un worker. P2, haute disponibilité dans une région : on survit à la perte d'une zone. P3, plusieurs clusters : on survit à la perte d'un cluster. À chaque marche, le travail d'exploitation augmente.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .grimpe { animation: grimpe 9s infinite both; }
+      @keyframes grimpe {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3%, 8% { opacity: 1; transform: translate(0px, 0px); }
+        14%, 32% { opacity: 1; transform: translate(220px, -50px); }
+        38%, 64% { opacity: 1; transform: translate(440px, -100px); }
+        70%, 94% { opacity: 1; transform: translate(660px, -150px); }
+        98%, 100% { opacity: 0; transform: translate(660px, -150px); }
+      }
+      .litB { animation: litB 9s infinite both; }
+      @keyframes litB { 0%, 34% { opacity: 0.18; } 38%, 95% { opacity: 1; } 99%, 100% { opacity: 0.18; } }
+      .litC { animation: litC 9s infinite both; }
+      @keyframes litC { 0%, 66% { opacity: 0.18; } 70%, 95% { opacity: 1; } 99%, 100% { opacity: 0.18; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .grimpe { animation: none; opacity: 1; transform: translate(660px, -150px); }
+        .litB, .litC { animation: none; opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Monter les paliers</text>
+  <text class="petit" x="32" y="80">paliers pédagogiques : chacun supprime un point de panne unique de plus</text>
+<g class=""><rect x="40" y="270" width="210" height="82" rx="8" fill="#1d1d1d" stroke="#ff1a1a" stroke-width="2.5"/><text class="l18" x="56" y="300" fill="#ff1a1a">P0 · un poste</text><text class="petit" x="56" y="324">exploitation ●</text><text class="petit" x="56" y="256" fill="#ff1a1a" style="fill:#ff1a1a">tout tombe avec lui</text></g>
+  <g class=""><rect x="260" y="220" width="210" height="132" rx="8" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/><text class="l18" x="276" y="250" fill="#eeff57">P1 · multinœud</text><text class="petit" x="276" y="274">exploitation ●●</text><text class="petit" x="276" y="206" fill="#eeff57" style="fill:#eeff57">survit : un worker</text></g>
+  <g class="litB"><rect x="480" y="170" width="210" height="182" rx="8" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/><text class="l18" x="496" y="200" fill="#00eaff">P2 · HA en région</text><text class="petit" x="496" y="224">exploitation ●●●</text><text class="petit" x="496" y="156" fill="#00eaff" style="fill:#00eaff">survit : une zone</text></g>
+  <g class="litC"><rect x="700" y="120" width="210" height="232" rx="8" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="716" y="150" fill="#5affb6">P3 · multicluster</text><text class="petit" x="716" y="174">exploitation ●●●●</text><text class="petit" x="716" y="106" fill="#5affb6" style="fill:#5affb6">survit : un cluster</text></g>
+  <circle class="grimpe" cx="230" cy="256" r="12" fill="#eeff57" stroke="#0a0006" stroke-width="3"/>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Plus haut = <tspan fill="#5affb6" font-weight="700">une panne plus grosse absorbée</tspan>, et plus de travail d'exploitation.</text>
+</svg>

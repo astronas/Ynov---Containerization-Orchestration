@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Maison ou appartement : machine virtuelle ou conteneur</title>
+  <desc id="d">À gauche, deux maisons individuelles, les machines virtuelles, se construisent lentement, chacune avec sa propre chaudière, son noyau. À droite, un immeuble, les conteneurs : les occupants emménagent en quelques secondes et sont tous chauffés par la même chaudière commune, le noyau partagé. Puis la chaudière commune tombe en panne : tout l'immeuble a froid, tandis que les maisons restent chauffées.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <g id="flamme"><path d="M0 -30 C2 -20 14 -16 13 -2 C12 9 -12 9 -13 -2 C-14 -12 -6 -12 -5 -20 C-2 -16 -1 -22 0 -30 Z"/><path d="M0 -12 C4 -6 7 -3 6 2 C5 6 -5 6 -6 2 C-6 -3 -3 -5 0 -12 Z" fill="#ff84ef"/></g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .etape { font-size: 18px; font-weight: 700; text-anchor: end; }
+      .m { text-anchor: middle; }
+      /* 8 s : 1 on construit / on emménage, 2 tout le monde a chaud, 3 la chaudière commune lâche */
+      .a1, .a2, .a3, .a12 { animation: 8s infinite both; opacity: 0; }
+      .a1 { animation-name: a1; } .a2 { animation-name: a2; } .a3 { animation-name: a3; } .a12 { animation-name: a12; }
+      @keyframes a1 { 0%, 31% { opacity: 1; } 34%, 100% { opacity: 0; } }
+      @keyframes a2 { 0%, 31% { opacity: 0; } 34%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      @keyframes a3 { 0%, 64% { opacity: 0; } 67%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes a12 { 0%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      .construit { transform-box: fill-box; transform-origin: 50% 100%; animation: construit 8s infinite both; }
+      @keyframes construit {
+        0% { transform: scaleY(.04); opacity: .4; }
+        33% { transform: scaleY(1); opacity: 1; }
+        97% { transform: scaleY(1); opacity: 1; }
+        100% { transform: scaleY(.04); opacity: .4; }
+      }
+      .emmenage { animation: emmenage 8s infinite both; opacity: 0; }
+      @keyframes emmenage { 0% { opacity: 0; transform: translateY(-12px); } 5%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+      .chaud { animation: chaud 8s infinite both; opacity: 0; }
+      @keyframes chaud { 0%, 4% { opacity: 0; } 9%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      .flux { stroke-dasharray: 6 8; animation: flux .8s linear infinite; }
+      @keyframes flux { to { stroke-dashoffset: 14; } }
+      .feu { transform-box: fill-box; transform-origin: 50% 100%; animation: feu .7s infinite alternate ease-in-out; }
+      @keyframes feu { from { transform: scale(1, 1); } to { transform: scale(.9, .82); } }
+      @media (prefers-reduced-motion: reduce) {
+        .a1, .a2, .a12, .chaud { animation: none; opacity: 0; }
+        .a3, .emmenage { animation: none; opacity: 1; }
+        .construit { animation: none; }
+        .flux, .feu { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Maison ou appartement</text>
+  <text class="petit" x="32" y="78">machine virtuelle ou conteneur : qui a sa propre chaudière ?</text>
+  <text class="etape a1" x="928" y="52" fill="#eeff57">1 · construire ou emménager</text>
+  <text class="etape a2" x="928" y="52" fill="#ff84ef">2 · tout le monde a chaud</text>
+  <text class="etape a3" x="928" y="52" fill="#ff1a1a">3 · la chaudière commune lâche</text>
+
+  <!-- Machines virtuelles : maisons -->
+  <text class="label" x="32" y="122" fill="#00eaff">Machines virtuelles : des maisons</text>
+  <path d="M32 330 H440" stroke="#a0a4a0" stroke-width="2"/>
+  <g class="construit">
+    <path d="M38 214 L125 150 L212 214 Z" fill="#00eaff" fill-opacity=".25" stroke="#00eaff" stroke-width="2.5"/>
+    <rect x="50" y="212" width="150" height="118" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+    <rect x="68" y="230" width="38" height="30" rx="3" fill="#eeff57" fill-opacity=".7"/>
+    <rect x="144" y="230" width="38" height="30" rx="3" fill="#eeff57" fill-opacity=".7"/>
+    <use href="#flamme" class="feu" x="125" y="296" fill="#eeff57"/>
+    <text class="petit m" x="125" y="322" style="fill:#eeff57">son noyau</text>
+  </g>
+  <g class="construit" style="animation-delay:.3s">
+    <path d="M238 214 L325 150 L412 214 Z" fill="#00eaff" fill-opacity=".25" stroke="#00eaff" stroke-width="2.5"/>
+    <rect x="250" y="212" width="150" height="118" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+    <rect x="268" y="230" width="38" height="30" rx="3" fill="#eeff57" fill-opacity=".7"/>
+    <rect x="344" y="230" width="38" height="30" rx="3" fill="#eeff57" fill-opacity=".7"/>
+    <use href="#flamme" class="feu" x="325" y="296" fill="#eeff57"/>
+    <text class="petit m" x="325" y="322" style="fill:#eeff57">son noyau</text>
+  </g>
+  <text class="petit m a12" x="225" y="354">construire : plusieurs minutes</text>
+  <text class="petit m a3" x="225" y="354" style="fill:#5affb6;font-weight:700">chacune sa chaudière : il fait chaud</text>
+
+  <!-- Conteneurs : immeuble -->
+  <text class="label" x="560" y="122" fill="#5affb6">Conteneurs : un immeuble</text>
+  <path d="M520 330 H928" stroke="#a0a4a0" stroke-width="2"/>
+  <rect x="560" y="132" width="330" height="198" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/>
+  <!-- tuyaux de chauffage -->
+  <path d="M677 272 V146 M783 272 V146" stroke="#a0a4a0" stroke-width="3"/>
+  <g class="a12"><path class="flux" d="M677 272 V146 M783 272 V146" stroke="#eeff57" stroke-width="3"/></g>
+  <!-- appartements -->
+  <g fill="#0a0006" stroke="#5affb6" stroke-width="1.5">
+    <rect x="576" y="146" width="96" height="52" rx="4"/><rect x="688" y="146" width="90" height="52" rx="4"/><rect x="788" y="146" width="90" height="52" rx="4"/>
+    <rect x="576" y="208" width="96" height="52" rx="4"/><rect x="688" y="208" width="90" height="52" rx="4"/><rect x="788" y="208" width="90" height="52" rx="4"/>
+  </g>
+  <g fill="#ff84ef" fill-opacity=".3">
+    <rect class="chaud" x="576" y="146" width="96" height="52" rx="4"/>
+    <rect class="chaud" x="688" y="146" width="90" height="52" rx="4" style="animation-delay:.15s"/>
+    <rect class="chaud" x="788" y="146" width="90" height="52" rx="4" style="animation-delay:.3s"/>
+    <rect class="chaud" x="576" y="208" width="96" height="52" rx="4" style="animation-delay:.45s"/>
+    <rect class="chaud" x="688" y="208" width="90" height="52" rx="4" style="animation-delay:.6s"/>
+    <rect class="chaud" x="788" y="208" width="90" height="52" rx="4" style="animation-delay:.75s"/>
+  </g>
+  <g fill="#859cff" fill-opacity=".38" class="a3">
+    <rect x="576" y="146" width="96" height="52" rx="4"/><rect x="688" y="146" width="90" height="52" rx="4"/><rect x="788" y="146" width="90" height="52" rx="4"/>
+    <rect x="576" y="208" width="96" height="52" rx="4"/><rect x="688" y="208" width="90" height="52" rx="4"/><rect x="788" y="208" width="90" height="52" rx="4"/>
+  </g>
+  <g fill="#eaf0eb">
+    <circle class="emmenage" cx="624" cy="174" r="9"/>
+    <circle class="emmenage" cx="733" cy="174" r="9" style="animation-delay:.15s"/>
+    <circle class="emmenage" cx="833" cy="174" r="9" style="animation-delay:.3s"/>
+    <circle class="emmenage" cx="624" cy="236" r="9" style="animation-delay:.45s"/>
+    <circle class="emmenage" cx="733" cy="236" r="9" style="animation-delay:.6s"/>
+    <circle class="emmenage" cx="833" cy="236" r="9" style="animation-delay:.75s"/>
+  </g>
+  <!-- chaufferie commune -->
+  <rect x="576" y="272" width="302" height="50" rx="6" fill="#0a0006" stroke="#eeff57" stroke-width="2"/>
+  <g class="a12"><use href="#flamme" class="feu" x="606" y="306" fill="#eeff57"/></g>
+  <text class="a3" x="594" y="308" font-size="30" font-weight="700" fill="#ff1a1a">✕</text>
+  <text class="l18" x="634" y="294" fill="#eeff57">le noyau partagé</text>
+  <text class="petit" x="634" y="314">une chaudière commune</text>
+  <text class="petit m a12" x="725" y="354">emménager : quelques secondes</text>
+  <text class="petit m a3" x="725" y="354" style="fill:#ff1a1a;font-weight:700">panne : tout l'immeuble a froid</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400"><tspan fill="#00eaff" font-weight="700">VM</tspan> : son propre noyau, lourde mais indépendante. <tspan fill="#5affb6" font-weight="700">Conteneur</tspan> : noyau partagé, léger.</text>
+</svg>

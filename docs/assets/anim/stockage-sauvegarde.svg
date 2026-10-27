@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Persistance ou sauvegarde : le casier et la photocopie dans un autre bâtiment</title>
+  <desc id="d">Le conteneur db est remplacé, le casier (volume) garde les données : c'est la persistance. Une copie datée part dans un autre bâtiment et on vérifie qu'elle se relit : c'est la sauvegarde. L'hôtel brûle : le casier est perdu avec lui, la copie relue dans l'autre bâtiment survit.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) conteneur remplacé, casier intact ; 2) copie datée vers l'autre bâtiment, relue ; 3) l'hôtel brûle, la copie survit. */
+      .s1 { animation: s1 9s infinite both; opacity: 0; }
+      .s2 { animation: s2 9s infinite both; opacity: 0; }
+      .s3 { animation: s3 9s infinite both; opacity: 0; }
+      .d2 { animation: d2 9s infinite both; opacity: 0; }
+      .relue { animation: relue 9s infinite both; opacity: 0; }
+      .avant3 { animation: avant3 9s infinite both; }
+      @keyframes s1 { 0% { opacity: 0; } 3%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 63% { opacity: 0; } 67%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes d2 { 0%, 46% { opacity: 0; } 50%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes relue { 0%, 54% { opacity: 0; } 57%, 93% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes avant3 { 0%, 64% { opacity: 1; } 69%, 96% { opacity: .15; } 100% { opacity: 1; } }
+      .ancien { animation: ancien 9s infinite both; }
+      @keyframes ancien { 0%, 10% { opacity: 1; } 14%, 97% { opacity: 0; } 100% { opacity: 1; } }
+      .nouveau { animation: nouveau 9s infinite both; opacity: 0; }
+      @keyframes nouveau { 0%, 15% { opacity: 0; } 19%, 96% { opacity: 1; } 100% { opacity: 0; } }
+      .copie { animation: copie 9s infinite both; opacity: 0; }
+      @keyframes copie {
+        0%, 34% { opacity: 0; transform: translate(0, 0); }
+        36% { opacity: 1; transform: translate(0, 0); }
+        47% { opacity: 1; transform: translate(276px, -60px); }
+        50%, 100% { opacity: 0; transform: translate(276px, -60px); }
+      }
+      .survit { animation: survit 9s infinite both; }
+      @keyframes survit { 0%, 66% { stroke-width: 2.5; } 72%, 90% { stroke-width: 6; } 95%, 100% { stroke-width: 2.5; } }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .s2, .ancien, .copie { animation: none; opacity: 0; }
+        .s3, .d2, .relue, .nouveau { animation: none; opacity: 1; }
+        .avant3 { animation: none; opacity: .15; }
+        .survit { animation: none; stroke-width: 6; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="48">Persistance ou sauvegarde ?</text>
+  <g class="s1"><text class="label" x="32" y="80" fill="#5affb6">1. Persistance : le conteneur change, le casier reste</text></g>
+  <g class="s2"><text class="label" x="32" y="80" fill="#eeff57">2. Sauvegarde : une copie datée, ailleurs, et relue</text></g>
+  <g class="s3"><text class="label" x="32" y="80" fill="#ff1a1a">3. L'hôtel brûle : le casier part avec lui</text></g>
+
+  <!-- Hôtel (l'hôte) -->
+  <rect class="boite" x="32" y="96" width="488" height="254" rx="14" stroke="#859cff"/>
+  <g class="s3"><rect x="32" y="96" width="488" height="254" rx="14" fill="#ff1a1a" fill-opacity=".14" stroke="#ff1a1a" stroke-width="3"/></g>
+  <text class="label" x="52" y="126" fill="#859cff">Hôtel · l'hôte</text>
+
+  <g class="avant3">
+    <g class="ancien"><rect class="boite" x="56" y="140" width="210" height="72" rx="12" stroke="#00eaff"/><text class="label" x="76" y="172" fill="#00eaff">db</text><text class="petit" x="76" y="196">conteneur 1</text></g>
+    <g class="nouveau"><rect class="boite" x="56" y="140" width="210" height="72" rx="12" stroke="#00eaff"/><text class="label" x="76" y="172" fill="#00eaff">db</text><text class="petit" x="76" y="196">conteneur 2</text></g>
+    <path d="M160 212 V244" stroke="#5affb6" stroke-width="3"/>
+    <rect x="56" y="244" width="440" height="88" rx="10" fill="#5affb6" fill-opacity=".12" stroke="#5affb6" stroke-width="2.5"/>
+    <text class="label" x="76" y="274" fill="#5affb6">Casier · volume</text>
+    <g fill="#5affb6"><rect x="76" y="292" width="16" height="16" rx="3"/><rect x="98" y="292" width="16" height="16" rx="3"/><rect x="120" y="292" width="16" height="16" rx="3"/></g>
+    <text class="petit" x="150" y="306">/var/lib/mysql</text>
+  </g>
+  <g class="s1"><text class="petit" x="284" y="172" style="fill:#00eaff">remplacé</text><text class="label" x="300" y="306" fill="#5affb6">✓ intact</text></g>
+
+  <!-- Flammes -->
+  <g class="s3">
+    <path d="M330 200 q-24 -30 4 -64 q2 26 18 30 q8 -22 -2 -44 q36 26 26 64 q-6 18 -46 14z" fill="#ff1a1a"/>
+    <path d="M340 196 q-10 -16 4 -32 q4 14 14 14 q10 10 -2 18z" fill="#eeff57"/>
+    <path d="M410 214 q-18 -22 4 -46 q2 18 12 22 q6 -16 0 -32 q26 20 18 46 q-6 14 -34 10z" fill="#ff1a1a"/>
+    <text class="label" x="300" y="306" fill="#ff1a1a">✗ perdu</text>
+  </g>
+
+  <!-- Autre bâtiment -->
+  <rect class="boite" x="600" y="96" width="336" height="254" rx="14" stroke="#a0a4a0" stroke-dasharray="8 6"/>
+  <text class="label" x="620" y="126" fill="#a0a4a0">Autre bâtiment</text>
+  <text class="petit" x="620" y="150">autre disque, autre lieu</text>
+  <g class="d2">
+    <rect class="survit" x="636" y="170" width="190" height="96" rx="10" fill="#eeff57" fill-opacity=".1" stroke="#eeff57" stroke-width="2.5"/>
+    <text class="label" x="654" y="202" fill="#eeff57">Photocopie</text>
+    <text class="petit" x="654" y="226">dump cohérent</text>
+    <text class="petit" x="654" y="248">daté du 27/10</text>
+  </g>
+  <g class="relue"><text class="label" x="636" y="300" fill="#5affb6">✓ relue : elle se restaure</text></g>
+  <g class="s3"><text class="label" x="636" y="332" fill="#5affb6">la copie survit</text></g>
+
+  <!-- Copie en transit -->
+  <g class="copie"><rect x="430" y="256" width="40" height="50" rx="5" fill="#eeff57"/><path d="M438 270 h24 M438 280 h24 M438 290 h16" stroke="#0a0006" stroke-width="2.5"/></g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le casier survit au conteneur ; seule une <tspan fill="#eeff57" font-weight="700">copie ailleurs, relue</tspan>, survit à l'hôte.</text>
+</svg>

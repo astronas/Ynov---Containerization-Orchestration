@@ -20,6 +20,8 @@
 
     Tu règles un **thermostat** sur 21 °C. Tu ne dis pas à la chaudière quand s'allumer : le thermostat mesure, compare à la consigne, et allume ou éteint. Kubernetes fait pareil avec tes applications : tu écris « je veux 3 copies », et des programmes comptent sans arrêt et corrigent. Limite de l'image : un thermostat règle une valeur continue, alors que Kubernetes crée ou supprime des objets, et il a **un « thermostat » par type d'objet**.
 
+    ![Schéma animé : la température baisse et un pod disparaît, la chaudière et le contrôleur comblent l'écart avec la consigne](assets/anim/etat-thermostat.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -60,6 +62,8 @@
 
     Au restaurant, tu ne dis pas au cuisinier « allume le feu, prends une poêle, casse deux œufs ». Tu commandes **une omelette**. Le fichier Kubernetes, c'est ta commande : il décrit le plat, pas la recette.
 
+    ![Schéma animé : les gestes dictés s'effacent, le bon « 1 omelette » part en cuisine et le plat arrive](assets/anim/etat-commande.svg){ .anim }
+
 Dans Kubernetes, tout ce qu'on crée est un **objet** : une fiche enregistrée dans le cluster. On décrit un objet dans un **manifeste**, un fichier YAML. Chaque objet a deux moitiés :
 
 - `spec` (pour *spécification*) : l'**état désiré**, écrit par toi. Exemple : `replicas: 3`.
@@ -97,6 +101,8 @@ C'est le même esprit que l'Infrastructure as Code : Terraform ou Ansible décri
 !!! quote "En clair"
 
     Un contrôleur, c'est un **surveillant de piscine** qui compte les nageurs toutes les minutes. Il ne se souvient pas de qui est sorti ni quand : il compte, compare au nombre attendu, et agit. C'est pour ça qu'il répare n'importe quelle panne, même imprévue.
+
+    ![Schéma animé : le surveillant recompte sans arrêt ; pod-b disparaît, pod-d entre et le compte revient à 3](assets/anim/etat-piscine.svg){ .anim }
 
 Un **contrôleur** est un programme qui surveille un type d'objet et tourne en boucle : **observer**, **comparer**, **agir**. Il ne rejoue pas une suite d'événements : il regarde l'écart **à l'instant présent**. C'est pourquoi l'auto-guérison n'est pas une fonction à part : elle sort toute seule de cette boucle.
 
@@ -151,6 +157,8 @@ sequenceDiagram
 
     Imagine une entreprise. La **direction** (le plan de contrôle) décide ; les **ateliers** (les nœuds) fabriquent. Personne ne se parle directement : chacun dépose et lit des fiches au **secrétariat** (l'API server), qui les range dans une **armoire** unique (etcd).
 
+    ![Schéma animé : une fiche passe de toi au secrétariat, à la direction qui décide, puis à l'atelier qui lance le pod](assets/anim/etat-entreprise.svg){ .anim }
+
 Un **plan de contrôle** (control plane) décide ; des **nœuds de travail** (workers, les machines qui exécutent) font tourner les pods. **Tout** passe par l'API server : aucun composant ne parle directement à un autre, ni à etcd.
 
 | Composant | Où | Rôle |
@@ -202,6 +210,8 @@ flowchart TB
 !!! quote "En clair"
 
     `~/.kube/config`, c'est ton **trousseau de badges**. Chaque badge (un **contexte**) associe un bâtiment (un cluster) et ton identité (un utilisateur). `current-context`, c'est le badge que tu tiens en main : toutes tes commandes ouvrent les portes de **ce** bâtiment-là.
+
+    ![Schéma animé : on passe du badge minikube au badge prod, et la même commande ouvre la porte de l'autre cluster](assets/anim/etat-badges.svg){ .anim }
 
 **kubectl** est un simple **client de l'API** : il envoie des requêtes HTTPS à l'API server. Pour savoir quel cluster joindre et qui il est, il lit le fichier `~/.kube/config` (le `~` désigne ton dossier personnel).
 

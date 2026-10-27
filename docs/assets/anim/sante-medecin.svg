@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Diagnostiquer comme un médecin : symptôme, dossier, examen couche par couche</title>
+  <desc id="d">L'application montre un symptôme : une erreur 500. On lit le dossier, les journaux de web : SQLSTATE 2002, Connection refused. On examine ensuite couche par couche : image correcte, réseau et DNS corrects, disponibilité en défaut, la base n'est pas encore prête. Le traitement vise cette couche seulement : attendre que db soit healthy.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      /* 9 s : 1) le symptôme, 2) le dossier (journaux), 3) l'examen couche par couche, puis le traitement ciblé. */
+      .s1, .s2, .s3, .d2, .k1, .k2, .k3, .soin { opacity: 0; animation: 9s infinite both; }
+      .s1 { animation-name: s1; } .s2 { animation-name: s2; } .s3 { animation-name: s3; } .d2 { animation-name: d2; }
+      .k1 { animation-name: k1; } .k2 { animation-name: k2; } .k3 { animation-name: k3; } .soin { animation-name: soin; }
+      @keyframes s1 { 0% { opacity: 0; } 3%, 28% { opacity: 1; } 31%, 100% { opacity: 0; } }
+      @keyframes s2 { 0%, 31% { opacity: 0; } 34%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes s3 { 0%, 63% { opacity: 0; } 66%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes d2 { 0%, 34% { opacity: 0; } 38%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes k1 { 0%, 66% { opacity: 0; } 68%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes k2 { 0%, 70% { opacity: 0; } 72%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes k3 { 0%, 74% { opacity: 0; } 76%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      @keyframes soin { 0%, 80% { opacity: 0; } 83%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
+      .scan { opacity: 0; animation: scan 9s infinite both; }
+      @keyframes scan {
+        0%, 63% { opacity: 0; transform: translate(0, 0); }
+        65% { opacity: 1; transform: translate(0, 0); }
+        69% { transform: translate(0, 0); } 71% { transform: translate(0, 40px); }
+        73% { transform: translate(0, 40px); } 75%, 94% { opacity: 1; transform: translate(0, 80px); }
+        97%, 100% { opacity: 0; transform: translate(0, 80px); }
+      }
+      .pouls { transform-box: fill-box; transform-origin: center; animation: pouls 1.5s infinite both; }
+      @keyframes pouls { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+      @media (prefers-reduced-motion: reduce) {
+        .s1, .s2, .pouls { animation: none; opacity: 0; }
+        .pouls { opacity: 1; }
+        .s3, .d2, .k1, .k2, .k3, .soin { animation: none; opacity: 1; }
+        .scan { animation: none; opacity: 1; transform: translate(0, 80px); }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="50">Comme un médecin</text>
+  <text class="petit" x="32" y="76">on écoute le symptôme, on lit le dossier, on examine organe par organe</text>
+
+  <!-- Patient -->
+  <rect class="boite" x="32" y="96" width="270" height="256" rx="14" stroke="#00eaff"/>
+  <text class="label" x="52" y="126" fill="#00eaff">Patient · l'appli</text>
+  <rect class="pouls" x="52" y="142" width="230" height="44" rx="10" fill="#ff1a1a" fill-opacity=".16" stroke="#ff1a1a" stroke-width="2"/>
+  <text class="label" x="70" y="171" fill="#ff1a1a">Erreur HTTP 500</text>
+  <text class="petit" x="52" y="212">« la page ne s'affiche pas »</text>
+  <g class="s1"><text class="label" x="52" y="282" fill="#eeff57">1. On écoute</text><text class="petit" x="52" y="306">pas encore de correction</text></g>
+  <g class="s2"><text class="label" x="52" y="282" fill="#859cff">2. On lit le dossier</text><text class="petit" x="52" y="306">les journaux de web</text></g>
+  <g class="s3"><text class="label" x="52" y="282" fill="#5affb6">3. On examine</text><text class="petit" x="52" y="306">couche par couche</text></g>
+
+  <!-- Dossier -->
+  <rect class="boite" x="322" y="96" width="280" height="256" rx="14" stroke="#859cff"/>
+  <text class="label" x="342" y="126" fill="#859cff">Dossier · logs web</text>
+  <text class="petit" x="342" y="162">GET / : 500</text>
+  <text class="petit" x="342" y="188">PDOException :</text>
+  <rect class="d2" x="334" y="200" width="256" height="56" rx="8" fill="#eeff57" fill-opacity=".14" stroke="#eeff57" stroke-width="2"/>
+  <text class="petit" x="342" y="222" style="fill:#eaf0eb">SQLSTATE[HY000] [2002]</text>
+  <text class="petit" x="342" y="246" style="fill:#eaf0eb">Connection refused</text>
+  <text class="petit" x="342" y="282">dans index.php</text>
+  <g class="d2"><text class="label" x="342" y="330" fill="#eeff57">→ la base ne répond pas</text></g>
+
+  <!-- Examen -->
+  <rect class="boite" x="622" y="96" width="314" height="256" rx="14" stroke="#eeff57"/>
+  <text class="label" x="642" y="126" fill="#eeff57">Examen</text>
+  <rect class="scan" x="634" y="140" width="290" height="34" rx="8" fill="none" stroke="#eeff57" stroke-width="2.5"/>
+  <text class="label" x="646" y="164" fill="#eaf0eb">image</text>
+  <text class="label" x="646" y="204" fill="#eaf0eb">réseau, DNS</text>
+  <text class="label" x="646" y="244" fill="#eaf0eb">disponibilité</text>
+  <text class="label" x="646" y="284" fill="#a0a4a0">authentification</text>
+  <text class="label" x="646" y="324" fill="#a0a4a0">code</text>
+  <text class="label k1" x="890" y="164" fill="#5affb6">✓</text>
+  <text class="label k2" x="890" y="204" fill="#5affb6">✓</text>
+  <text class="label k3" x="890" y="244" fill="#ff1a1a">✗</text>
+
+  <!-- Traitement ciblé -->
+  <g class="soin"><text class="petit" x="52" y="334" style="fill:#5affb6">→ traiter : attendre db healthy</text></g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Symptôme, journaux, puis couche par couche : on ne corrige <tspan fill="#5affb6" font-weight="700">qu'après avoir trouvé</tspan>.</text>
+</svg>

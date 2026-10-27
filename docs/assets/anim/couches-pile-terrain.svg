@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Terrain, bâtiments, appartements et syndic : les trois couches</title>
+  <desc id="d">Sur le terrain (le serveur physique) s'élèvent deux bâtiments, chacun avec ses fondations (des VM avec leur noyau). Chaque bâtiment est découpé en appartements qui partagent ses fondations (les conteneurs). Le syndic (l'orchestration) arrive : un appartement db tombe en panne et il le remplace, puis il ouvre un appartement web dans une place libre.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .bat { transform-box: fill-box; transform-origin: center bottom; animation: bat 9s infinite both; }
+      @keyframes bat { 0% { opacity: 0; transform: scaleY(0); } 3% { opacity: 1; } 12%, 95% { opacity: 1; transform: scaleY(1); } 99%, 100% { opacity: 0; transform: scaleY(1); } }
+      .panne { animation: panne 9s infinite both; }
+      @keyframes panne { 0%, 64% { opacity: 0; } 66%, 72% { opacity: 1; } 74%, 100% { opacity: 0; } }
+      .neuf1 { animation: neuf1 9s infinite both; } .neuf2 { animation: neuf2 9s infinite both; }
+      @keyframes neuf1 { 0%, 72% { opacity: 0; transform: scale(.5); } 75% { opacity: 1; transform: scale(1.12); } 77%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      @keyframes neuf2 { 0%, 76% { opacity: 0; transform: scale(.5); } 79% { opacity: 1; transform: scale(1.12); } 81%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .bat { animation: none; opacity: 1; transform: none; }
+        .panne { animation: none; opacity: 0; }
+        .neuf1, .neuf2 { animation: none; opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Terrain, bâtiments, appartements, syndic</text>
+  <text class="petit" x="32" y="80">virtualisation, conteneurisation, orchestration : trois couches empilées</text>
+
+  <g class="pa"><text class="l18" x="40" y="124" fill="#859cff">1. Virtualisation : des bâtiments, chacun ses fondations</text></g>
+  <g class="pb"><text class="l18" x="40" y="124" fill="#00eaff">2. Conteneurisation : des appartements sur les mêmes fondations</text></g>
+  <g class="pc"><text class="l18" x="40" y="124" fill="#ff84ef">3. Orchestration : le syndic remplace et ouvre des appartements</text></g>
+  <rect x="40" y="320" width="720" height="32" rx="4" fill="#1f9e91"/>
+  <text class="l18" x="60" y="342" fill="#0a0006" style="font-size:17px">Terrain = serveur physique</text>
+  <g class="bat"><rect x="80" y="150" width="280" height="170" rx="6" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="l18" x="96" y="177" fill="#eaf0eb">VM 1</text><text class="petit" x="160" y="177">son propre noyau</text><rect x="82" y="300" width="276" height="18" fill="#859cff"/><text class="petit" x="96" y="314" fill="#0a0006" style="fill:#0a0006;font-size:15px">fondations = noyau</text></g><g class="popb pop"><rect x="96" y="188" width="116" height="50" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18" x="154" y="220" fill="#00eaff" text-anchor="middle">web</text><rect x="228" y="188" width="116" height="50" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18" x="286" y="220" fill="#00eaff" text-anchor="middle">db</text><rect x="96" y="244" width="116" height="50" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18" x="154" y="276" fill="#00eaff" text-anchor="middle">api</text><rect x="228" y="244" width="116" height="50" rx="8" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 5"/><text class="petit" x="286" y="275" text-anchor="middle">libre</text></g>
+  <g class="bat"><rect x="440" y="150" width="280" height="170" rx="6" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/><text class="l18" x="456" y="177" fill="#eaf0eb">VM 2</text><text class="petit" x="520" y="177">son propre noyau</text><rect x="442" y="300" width="276" height="18" fill="#859cff"/><text class="petit" x="456" y="314" fill="#0a0006" style="fill:#0a0006;font-size:15px">fondations = noyau</text></g><g class="popb pop"><rect x="456" y="188" width="116" height="50" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18" x="514" y="220" fill="#00eaff" text-anchor="middle">web</text><rect x="588" y="188" width="116" height="50" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/><text class="l18" x="646" y="220" fill="#00eaff" text-anchor="middle">cache</text><rect x="456" y="244" width="116" height="50" rx="8" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 5"/><text class="petit" x="514" y="275" text-anchor="middle">libre</text><rect x="588" y="244" width="116" height="50" rx="8" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 5"/><text class="petit" x="646" y="275" text-anchor="middle">libre</text></g>
+  <g class="panne"><rect x="228" y="188" width="116" height="50" rx="8" fill="#ff1a1a"/><text class="l18" x="286" y="220" fill="#0a0006" text-anchor="middle">en panne</text></g>
+  <g class="neuf1 pop"><rect x="228" y="188" width="116" height="50" rx="8" fill="#0a0006" stroke="#ff84ef" stroke-width="3"/><text class="l18" x="286" y="220" fill="#ff84ef" text-anchor="middle">db</text></g>
+  <g class="neuf2 pop"><rect x="588" y="244" width="116" height="50" rx="8" fill="#0a0006" stroke="#ff84ef" stroke-width="3"/><text class="l18" x="646" y="276" fill="#ff84ef" text-anchor="middle">web</text></g>
+  <g class="popc pop"><rect x="782" y="150" width="150" height="170" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/><text class="label" x="800" y="180" fill="#ff84ef">Syndic</text><text class="petit" x="800" y="204">orchestration</text><text class="petit" x="800" y="244" fill="#eaf0eb" style="fill:#eaf0eb">attribue,</text><text class="petit" x="800" y="268" fill="#eaf0eb" style="fill:#eaf0eb">remplace,</text><text class="petit" x="800" y="292" fill="#eaf0eb" style="fill:#eaf0eb">ouvre</text></g>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le syndic gère les appartements, <tspan fill="#ff84ef" font-weight="700">pas les bâtiments</tspan> : ça, c'est la couche du dessous.</text>
+</svg>

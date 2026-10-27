@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+<title id="t">Le cache est réutilisé jusqu'à l'étape modifiée, puis tout est refait</title>
+<desc id="d">Deuxième build d'un Dockerfile qui copie le code avant d'installer les dépendances. Les étapes 1 et 2 ressortent du frigo, marquées CACHED. app.py a changé : l'étape 3, COPY . ., est refaite. Puis les étapes 4 et 5 sont refaites aussi, bien qu'inchangées, car leur point de départ a changé.</desc>
+<defs>
+<linearGradient id="ynov" x1="0" x2="1">
+<stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+<stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+<stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+<stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+</linearGradient>
+<marker id="fr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#ff84ef"/></marker>
+<style>
+text{font-family:Bahnschrift,"Barlow Semi Condensed","Segoe UI",Arial,sans-serif}
+.titre{font-size:26px;font-weight:700;fill:#fff}
+.label{font-size:19px;font-weight:700}
+.txt{font-size:17px;fill:#eaf0eb}
+.petit{font-size:15px;fill:#a0a4a0}
+.etape{font-size:17px;fill:#eaf0eb}
+.legende{font-size:19px;fill:#eaf0eb}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3,.e1,.e2,.e3,.h2,.h3{animation-duration:8s;animation-iteration-count:infinite;animation-fill-mode:both}
+.a1{animation-name:a1}.a2{animation-name:a2}.a3{animation-name:a3}
+.f1{animation-name:f1}.f2{animation-name:f2}.f3{animation-name:f3}
+.p2,.p3{transform-box:fill-box;transform-origin:center}
+.p2{animation-name:p2}.p3{animation-name:p3}
+.e1{animation-name:e1}.e2{animation-name:e2}.e3{animation-name:e3}
+.h2{animation-name:h2}.h3{animation-name:h3}
+@keyframes a1{0%{opacity:0;transform:translateY(-24px)}6%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a2{0%,35%{opacity:0;transform:translateY(-24px)}41%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes a3{0%,65%{opacity:0;transform:translateY(-24px)}71%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes f1{0%{opacity:0}6%,95%{opacity:1}100%{opacity:0}}
+@keyframes f2{0%,35%{opacity:0}41%,95%{opacity:1}100%{opacity:0}}
+@keyframes f3{0%,65%{opacity:0}71%,95%{opacity:1}100%{opacity:0}}
+@keyframes p2{0%,35%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.12)}44%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes p3{0%,65%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.12)}74%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes e1{0%{opacity:0}4%,31%{opacity:1}35%,100%{opacity:0}}
+@keyframes e2{0%,35%{opacity:0}39%,61%{opacity:1}65%,100%{opacity:0}}
+@keyframes e3{0%,65%{opacity:0}69%,95%{opacity:1}100%{opacity:0}}
+@keyframes h2{0%,34%{opacity:1}39%,100%{opacity:0}}
+@keyframes h3{0%,64%{opacity:1}69%,100%{opacity:0}}
+.rm{display:none}
+
+@media (prefers-reduced-motion:reduce){
+*{animation:none!important}
+.a1,.a2,.a3,.f1,.f2,.f3,.p2,.p3{opacity:1;transform:none}
+.e1,.e2,.e3,.h2,.h3{opacity:0}
+.rm{display:inline}
+}
+</style>
+</defs>
+<rect width="960" height="420" rx="18" fill="#0a0006"/>
+<rect width="960" height="6" fill="url(#ynov)"/>
+<text class="titre" x="32" y="52">Le cache casse à partir de l'étape modifiée</text>
+<text class="etape e1" x="32" y="84"><tspan fill="#eeff57" font-weight="700">1.</tspan> Même étape, même point de départ : la préparation ressort du frigo</text>
+<text class="etape e2" x="32" y="84"><tspan fill="#eeff57" font-weight="700">2.</tspan> Une étape a changé (app.py modifié) : elle est refaite</text>
+<text class="etape e3" x="32" y="84"><tspan fill="#eeff57" font-weight="700">3.</tspan> Toutes les suivantes sont refaites : leur point de départ a changé</text>
+<text class="etape rm" x="32" y="84">Étapes 1 et 2 en cache ; l'étape 3 a changé, donc 3, 4 et 5 sont refaites</text>
+<text class="petit" x="40" y="109">Dockerfile mal ordonné, 2e build après une retouche de app.py</text><text class="petit" x="604" y="109">frigo (cache)</text>
+<rect x="32" y="118" width="898" height="40" rx="9" fill="#1d1d1d"/>
+<circle cx="56" cy="138" r="13" fill="#0a0006" stroke="#a0a4a0" stroke-width="1.5"/>
+<text x="56" y="144" text-anchor="middle" font-size="15" font-weight="700" fill="#eaf0eb">1</text>
+<text class="txt" x="82" y="144">FROM python:3.12-slim</text>
+<rect x="602" y="130" width="20" height="22" rx="4" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="599" y="125" width="26" height="6" rx="2" fill="#a0a4a0"/>
+
+<text class="a1" style="animation-delay:0s" x="640" y="145" font-size="17" font-weight="700" fill="#5affb6">ressortie : CACHED</text>
+<rect x="32" y="164" width="898" height="40" rx="9" fill="#1d1d1d"/>
+<circle cx="56" cy="184" r="13" fill="#0a0006" stroke="#a0a4a0" stroke-width="1.5"/>
+<text x="56" y="190" text-anchor="middle" font-size="15" font-weight="700" fill="#eaf0eb">2</text>
+<text class="txt" x="82" y="190">WORKDIR /app</text>
+<rect x="602" y="176" width="20" height="22" rx="4" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="599" y="171" width="26" height="6" rx="2" fill="#a0a4a0"/>
+
+<text class="a1" style="animation-delay:.3s" x="640" y="191" font-size="17" font-weight="700" fill="#5affb6">ressortie : CACHED</text>
+<rect x="32" y="210" width="898" height="40" rx="9" fill="#1d1d1d"/>
+<circle cx="56" cy="230" r="13" fill="#0a0006" stroke="#a0a4a0" stroke-width="1.5"/>
+<text x="56" y="236" text-anchor="middle" font-size="15" font-weight="700" fill="#eaf0eb">3</text>
+<text class="txt" x="82" y="236">COPY . .</text>
+<rect x="602" y="222" width="20" height="22" rx="4" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="599" y="217" width="26" height="6" rx="2" fill="#a0a4a0"/>
+<path class="f2" d="M601 220 l22 22 M623 220 l-22 22" stroke="#ff1a1a" stroke-width="2.5" style="animation-delay:0s"/><text class="h2" x="640" y="237" font-size="17" fill="#a0a4a0">…</text>
+<text class="p2" style="animation-delay:0s" x="640" y="237" font-size="17" font-weight="700" fill="#eeff57">ingrédient changé : refaite</text>
+<rect x="32" y="256" width="898" height="40" rx="9" fill="#1d1d1d"/>
+<circle cx="56" cy="276" r="13" fill="#0a0006" stroke="#a0a4a0" stroke-width="1.5"/>
+<text x="56" y="282" text-anchor="middle" font-size="15" font-weight="700" fill="#eaf0eb">4</text>
+<text class="txt" x="82" y="282">RUN pip install -r requirements.txt</text>
+<rect x="602" y="268" width="20" height="22" rx="4" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="599" y="263" width="26" height="6" rx="2" fill="#a0a4a0"/>
+<path class="f3" d="M601 266 l22 22 M623 266 l-22 22" stroke="#ff1a1a" stroke-width="2.5" style="animation-delay:0s"/><text class="h3" x="640" y="283" font-size="17" fill="#a0a4a0">…</text>
+<text class="p3" style="animation-delay:0s" x="640" y="283" font-size="17" font-weight="700" fill="#ff84ef">refaite aussi : départ changé</text>
+<rect x="32" y="302" width="898" height="40" rx="9" fill="#1d1d1d"/>
+<circle cx="56" cy="322" r="13" fill="#0a0006" stroke="#a0a4a0" stroke-width="1.5"/>
+<text x="56" y="328" text-anchor="middle" font-size="15" font-weight="700" fill="#eaf0eb">5</text>
+<text class="txt" x="82" y="328">CMD ["python", "app.py"]</text>
+<rect x="602" y="314" width="20" height="22" rx="4" fill="none" stroke="#a0a4a0" stroke-width="2"/><rect x="599" y="309" width="26" height="6" rx="2" fill="#a0a4a0"/>
+<path class="f3" d="M601 312 l22 22 M623 312 l-22 22" stroke="#ff1a1a" stroke-width="2.5" style="animation-delay:.3s"/><text class="h3" x="640" y="329" font-size="17" fill="#a0a4a0">…</text>
+<text class="p3" style="animation-delay:.3s" x="640" y="329" font-size="17" font-weight="700" fill="#ff84ef">refaite aussi : départ changé</text>
+<g class="p2"><rect x="400" y="211" width="180" height="26" rx="7" fill="#0a0006" stroke="#ff1a1a" stroke-width="2"/><text x="490.0" y="229.4" text-anchor="middle" font-size="15" font-weight="700" fill="#ff1a1a">app.py a changé</text></g>
+<path class="f3" d="M576 262 V334" stroke="#ff84ef" stroke-width="3" marker-end="url(#fr)"/>
+
+<rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+<text class="legende" x="32" y="400">Les dépendances avant le code : sinon, chaque retouche de app.py relance pip install.</text>
+</svg>

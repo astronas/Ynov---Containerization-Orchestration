@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le trousseau de badges : kubeconfig, contextes et current-context</title>
+  <desc id="d">Le fichier ~/.kube/config contient deux badges, minikube et prod. Le badge minikube est en main : la commande kubectl get pods ouvre la porte du cluster minikube. On change de badge avec kubectl config use-context prod : le badge prod passe en main. La même commande kubectl get pods ouvre alors la porte du cluster prod.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .code { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 16px; fill: #eeff57; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .me { fill: #5affb6; } .ro { fill: #ff84ef; }
+      /* 9 s : badge minikube (0-3 s), changement de badge (3-6 s), badge prod (6-9 s). Base = état final. */
+      .e1, .e2, .e13x, .r1, .r2, .p1 { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; } .e13 { animation: e13 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e13 { 0%, 30% { opacity: 1; } 33%, 62% { opacity: 0; } 65%, 100% { opacity: 1; } }
+      .bm { animation: bm 9s infinite; }
+      @keyframes bm { 0%, 33% { transform: translate(300px, 6px); } 41%, 97% { transform: translate(0, 0); } 100% { transform: translate(300px, 6px); } }
+      .bp { transform: translate(300px, -80px); animation: bp 9s infinite; }
+      @keyframes bp { 0%, 41% { transform: translate(0, 0); } 50%, 97% { transform: translate(300px, -80px); } 100% { transform: translate(0, 0); } }
+      .r1 { animation: r1 9s infinite; }
+      @keyframes r1 { 0%, 6% { opacity: 0; transform: translate(0, 0); } 8% { opacity: 1; } 17% { opacity: 1; transform: translate(276px, -53px); } 19%, 100% { opacity: 0; transform: translate(276px, -53px); } }
+      .r2 { animation: r2 9s infinite; }
+      @keyframes r2 { 0%, 62% { opacity: 0; transform: translate(0, 0); } 64% { opacity: 1; } 73% { opacity: 1; transform: translate(276px, 83px); } 75%, 100% { opacity: 0; transform: translate(276px, 83px); } }
+      .p1 { animation: p1 9s infinite; } @keyframes p1 { 0%, 16% { opacity: 0; } 18%, 31% { opacity: 1; } 33%, 100% { opacity: 0; } }
+      .p2 { animation: p2 9s infinite; } @keyframes p2 { 0%, 73% { opacity: 0; } 75%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le trousseau de badges</text>
+  <text class="petit" x="32" y="80">contexte = badge (un cluster + ton identité), current-context = le badge en main</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#5affb6">1 · Badge minikube en main</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#eeff57">2 · On change de badge</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#ff84ef">3 · Même commande, autre cluster</text>
+
+  <!-- Trousseau -->
+  <rect class="boite" x="32" y="100" width="280" height="246" rx="14" stroke="#00eaff"/>
+  <text class="label" x="52" y="132" fill="#00eaff">~/.kube/config</text>
+  <text class="petit" x="52" y="156">le trousseau</text>
+  <g fill="none" stroke="#a0a4a0" stroke-dasharray="5 5" stroke-width="1.5"><rect x="52" y="176" width="240" height="62" rx="10"/><rect x="52" y="262" width="240" height="62" rx="10"/></g>
+
+  <!-- Main : current-context -->
+  <text class="petit" x="352" y="170">current-context (en main)</text>
+  <rect x="352" y="182" width="240" height="62" rx="10" fill="none" stroke="#eaf0eb" stroke-width="2" stroke-dasharray="7 5"/>
+  <text class="code e13" x="352" y="282">$ kubectl get pods</text>
+  <text class="code e2" x="352" y="282">$ kubectl config</text><text class="code e2" x="380" y="304">use-context prod</text>
+
+  <!-- Badges -->
+  <g class="bm"><rect x="52" y="176" width="240" height="62" rx="10" fill="#12301f" stroke="#5affb6" stroke-width="2.5"/><circle cx="76" cy="207" r="9" fill="#5affb6"/><text class="label me" x="96" y="204">minikube</text><text class="petit" x="96" y="226">cluster minikube + toi</text></g>
+  <g class="bp"><rect x="52" y="262" width="240" height="62" rx="10" fill="#301229" stroke="#ff84ef" stroke-width="2.5"/><circle cx="76" cy="293" r="9" fill="#ff84ef"/><text class="label ro" x="96" y="290">prod</text><text class="petit" x="96" y="312">cluster prod + toi</text></g>
+
+  <!-- Bâtiments -->
+  <rect class="boite" x="640" y="100" width="288" height="110" rx="14" stroke="#5affb6"/>
+  <text class="label me" x="660" y="132">Cluster minikube</text>
+  <text class="petit" x="660" y="156">ton labo</text>
+  <rect x="880" y="132" width="30" height="58" rx="4" fill="#3a3a3a"/>
+  <rect class="p1" x="880" y="132" width="30" height="58" rx="4" fill="#5affb6"/>
+  <text class="petit me p1" x="660" y="188">porte ouverte</text>
+  <rect class="boite" x="640" y="236" width="288" height="110" rx="14" stroke="#ff84ef"/>
+  <text class="label ro" x="660" y="268">Cluster prod</text>
+  <text class="petit" x="660" y="292">la production</text>
+  <rect x="880" y="268" width="30" height="58" rx="4" fill="#3a3a3a"/>
+  <rect class="p2" x="880" y="268" width="30" height="58" rx="4" fill="#ff84ef"/>
+  <text class="petit ro p2" x="660" y="324">porte ouverte, attention</text>
+
+  <!-- Requêtes -->
+  <circle class="r1" cx="604" cy="213" r="8" fill="#eeff57"/>
+  <circle class="r2" cx="604" cy="213" r="8" fill="#eeff57"/>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Même commande, autre badge, autre cluster : <tspan fill="#eeff57" font-weight="700">vérifie le contexte</tspan> avant d'agir.</text>
+</svg>

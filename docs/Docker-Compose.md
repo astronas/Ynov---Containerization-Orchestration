@@ -18,6 +18,8 @@
 
     Compose, c'est le **plan de salle** remis au traiteur avant une réception : tables, chaises, buffet, décor. Le traiteur arrive, compare le plan avec la salle, installe ce qui manque, refait ce qui a changé et ne touche pas au reste. Tu ne donnes plus dix ordres à la suite : tu tiens le plan à jour. Limite de l'image : le traiteur ne s'occupe que d'**une seule salle**. Pour répartir la fête sur plusieurs bâtiments, il faut un orchestrateur.
 
+    ![Schéma animé : Compose compare le plan et la salle, recrée web, crée le réseau manquant et ne touche pas au reste](assets/anim/compose-plan.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -185,6 +187,8 @@ Trois niveaux, trois responsabilités : l'**image** (ce que l'application contie
 !!! quote "En clair"
 
     `up` : « mets la salle conforme au plan ». `down` : « range tout ». Entre les deux, `ps` et `logs` servent à regarder, sans rien changer.
+
+    ![Schéma animé : up installe la salle, ps et logs regardent sans rien changer, down range tout sauf le volume](assets/anim/compose-cycle.svg){ .anim }
 
 | Commande | Effet |
 |---|---|

@@ -18,6 +18,8 @@
 
     Pense aux **calques transparents** d'un logiciel de dessin. Chaque calque ne contient que ce qu'il ajoute ; empilés, ils forment une seule image. Le conteneur reçoit un calque vierge posé tout en haut, et il ne dessine **que sur celui-là** : les calques du dessous restent intacts. Limite de l'image : un calque peut aussi **cacher** un fichier du dessous, mais ce fichier reste présent dans son calque d'origine.
 
+    ![Schéma animé : trois calques s'empilent, le conteneur écrit sur un calque vierge posé dessus, un fichier supprimé n'est que caché](assets/anim/couches-calques.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     Une **couche**, c'est la liste de ce qui a changé dans les fichiers à une étape de la fabrication : « ajouté ceci, modifié cela, supprimé ça ». L'image est la pile de toutes ces étapes.
+
+    ![Schéma animé : chaque étape ne garde que ses changements, les couches s'empilent et la version du haut gagne](assets/anim/couches-diff.svg){ .anim }
 
 Au démarrage d'un conteneur, Docker superpose les couches avec **OverlayFS** (le mécanisme de Linux qui empile des dossiers). Le conteneur voit une seule racine `/` ; si un même fichier existe dans deux couches, c'est celle du haut qui gagne.
 
@@ -102,6 +106,8 @@ Les instructions du Dockerfile (la recette de l'image, voir [Écrire un Dockerfi
 !!! quote "En clair"
 
     Le **tag**, c'est l'étiquette collée sur un carton : on peut la décoller et la recoller sur un autre carton. Le **digest**, c'est l'empreinte digitale de ce qu'il y a dedans : si le contenu change d'un seul octet, l'empreinte change.
+
+    ![Schéma animé : l'étiquette web:1.0 passe d'un carton à l'autre, chaque empreinte reste attachée à son contenu](assets/anim/couches-tag-digest.svg){ .anim }
 
 Le nom complet d'une image se lit en trois morceaux :
 

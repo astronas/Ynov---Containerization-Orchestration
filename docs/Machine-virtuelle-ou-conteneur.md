@@ -18,6 +18,8 @@
 
     Une **machine virtuelle**, c'est une **maison individuelle** : ses murs, sa chaudière, ses compteurs. Très indépendante, mais longue à construire et chère à chauffer. Un **conteneur**, c'est un **appartement** dans un immeuble : chacun chez soi, mais la chaudière commune (le **noyau**) est partagée, et on emménage en quelques secondes. Limite de l'image : si la chaudière commune tombe en panne, tout l'immeuble a froid. C'est le prix du partage.
 
+    ![Schéma animé : les maisons se construisent lentement avec leur chaudière, l'immeuble se remplit vite et a froid quand la chaudière commune lâche](assets/anim/vm-maison.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -79,6 +81,8 @@ Un conteneur **emballe** l'application avec tout ce dont elle a besoin, lui donn
 
     Le **noyau** est le chef d'atelier : les programmes ne touchent jamais eux-mêmes aux machines (processeur, mémoire, disque), ils lui **demandent**. Ces demandes s'appellent des appels système. Les programmes et leurs outils forment l'**espace utilisateur**. Une image apporte les ouvriers et leurs outils (ceux de Debian, d'Alpine…), jamais le chef d'atelier : c'est toujours celui de l'hôte.
 
+    ![Schéma animé : les images Debian et Alpine apportent leurs outils, et leurs programmes demandent tout au même noyau, celui de l'hôte](assets/anim/vm-atelier.svg){ .anim }
+
 | Notion | En une ligne |
 |---|---|
 | **Processus** | un programme en cours d'exécution, avec son numéro (PID), sa mémoire, ses fichiers et connexions ouverts |
@@ -110,6 +114,8 @@ Une **image** contient les fichiers d'un espace utilisateur, **sans noyau**, et 
 !!! quote "En clair"
 
     Un hyperviseur fait croire à chaque VM qu'elle a **son propre ordinateur** : processeur, mémoire, disque, carte réseau. Ce matériel est simulé et, en coulisses, partagé entre toutes les VM.
+
+    ![Schéma animé : chaque VM croit avoir son ordinateur, puis l'hyperviseur et l'unique matériel partagé apparaissent](assets/anim/vm-hyperviseur.svg){ .anim }
 
 Un **hyperviseur** répartit le matériel entre des **machines virtuelles** ; chaque VM a son système, sa mémoire, son stockage, son réseau.
 

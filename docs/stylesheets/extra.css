@@ -338,3 +338,36 @@ html { scroll-behavior: smooth; }
 
 /* Schémas animés de vulgarisation (SVG) */
 .md-typeset img.anim { display: block; width: 100%; border-radius: 14px; margin: 0.8rem 0 0.2rem; box-shadow: 0 8px 22px rgba(10, 0, 6, 0.25); }
+
+/* =====================================================================
+   Respiration : plus d'espace entre les blocs, pour une lecture aérée
+   ===================================================================== */
+.md-typeset { line-height: 1.75; }
+.md-typeset p { margin: 0 0 1.15em; }
+.md-typeset h1 { margin-bottom: 0.9em; }
+.md-typeset h2 { margin: 3.2em 0 1.1em; padding-bottom: 0.35em; }
+.md-typeset h3 { margin: 2.2em 0 0.9em; }
+.md-typeset .lead { margin: 0.6rem 0 2.4rem; }
+.md-typeset img.hero { margin: 1rem 0 3rem; }
+.md-typeset .admonition, .md-typeset details {
+  margin: 2em 0;
+  padding-bottom: 0.4em;
+}
+.md-typeset .admonition > :not(.admonition-title), .md-typeset details > :not(summary) {
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+}
+.md-typeset .admonition-title, .md-typeset summary { margin-bottom: 0.6em; }
+.md-typeset .admonition img, .md-typeset details img { margin: 1.1rem 0 1.3rem; }
+.md-typeset img.anim { margin: 1.4rem 0 0.8rem; }
+.md-typeset .grid.cards { margin: 1.8em 0 2.2em; gap: 1rem; }
+.md-typeset .grid.cards > ul > li, .md-typeset .grid > .card { padding: 1.2rem 1.3rem; }
+.md-typeset table:not([class]) { margin: 1.8em 0 2.2em; }
+.md-typeset table:not([class]) td, .md-typeset table:not([class]) th { padding: 0.85em 1.1em; }
+.md-typeset .highlight, .md-typeset pre { margin: 1.4em 0 1.6em; }
+.md-typeset ul, .md-typeset ol { margin-bottom: 1.3em; }
+.md-typeset li { margin-bottom: 0.45em; }
+.md-typeset .mermaid { margin: 2em 0; }
+.md-typeset hr { margin: 3em 0; }
+.md-typeset .admonition, .md-typeset details { font-size: 0.76rem; line-height: 1.7; }
+.md-typeset .admonition-title, .md-typeset summary { font-size: 0.8rem; }

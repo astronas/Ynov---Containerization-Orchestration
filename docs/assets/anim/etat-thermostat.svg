@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le thermostat de Kubernetes : comparer le voulu au mesuré, et corriger l'écart</title>
+  <desc id="d">En haut, un thermostat réglé sur 21 °C ; en bas, un Deployment qui veut 3 pods. D'abord tout est à la consigne. Puis la température tombe à 18 °C et un pod disparaît : l'écart apparaît, la chaudière s'allume et le contrôleur crée un pod. Enfin la température remonte à 21 °C et un nouveau pod est là : l'écart est comblé, la chaudière s'éteint, le contrôleur n'a plus rien à faire.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .boite { fill: #1d1d1d; stroke-width: 2.5; }
+      .num { font-size: 24px; font-weight: 700; fill: #eeff57; }
+      .me { fill: #5affb6; } .rg { fill: #ff1a1a; } .ja { fill: #eeff57; } .bl { fill: #eaf0eb; }
+      /* 9 s : à la consigne (0-3 s), écart et action (3-6 s), écart comblé (6-9 s). Base = état final. */
+      .e1, .e2, .part { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; } .e13 { animation: e13 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e13 { 0%, 30% { opacity: 1; } 33%, 62% { opacity: 0; } 65%, 100% { opacity: 1; } }
+      .jauge { transform-box: fill-box; transform-origin: left; animation: jauge 9s infinite; }
+      @keyframes jauge { 0%, 30% { transform: scaleX(1); } 37%, 62% { transform: scaleX(.86); } 70%, 100% { transform: scaleX(1); } }
+      .flamme { transform-box: fill-box; transform-origin: bottom; animation: flamme .5s infinite alternate; }
+      @keyframes flamme { from { transform: scaleY(.85); } to { transform: scaleY(1.15); } }
+      .part { animation: part 9s infinite; }
+      @keyframes part { 0%, 32% { opacity: 1; transform: translateY(0); } 37%, 99% { opacity: 0; transform: translateY(16px); } 100% { opacity: 1; transform: translateY(0); } }
+      .recree { transform-box: fill-box; transform-origin: center; animation: recree 9s infinite; }
+      @keyframes recree { 0%, 60% { opacity: 0; transform: scale(.5); } 64% { opacity: 1; transform: scale(1.12); } 67%, 97% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+      .sig { opacity: 0; animation: sig 1.5s linear infinite; }
+      @keyframes sig { 0% { opacity: 0; transform: translateX(0); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(104px); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le thermostat de Kubernetes</text>
+  <text class="petit" x="32" y="80">limite de l'image : le thermostat règle une valeur, Kubernetes crée ou supprime des objets</text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#5affb6">1 · Mesuré = voulu</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#ff1a1a">2 · Écart : on agit</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#5affb6">3 · Écart comblé</text>
+
+  <!-- Ligne 1 : le thermostat -->
+  <rect class="boite" x="32" y="100" width="210" height="110" rx="14" stroke="#eeff57"/>
+  <text class="label ja" x="52" y="132">Thermostat</text>
+  <text class="petit" x="52" y="156">consigne (voulu)</text>
+  <text class="num" x="52" y="194">21 °C</text>
+  <text class="petit" x="280" y="132">température mesurée</text>
+  <rect x="280" y="146" width="200" height="20" rx="10" fill="#1d1d1d"/>
+  <rect class="jauge" x="280" y="146" width="200" height="20" rx="10" fill="#00eaff"/>
+  <path d="M480 139 v34" stroke="#eeff57" stroke-width="3"/>
+  <text class="label bl e13" x="280" y="196">21 °C</text>
+  <text class="label e2" x="280" y="196" fill="#00eaff">18 °C</text>
+  <text class="petit" x="510" y="132">écart</text>
+  <text class="label me e13" x="510" y="162">0</text>
+  <text class="label rg e2" x="510" y="162">3 °C</text>
+  <rect class="boite" x="700" y="100" width="228" height="110" rx="14" stroke="#ff84ef"/>
+  <text class="label" x="720" y="132" fill="#ff84ef">Chaudière</text>
+  <text class="petit e13" x="720" y="158">éteinte</text>
+  <text class="label ja e2" x="720" y="160">allumée</text>
+  <g class="e2">
+    <path class="flamme" d="M880 196 C864 196 862 180 871 168 C873 177 880 175 878 158 C892 168 896 182 892 189 C890 195 885 196 880 196Z" fill="#ff1a1a"/>
+    <path class="flamme" d="M880 196 C873 196 871 186 877 179 C879 185 883 183 882 175 C889 182 890 189 887 193 C886 195 883 196 880 196Z" fill="#eeff57"/>
+  </g>
+
+  <!-- Ligne 2 : Kubernetes -->
+  <rect class="boite" x="32" y="236" width="210" height="110" rx="14" stroke="#00eaff"/>
+  <text class="label" x="52" y="268" fill="#00eaff">Deployment</text>
+  <text class="petit" x="52" y="292">spec (voulu)</text>
+  <text class="num" x="52" y="330">replicas: 3</text>
+  <text class="petit" x="280" y="268">status (pods mesurés)</text>
+  <g fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5">
+    <rect x="280" y="282" width="56" height="52" rx="8"/><rect x="346" y="282" width="56" height="52" rx="8"/>
+  </g>
+  <rect x="412" y="282" width="56" height="52" rx="8" fill="none" stroke="#ff1a1a" stroke-width="2" stroke-dasharray="5 5" class="e2"/>
+  <g class="part"><rect x="412" y="282" width="56" height="52" rx="8" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="petit bl" x="440" y="313" text-anchor="middle">pod</text></g>
+  <g class="recree"><rect x="412" y="282" width="56" height="52" rx="8" fill="#12301f" stroke="#5affb6" stroke-width="3"/><text class="petit me" x="440" y="313" text-anchor="middle">neuf</text></g>
+  <g class="petit bl" text-anchor="middle"><text x="308" y="313">pod</text><text x="374" y="313">pod</text></g>
+  <text class="petit" x="510" y="268">écart</text>
+  <text class="label me e13" x="510" y="298">0</text>
+  <text class="label rg e2" x="510" y="298">1 pod</text>
+  <rect class="boite" x="700" y="236" width="228" height="110" rx="14" stroke="#859cff"/>
+  <text class="label" x="720" y="268" fill="#859cff">Contrôleur</text>
+  <text class="petit e13" x="720" y="294">rien à faire</text>
+  <text class="label ja e2" x="720" y="296">crée 1 pod</text>
+  <text class="petit e2" x="720" y="322">il ne répare pas : il recrée</text>
+
+  <!-- La boucle tourne en permanence : un signal part sans cesse de l'écart vers l'actionneur -->
+  <g stroke="#a0a4a0" stroke-width="2" stroke-dasharray="4 5"><path d="M580 156 h104"/><path d="M580 292 h104"/></g>
+  <g fill="#859cff"><circle class="sig" cx="580" cy="156" r="6"/><circle class="sig" cx="580" cy="292" r="6"/></g>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Comparer <tspan fill="#eeff57" font-weight="700">le voulu</tspan> au <tspan fill="#00eaff" font-weight="700">mesuré</tspan>, agir sur l'écart : en boucle, sans fin.</text>
+</svg>

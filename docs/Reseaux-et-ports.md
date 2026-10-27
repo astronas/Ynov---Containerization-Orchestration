@@ -18,6 +18,8 @@
 
     Imagine un **immeuble de bureaux**. Chaque bureau (un conteneur) a son téléphone interne. Un **standard** connaît le nom de chacun : tu demandes « Martin », il te passe le bon poste, même si Martin a changé de bureau. De l'extérieur, on ne joint que les numéros que l'accueil a **rendus publics**. La limite de l'image : ici, chaque immeuble a son propre standard ; deux conteneurs qui ne sont pas dans le même réseau ne se connaissent pas du tout.
 
+    ![Schéma animé : une requête entre par la porte publiée, web trouve db par le standard, un autre réseau ne connaît pas db](assets/anim/reseau-immeuble.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -60,6 +62,8 @@ Une application web et sa base produisent trois flux de nature différente : **e
 
     Le DNS interne, c'est le **standard** de l'immeuble : il traduit un nom (`db`) en adresse du moment (`172.18.0.2`). Il n'existe que dans les réseaux que tu crées toi-même.
 
+    ![Schéma animé : db est recréé et change d'adresse, web le joint toujours par son nom](assets/anim/reseau-standard.svg){ .anim }
+
 Sur un réseau **créé** (`docker network create`, ou celui que Compose crée pour toi), Docker fournit un résolveur, c'est-à-dire un petit service qui répond aux questions DNS, à l'adresse `127.0.0.11`. Il traduit le nom d'un conteneur, d'un alias ou d'un service en son IP actuelle. Sa portée est **le réseau** : ni ton poste, ni le DNS de l'entreprise ne connaissent `db`.
 
 Le réseau par défaut s'appelle `bridge` (un *bridge*, ou pont, est un commutateur logiciel : une multiprise réseau à l'intérieur de l'hôte).
@@ -92,6 +96,8 @@ L'IP est attribuée à la création par le gestionnaire d'adresses du réseau (l
 !!! quote "En clair"
 
     Publier un port, c'est percer une **porte dans la façade** de l'hôte et la relier à la porte du conteneur. Sans cette porte, le conteneur est joignable par ses voisins de réseau, pas par toi.
+
+    ![Schéma animé : sans -p la requête bute sur le mur, -p 127.0.0.1:8080:80 perce une porte vers le port 80](assets/anim/reseau-porte.svg){ .anim }
 
 ```bash
 docker run -d --name site -p 127.0.0.1:8080:80 nginx:stable  # (1)!
@@ -135,6 +141,8 @@ docker run -d --name site -p 127.0.0.1:8080:80 nginx:stable  # (1)!
 !!! quote "En clair"
 
     Deux couloirs : un couloir **public** où arrivent les visiteurs, un couloir **de service** réservé au personnel. Le serveur web a une porte sur chaque couloir ; la base n'a qu'une porte, côté service.
+
+    ![Schéma animé : le visiteur atteint web par le couloir public, web joint db par le couloir de service, db reste inaccessible côté public](assets/anim/reseau-couloirs.svg){ .anim }
 
 Le serveur web doit être joignable par l'utilisateur ; la base, uniquement par le serveur web. `web` est sur les deux réseaux et sert de pont. Voici l'extrait du fichier Compose (le format est expliqué dans [Docker Compose](Docker-Compose.md)) :
 

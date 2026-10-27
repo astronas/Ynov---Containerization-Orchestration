@@ -18,6 +18,8 @@
 
     Pense au **standard téléphonique** d'une entreprise. Les employés (les pods) arrivent, partent, changent de bureau ; le numéro du standard (le Service), lui, ne change jamais, et il passe l'appel à un employé disponible. L'**Ingress**, c'est l'accueil à l'entrée du bâtiment : il lit le nom de la société demandée et indique le bon étage. Limite de l'image : le standard ne comprend pas ce qu'on lui dit, il transmet seulement ; seul l'accueil (l'Ingress) lit la demande, ici l'adresse web.
 
+    ![Schéma animé : l'accueil lit l'adresse, le standard au numéro fixe passe l'appel ; un pod part, un autre le remplace et le numéro ne change pas](assets/anim/service-standard.svg){ .anim }
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -57,6 +59,8 @@
 !!! quote "En clair"
 
     Un pod remplacé, c'est un nouvel employé avec un nouveau bureau. Personne ne retient les numéros de bureau : on appelle le standard, qui tient à jour la liste de qui est présent.
+
+    ![Schéma animé : le pod 2 tombe, le standard met à jour sa liste des présents et envoie l'appel suivant au pod 3](assets/anim/service-annuaire.svg){ .anim }
 
 Trois pièces travaillent ensemble :
 
@@ -141,6 +145,8 @@ Chaque pod reçoit dans son fichier `/etc/resolv.conf` l'adresse du Service `kub
 
     ClusterIP, c'est une **ligne interne** : seuls les collègues peuvent appeler. NodePort ajoute un **numéro direct** sur chaque machine du cluster. LoadBalancer **loue un numéro public** à l'hébergeur cloud, qui renvoie les appels vers ces machines.
 
+    ![Schéma animé : ligne interne, puis un port sur chaque nœud, puis une IP publique louée au cloud](assets/anim/service-types.svg){ .anim }
+
 | Type | Joignable depuis | Comment |
 |---|---|---|
 | **ClusterIP** (défaut) | l'intérieur du cluster | une IP virtuelle |
@@ -206,6 +212,8 @@ spec:
 !!! quote "En clair"
 
     L'objet **Ingress** est le **panneau** à l'accueil : « Société A, 3ᵉ étage ; Société B, 5ᵉ étage ». Le **contrôleur d'Ingress** est la personne à l'accueil qui lit le panneau et oriente les visiteurs. Un panneau sans personne pour le lire ne sert à rien.
+
+    ![Schéma animé : sans personne à l'accueil les visiteurs attendent ; le contrôleur lit le panneau et les oriente vers le bon étage](assets/anim/service-ingress-panneau.svg){ .anim }
 
 Un Ingress est un objet **déclaratif** : on y écrit le nom du site, le chemin, le Service cible et, si besoin, un certificat TLS. Le **contrôleur d'Ingress** (Traefik, NGINX, HAProxy…) est lui-même une application du cluster, exposée par un NodePort ou un LoadBalancer : c'est lui qui reçoit le trafic et applique ces règles.
 

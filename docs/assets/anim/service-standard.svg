@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le standard et l'accueil : Service et Ingress</title>
+  <desc id="d">Un visiteur arrive avec l'adresse web.local. L'accueil (l'Ingress) lit l'adresse et passe l'appel au standard (le Service), dont le numéro web:80 ne change pas ; le standard le transmet au pod A. Le pod B part, un pod D s'installe dans un nouveau bureau. L'appel suivant arrive au même numéro et part vers le pod D.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .appel1 { animation: appel1 9s infinite both; }
+      @keyframes appel1 {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        2% { opacity: 1; transform: translate(0px, 0px); }
+        7% { opacity: 1; transform: translate(170px, 0px); }
+        11% { opacity: 1; transform: translate(170px, 0px); }
+        17% { opacity: 1; transform: translate(460px, 0px); }
+        23%, 28% { opacity: 1; transform: translate(645px, -90px); }
+        31%, 100% { opacity: 0; transform: translate(645px, -90px); }
+      }
+      .appel3 { animation: appel3 9s infinite both; }
+      @keyframes appel3 {
+        0%, 64% { opacity: 0; transform: translate(0px, 0px); }
+        66% { opacity: 1; transform: translate(0px, 0px); }
+        70% { opacity: 1; transform: translate(170px, 0px); }
+        73% { opacity: 1; transform: translate(170px, 0px); }
+        78% { opacity: 1; transform: translate(460px, 0px); }
+        83%, 93% { opacity: 1; transform: translate(645px, 96px); }
+        96%, 100% { opacity: 0; transform: translate(645px, 96px); }
+      }
+      .lecture { animation: lecture 9s infinite both; }
+      @keyframes lecture { 0%, 6% { opacity: 0; } 8%, 17% { opacity: 1; } 19%, 68% { opacity: 0; } 70%, 78% { opacity: 1; } 80%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .appel1, .appel3, .lecture { animation: none; opacity: 0; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le standard et l'accueil</text>
+  <text class="petit" x="32" y="80">Ingress = l'accueil qui lit l'adresse ; Service = le standard au numéro fixe ; pods = les employés</text>
+
+  <!-- Visiteur -->
+  <rect x="14" y="160" width="100" height="32" rx="16" fill="#1d1d1d" stroke="#eeff57" stroke-width="2"/>
+  <text class="petit" x="26" y="182" fill="#eeff57" style="fill:#eeff57">web.local</text>
+  <circle cx="60" cy="215" r="14" fill="#eeff57"/>
+  <text class="petit" x="30" y="256">Visiteur</text>
+
+  <!-- Accueil = Ingress -->
+  <rect x="140" y="150" width="180" height="130" rx="14" fill="#1d1d1d" stroke="#ff84ef" stroke-width="2.5"/>
+  <text class="label" x="158" y="184" fill="#ff84ef">Accueil</text>
+  <text class="petit" x="158" y="206">l'Ingress</text>
+  <text class="petit" x="158" y="264">lit l'adresse</text>
+  <g class="lecture"><rect x="140" y="104" width="270" height="34" rx="17" fill="#2a1027" stroke="#ff84ef" stroke-width="2"/><text class="l18" x="156" y="127" fill="#ff84ef">web.local → Service web</text></g>
+  <path d="M320 215 H420" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- Standard = Service -->
+  <rect x="420" y="130" width="200" height="170" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/>
+  <text class="label" x="440" y="164" fill="#00eaff">Standard</text>
+  <text class="petit" x="440" y="186">le Service</text>
+  <rect x="440" y="202" width="160" height="40" rx="8" fill="#0a0006" stroke="#00eaff" stroke-width="2"/>
+  <text class="label" x="462" y="229" fill="#eaf0eb">web : 80</text>
+  <g class="pbc"><rect x="440" y="202" width="160" height="40" rx="8" fill="none" stroke="#eeff57" stroke-width="3"/></g>
+  <g class="pa"><text class="petit" x="440" y="282">numéro fixe</text></g>
+  <g class="pbc"><text class="petit" x="440" y="282" fill="#eeff57" style="fill:#eeff57">toujours le même</text></g>
+
+  <!-- Bureaux = pods -->
+  <path d="M620 215 L690 125" stroke="#555" stroke-width="2"/><rect x="690" y="100" width="220" height="50" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/><path d="M620 215 L690 187" stroke="#555" stroke-width="2"/><rect x="690" y="162" width="220" height="50" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/><path d="M620 215 L690 249" stroke="#555" stroke-width="2"/><rect x="690" y="224" width="220" height="50" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/><path d="M620 215 L690 311" stroke="#555" stroke-width="2"/><rect x="690" y="286" width="220" height="50" rx="14" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 6"/>
+  <rect x="690" y="100" width="220" height="50" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="708" y="132" fill="#5affb6">Pod A</text><text class="petit" x="810" y="131">bureau 1</text>
+  <g class="pa"><rect x="690" y="162" width="220" height="50" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="708" y="194" fill="#5affb6">Pod B</text><text class="petit" x="810" y="193">bureau 2</text></g>
+  <g class="pbc"><text class="l18" x="708" y="194" fill="#ff1a1a">Pod B est parti</text></g>
+  <rect x="690" y="224" width="220" height="50" rx="14" fill="#1d1d1d" stroke="#5affb6" stroke-width="2.5"/><text class="l18" x="708" y="256" fill="#5affb6">Pod C</text><text class="petit" x="810" y="255">bureau 3</text>
+  <g class="pa"><text class="petit" x="708" y="318">libre</text><text class="petit" x="810" y="317">bureau 4</text></g>
+  <g class="popb pop"><rect x="690" y="286" width="220" height="50" rx="14" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/><text class="l18" x="708" y="318" fill="#eeff57">Pod D</text><text class="petit" x="810" y="317">bureau 4</text></g>
+
+  <!-- Appels -->
+  <circle class="appel1" cx="60" cy="215" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <circle class="appel3" cx="60" cy="215" r="9" fill="#eeff57" stroke="#0a0006" stroke-width="2"/>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le numéro reste, les pods changent. <tspan fill="#ff84ef" font-weight="700">L'accueil lit</tspan> l'adresse, le standard transmet.</text>
+</svg>

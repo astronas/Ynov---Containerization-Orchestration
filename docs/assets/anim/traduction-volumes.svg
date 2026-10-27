@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Tableau blanc ou casier loué : emptyDir et PVC</title>
+  <desc id="d">Le pod écrit le compteur de visites, 42, sur le tableau blanc de la salle A (emptyDir) et dans un casier loué (la PVC). Il passe dans la salle B : le tableau de la salle A est effacé, le casier garde 42. Puis il rend la clé, c'est-à-dire qu'on supprime la PVC : le gardien vide le casier.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 16px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .pop { transform-box: fill-box; transform-origin: center; }
+      /* Trois temps sur 9 s : A de 0 à 30 %, B de 33 à 62 %, C de 66 à 96 %. */
+      .pa  { animation: pa 9s infinite both; }
+      .pb  { animation: pb 9s infinite both; }
+      .pc  { animation: pc 9s infinite both; }
+      .pab { animation: pab 9s infinite both; }
+      .pbc { animation: pbc 9s infinite both; }
+      .popb { animation: popb 9s infinite both; }
+      .popc { animation: popc 9s infinite both; }
+      @keyframes pa  { 0%, 29% { opacity: 1; } 32%, 100% { opacity: 0; } }
+      @keyframes pb  { 0%, 31% { opacity: 0; } 35%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pc  { 0%, 62% { opacity: 0; } 66%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes pab { 0%, 60% { opacity: 1; } 63%, 100% { opacity: 0; } }
+      @keyframes pbc { 0%, 31% { opacity: 0; } 35%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      @keyframes popb { 0%, 32% { opacity: 0; transform: scale(.5); } 36% { opacity: 1; transform: scale(1.1); } 39%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes popc { 0%, 64% { opacity: 0; transform: scale(.5); } 68% { opacity: 1; transform: scale(1.1); } 71%, 95% { opacity: 1; transform: scale(1); } 99%, 100% { opacity: 0; transform: scale(1); } }
+      .pod { animation: pod 9s infinite both; }
+      @keyframes pod {
+        0% { opacity: 0; transform: translate(0px, 0px); }
+        3% { opacity: 1; transform: translate(0px, 0px); }
+        33% { opacity: 1; transform: translate(0px, 0px); }
+        42%, 95% { opacity: 1; transform: translate(290px, 0px); }
+        98%, 100% { opacity: 0; transform: translate(290px, 0px); }
+      }
+      .ecritA { animation: ecritA 9s infinite both; }
+      @keyframes ecritA { 0%, 34% { opacity: 1; } 40%, 100% { opacity: 0; } }
+      .efface { animation: efface 9s infinite both; }
+      @keyframes efface { 0%, 39% { opacity: 0; } 43%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      .lienA { animation: lienA 9s infinite both; }
+      @keyframes lienA { 0%, 32% { opacity: 1; } 35%, 100% { opacity: 0; } }
+      .lienB { animation: lienB 9s infinite both; }
+      @keyframes lienB { 0%, 42% { opacity: 0; } 45%, 68% { opacity: 1; } 72%, 100% { opacity: 0; } }
+      .casier { animation: casier 9s infinite both; }
+      @keyframes casier { 0%, 72% { opacity: 1; } 77%, 100% { opacity: 0; } }
+      .vide { animation: vide 9s infinite both; }
+      @keyframes vide { 0%, 74% { opacity: 0; } 78%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
+      .cle { animation: cle 9s infinite both; }
+      @keyframes cle {
+        0%, 63% { opacity: 0; transform: translate(0px, 0px); }
+        66% { opacity: 1; transform: translate(0px, 0px); }
+        73%, 93% { opacity: 1; transform: translate(260px, 0px); }
+        96%, 100% { opacity: 0; transform: translate(260px, 0px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .pa, .pb, .pab { animation: none; opacity: 0; }
+        .pc, .pbc, .popb, .popc { animation: none; opacity: 1; transform: none; }
+        .pod { animation: none; opacity: 1; transform: translate(290px, 0); }
+        .ecritA, .lienA, .lienB, .casier { animation: none; opacity: 0; }
+        .efface, .vide { animation: none; opacity: 1; }
+        .cle { animation: none; opacity: 1; transform: translate(260px, 0); }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Tableau blanc ou casier loué</text>
+  <text class="petit" x="32" y="80">emptyDir : effacé quand on rend la salle. PVC : un casier qui survit au changement de salle</text>
+
+  <rect x="40" y="100" width="260" height="200" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/><text class="label" x="58" y="130" fill="#00eaff">Salle A</text><rect x="60" y="146" width="220" height="64" rx="6" fill="#eaf0eb"/><text class="petit" x="58" y="236">tableau blanc = emptyDir</text>
+  <rect x="330" y="100" width="260" height="200" rx="14" fill="#1d1d1d" stroke="#00eaff" stroke-width="2.5"/><text class="label" x="348" y="130" fill="#00eaff">Salle B</text><rect x="350" y="146" width="220" height="64" rx="6" fill="#eaf0eb"/><text class="petit" x="348" y="236">tableau blanc = emptyDir</text>
+  <g class="ecritA"><text class="label" x="80" y="186" fill="#0a0006">visites : 42</text></g>
+  <g class="efface"><text class="label" x="80" y="186" fill="#ff1a1a">effacé</text></g>
+
+  <rect x="640" y="100" width="280" height="200" rx="14" fill="#1d1d1d" stroke="#859cff" stroke-width="2.5"/>
+  <text class="label" x="658" y="130" fill="#859cff">Casier loué</text>
+  <text class="petit" x="776" y="130">la PVC</text>
+  <rect x="660" y="146" width="240" height="64" rx="6" fill="#0a0006" stroke="#859cff" stroke-width="2"/>
+  <g class="casier"><text class="label" x="680" y="186" fill="#eaf0eb">visites : 42</text></g>
+  <g class="vide"><text class="label" x="680" y="186" fill="#ff1a1a">vidé</text></g>
+  <text class="petit" x="658" y="236">loué au gardien de l'immeuble</text>
+
+  <path class="lienA" d="M220 274 C 400 330, 560 250, 660 200" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+  <path class="lienB" d="M510 274 C 580 270, 620 230, 660 200" stroke="#5affb6" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+  <g class="pod"><rect x="80" y="254" width="140" height="38" rx="10" fill="#5affb6"/><text class="l18" x="100" y="280" fill="#0a0006">le pod</text></g>
+  <g class="cle"><circle cx="560" cy="276" r="9" fill="none" stroke="#eeff57" stroke-width="3"/><path d="M569 276 h24 m-6 0 v8 m-8 -8 v6" stroke="#eeff57" stroke-width="3" fill="none"/></g>
+
+  <g class="pa"><text class="l18" x="40" y="338" fill="#5affb6">Le pod écrit sur le tableau et dans le casier</text></g>
+  <g class="pb"><text class="l18" x="40" y="338" fill="#eeff57">Il change de salle : tableau effacé, casier intact</text></g>
+  <g class="pc"><text class="l18" x="40" y="338" fill="#ff1a1a">Il rend la clé (PVC supprimée) : le gardien vide le casier</text></g>
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Le casier survit au pod, <tspan fill="#ff1a1a" font-weight="700">pas à la clé rendue</tspan> : supprimer la PVC efface les données.</text>
+</svg>

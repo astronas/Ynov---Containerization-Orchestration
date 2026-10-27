@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Changer les ampoules d'un couloir : rolling update ou Recreate</title>
+  <desc id="d">Deux couloirs de trois ampoules jaunes, l'ancienne version. En haut, rolling update avec trois ampoules et une douille libre : à chaque pas, une ampoule cyan, la nouvelle version, s'allume d'abord dans la douille libre, quatre ampoules brillent un instant, puis une ancienne s'éteint ; la jauge de lumière ne baisse jamais. En bas, Recreate : toutes les ampoules s'éteignent, le couloir est noir et la jauge tombe à zéro, puis toutes les nouvelles ampoules s'allument ensemble.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <g id="vieille"><circle r="42" fill="#eeff57" opacity=".2"/><circle r="20" fill="#eeff57"/></g>
+    <g id="neuve"><circle r="42" fill="#00eaff" opacity=".22"/><circle r="20" fill="#00eaff"/></g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .me { fill: #5affb6; } .rg { fill: #ff1a1a; }
+      /* 9 s : tout en v1 (0-3 s), changement (3-6 s), tout en v2 (6-9 s). Base = état final. */
+      .e1, .e2, .o1, .o2, .o3, .ob, .noir { opacity: 0; }
+      .e1 { animation: e1 9s infinite; } .e2 { animation: e2 9s infinite; } .e3 { animation: e3 9s infinite; } .e23 { animation: e23 9s infinite; }
+      @keyframes e1 { 0%, 30% { opacity: 1; } 33%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      @keyframes e2 { 0%, 31% { opacity: 0; } 34%, 61% { opacity: 1; } 64%, 100% { opacity: 0; } }
+      @keyframes e3 { 0%, 62% { opacity: 0; } 65%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes e23 { 0%, 31% { opacity: 0; } 34%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      /* Rolling update par défaut, 3 réplicas : maxSurge 1, maxUnavailable 0. La neuve s'allume dans la douille libre AVANT que l'ancienne s'éteigne. */
+      .o1 { animation: o1 9s infinite; } @keyframes o1 { 0%, 38% { opacity: 1; } 39.5%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .o2 { animation: o2 9s infinite; } @keyframes o2 { 0%, 47% { opacity: 1; } 48.5%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .o3 { animation: o3 9s infinite; } @keyframes o3 { 0%, 56% { opacity: 1; } 57.5%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .n4 { animation: n4 9s infinite; } @keyframes n4 { 0%, 34% { opacity: 0; } 35.5%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .n1 { animation: n1 9s infinite; } @keyframes n1 { 0%, 43% { opacity: 0; } 44.5%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .n2 { animation: n2 9s infinite; } @keyframes n2 { 0%, 52% { opacity: 0; } 53.5%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      /* Recreate : tout s'éteint à 34 %, tout se rallume à 59 % */
+      .ob { animation: ob 9s infinite; } @keyframes ob { 0%, 33% { opacity: 1; } 35%, 98% { opacity: 0; } 100% { opacity: 1; } }
+      .nb { animation: nb 9s infinite; } @keyframes nb { 0%, 58% { opacity: 0; } 60%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .noir { animation: noir 9s infinite; } @keyframes noir { 0%, 34% { opacity: 0; } 36%, 58% { opacity: 1; } 60%, 100% { opacity: 0; } }
+      .jb { transform-box: fill-box; transform-origin: left; animation: jb 9s infinite; }
+      @keyframes jb { 0%, 33% { transform: scaleX(1); } 35%, 58% { transform: scaleX(.01); } 60%, 100% { transform: scaleX(1); } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Changer les ampoules</text>
+  <text class="petit" x="32" y="80">ampoule = pod, <tspan style="fill:#eeff57">jaune = ancienne version (v1)</tspan>, <tspan style="fill:#00eaff">cyan = nouvelle version (v2)</tspan></text>
+  <text class="label e1" x="928" y="52" text-anchor="end" fill="#eeff57">1 · Couloir allumé en v1</text>
+  <text class="label e2" x="928" y="52" text-anchor="end" fill="#eaf0eb">2 · On change les ampoules</text>
+  <text class="label e3" x="928" y="52" text-anchor="end" fill="#00eaff">3 · Tout est en v2</text>
+
+  <!-- Rolling update -->
+  <text class="label me" x="32" y="148">RollingUpdate</text>
+  <text class="petit" x="32" y="172">la neuve s'allume,</text>
+  <text class="petit" x="32" y="192">puis l'ancienne s'éteint</text>
+  <rect x="230" y="104" width="500" height="110" rx="14" fill="#141414" stroke="#3a3a3a" stroke-width="2"/>
+  <g fill="#3a3a3a"><circle cx="300" cy="159" r="20"/><circle cx="420" cy="159" r="20"/><circle cx="540" cy="159" r="20"/><circle cx="660" cy="159" r="20"/></g>
+  <use class="o1" href="#vieille" x="300" y="159"/><use class="n1" href="#neuve" x="300" y="159"/>
+  <use class="o2" href="#vieille" x="420" y="159"/><use class="n2" href="#neuve" x="420" y="159"/>
+  <use class="o3" href="#vieille" x="540" y="159"/>
+  <use class="n4" href="#neuve" x="660" y="159"/>
+  <text class="petit" x="660" y="207" text-anchor="middle">douille en plus</text>
+  <text class="petit" x="760" y="132">lumière</text>
+  <rect x="760" y="144" width="168" height="18" rx="9" fill="#1d1d1d"/>
+  <rect x="760" y="144" width="168" height="18" rx="9" fill="#eaf0eb"/>
+  <text class="petit me e23" x="760" y="190">jamais dans le noir</text>
+  <text class="petit e2" x="760" y="210">un instant : 4 allumées</text>
+
+  <!-- Recreate -->
+  <text class="label" x="32" y="284" fill="#ff84ef">Recreate</text>
+  <text class="petit" x="32" y="308">tout éteindre,</text>
+  <text class="petit" x="32" y="328">puis tout rallumer</text>
+  <rect x="230" y="240" width="500" height="110" rx="14" fill="#141414" stroke="#3a3a3a" stroke-width="2"/>
+  <g fill="#3a3a3a"><circle cx="300" cy="286" r="20"/><circle cx="420" cy="286" r="20"/><circle cx="540" cy="286" r="20"/></g>
+  <g class="ob"><use href="#vieille" x="300" y="286"/><use href="#vieille" x="420" y="286"/><use href="#vieille" x="540" y="286"/></g>
+  <g class="nb"><use href="#neuve" x="300" y="286"/><use href="#neuve" x="420" y="286"/><use href="#neuve" x="540" y="286"/></g>
+  <g class="noir"><rect x="231" y="241" width="498" height="108" rx="13" fill="#000" fill-opacity=".55" stroke="#ff1a1a" stroke-width="2.5"/><text class="label rg" x="480" y="336" text-anchor="middle">coupure : le couloir est noir</text></g>
+  <text class="petit" x="760" y="268">lumière</text>
+  <rect x="760" y="280" width="168" height="18" rx="9" fill="#1d1d1d"/>
+  <rect class="jb" x="760" y="280" width="168" height="18" rx="9" fill="#eaf0eb"/>
+  <text class="label rg e2" x="760" y="326">coupure</text>
+  <text class="petit e3" x="760" y="320">jamais deux versions</text>
+  <text class="petit e3" x="760" y="340">en même temps</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400"><tspan fill="#5affb6" font-weight="700">Rolling update</tspan> : la neuve avant l'ancienne, jamais de noir. <tspan fill="#ff84ef" font-weight="700">Recreate</tspan> : une coupure.</text>
+</svg>

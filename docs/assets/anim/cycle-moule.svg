@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="t d">
+  <title id="t">Le moule et les gâteaux : une image, plusieurs conteneurs</title>
+  <desc id="d">Un moule à gâteau, l'image en lecture seule, produit trois gâteaux, trois conteneurs. Chacun est décoré à sa façon : cerises, bougies, glaçage rose. Puis on jette le deuxième gâteau et on en refait un : il sort du moule nu, sans les bougies, car le moule n'a jamais changé.</desc>
+  <defs>
+    <linearGradient id="ynov" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff1a1a"/><stop offset=".13" stop-color="#ff84ef"/>
+      <stop offset=".28" stop-color="#eeff57"/><stop offset=".47" stop-color="#5affb6"/>
+      <stop offset=".62" stop-color="#00eaff"/><stop offset=".8" stop-color="#859cff"/>
+      <stop offset=".89" stop-color="#4a8cff"/><stop offset="1" stop-color="#018e4d"/>
+    </linearGradient>
+    <marker id="f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#00eaff"/></marker>
+    <g id="gateau">
+      <rect x="-62" y="232" width="124" height="58" rx="8" fill="#1d1d1d" stroke="#eeff57" stroke-width="2.5"/>
+      <path d="M-62 242 q0 -12 12 -12 h100 q12 0 12 12 q-10 12 -20 0 q-10 12 -20 0 q-10 12 -20 0 q-10 12 -20 0 q-10 12 -20 0 q-10 12 -24 0 z" fill="#eaf0eb"/>
+      <path d="M-78 292 H78" stroke="#a0a4a0" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <style>
+      text { font-family: Bahnschrift, "Barlow Semi Condensed", "Segoe UI", Arial, sans-serif; }
+      .titre { font-size: 26px; font-weight: 700; fill: #fff; }
+      .label { font-size: 19px; font-weight: 700; }
+      .l18 { font-size: 18px; font-weight: 700; }
+      .petit { font-size: 15px; fill: #a0a4a0; }
+      .legende { font-size: 19px; fill: #eaf0eb; }
+      .etape { font-size: 18px; font-weight: 700; text-anchor: end; }
+      .m { text-anchor: middle; }
+      /* 8 s : 1 le moule fait trois gâteaux, 2 on les décore, 3 on en jette un et on le refait */
+      .a1, .a2, .a3 { animation: 8s infinite both; opacity: 0; }
+      .a1 { animation-name: a1; } .a2 { animation-name: a2; } .a3 { animation-name: a3; }
+      @keyframes a1 { 0%, 31% { opacity: 1; } 34%, 100% { opacity: 0; } }
+      @keyframes a2 { 0%, 31% { opacity: 0; } 34%, 64% { opacity: 1; } 67%, 100% { opacity: 0; } }
+      @keyframes a3 { 0%, 64% { opacity: 0; } 67%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      .sort { animation: sort 8s infinite both; }
+      @keyframes sort { 0% { opacity: 0; transform: translateX(var(--x)); } 3% { opacity: 1; } 16%, 97% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; } }
+      .deco { animation: deco 8s infinite both; opacity: 0; }
+      @keyframes deco { 0%, 34% { opacity: 0; transform: translateY(-24px); } 40%, 97% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+      .jete { animation: jete 8s infinite both; }
+      @keyframes jete { 0%, 67% { opacity: 1; transform: translateY(0); } 74%, 100% { opacity: 0; transform: translateY(20px); } }
+      .neuf { animation: neuf 8s infinite both; opacity: 0; }
+      @keyframes neuf { 0%, 76% { opacity: 0; transform: translateX(-470px); } 78% { opacity: 1; } 88%, 97% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(0); } }
+      .rm { animation: rm 8s infinite both; opacity: 0; }
+      @keyframes rm { 0%, 66% { opacity: 0; } 68%, 76% { opacity: 1; } 79%, 100% { opacity: 0; } }
+      .apres { animation: apres 8s infinite both; opacity: 0; }
+      @keyframes apres { 0%, 86% { opacity: 0; } 89%, 97% { opacity: 1; } 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .a1, .a2, .rm, .jete { animation: none; opacity: 0; }
+        .a3, .sort, .deco, .neuf, .apres { animation: none; opacity: 1; transform: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="960" height="420" rx="18" fill="#0a0006"/>
+  <rect width="960" height="6" fill="url(#ynov)"/>
+  <text class="titre" x="32" y="52">Le moule et les gâteaux</text>
+  <text class="petit" x="32" y="78">une image, autant de conteneurs qu'on veut</text>
+  <text class="etape a1" x="928" y="52" fill="#00eaff">1 · un moule, plusieurs gâteaux</text>
+  <text class="etape a2" x="928" y="52" fill="#ff84ef">2 · chacun décoré à sa façon</text>
+  <text class="etape a3" x="928" y="52" fill="#5affb6">3 · le moule n'a pas bougé</text>
+
+  <!-- Le moule -->
+  <text class="l18 m" x="140" y="150" fill="#00eaff">Image</text>
+  <text class="petit m" x="140" y="172">le moule, lecture seule</text>
+  <path d="M56 206 L224 206 L206 292 L74 292 Z" fill="#1d1d1d" stroke="#00eaff" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M66 206 l8 -10 h132 l8 10" fill="none" stroke="#00eaff" stroke-width="3"/>
+  <g fill="none" stroke="#00eaff" stroke-width="3"><rect x="126" y="244" width="28" height="22" rx="4" fill="#00eaff"/><path d="M131 244 v-8 a9 9 0 0 1 18 0 v8"/></g>
+  <text class="petit m a3" x="140" y="322" style="fill:#5affb6;font-weight:700">inchangé</text>
+  <path d="M244 250 H316" stroke="#00eaff" stroke-width="3" marker-end="url(#f)"/>
+
+  <!-- Gâteau 1 -->
+  <g class="sort" style="--x:-290px">
+    <use href="#gateau" x="430"/>
+    <g class="deco" fill="#ff1a1a"><circle cx="400" cy="222" r="8"/><circle cx="430" cy="218" r="8"/><circle cx="460" cy="222" r="8"/></g>
+    <text class="l18 m" x="430" y="328" fill="#eaf0eb">Conteneur 1</text>
+  </g>
+  <!-- Gâteau 2 : décoré, puis jeté -->
+  <g class="sort" style="--x:-470px;animation-delay:.3s">
+    <g class="jete">
+      <use href="#gateau" x="610"/>
+      <g class="deco" style="animation-delay:.3s"><rect x="590" y="196" width="8" height="32" rx="2" fill="#859cff"/><rect x="622" y="196" width="8" height="32" rx="2" fill="#859cff"/><circle cx="594" cy="188" r="5" fill="#eeff57"/><circle cx="626" cy="188" r="5" fill="#eeff57"/></g>
+      <text class="l18 m" x="610" y="328" fill="#eaf0eb">Conteneur 2</text>
+    </g>
+  </g>
+  <!-- Gâteau 3 -->
+  <g class="sort" style="--x:-650px;animation-delay:.6s">
+    <use href="#gateau" x="790"/>
+    <g class="deco" style="animation-delay:.6s"><path d="M728 242 q0 -12 12 -12 h100 q12 0 12 12 v14 q-8 10 -14 0 q-10 14 -22 0 q-10 14 -22 0 q-10 14 -22 0 q-10 14 -22 0 q-6 10 -14 0 z" fill="#ff84ef"/></g>
+    <text class="l18 m" x="790" y="328" fill="#eaf0eb">Conteneur 3</text>
+  </g>
+
+  <!-- Gâteau 2 refait -->
+  <text class="l18 m rm" x="610" y="200" fill="#ff1a1a">jeté (docker rm)</text>
+  <g class="neuf">
+    <use href="#gateau" x="610"/>
+    <text class="l18 m" x="610" y="328" fill="#5affb6">nouveau</text>
+  </g>
+  <text class="petit m apres" x="610" y="204" style="fill:#5affb6;font-weight:700">sans bougies : tel le moule</text>
+
+  <!-- Légende -->
+  <rect x="0" y="366" width="960" height="54" fill="#15101a"/>
+  <text class="legende" x="32" y="400">Ce qu'on fait à un gâteau (un conteneur) <tspan fill="#00eaff" font-weight="700">ne change jamais le moule</tspan> (l'image).</text>
+</svg>
