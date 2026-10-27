@@ -64,7 +64,9 @@ def main():
     for page in CIBLE.glob("*.md"):
         texte = page.read_text(encoding="utf8").replace("](../README.md)", "](index.md)")
         page.write_text(encadres_vers_admonitions(texte), encoding="utf8", newline="\n")
-    (CIBLE / "index.md").write_text(accueil((RACINE / "README.md").read_text(encoding="utf8")), encoding="utf8", newline="\n")
+    # docs/index.md est la page d'accueil du site ; à défaut, on la tire du README.
+    if not (SOURCE / "index.md").exists():
+        (CIBLE / "index.md").write_text(accueil((RACINE / "README.md").read_text(encoding="utf8")), encoding="utf8", newline="\n")
     print(f"{len(list(CIBLE.glob('*.md')))} pages préparées dans {CIBLE.name}/")
 
 

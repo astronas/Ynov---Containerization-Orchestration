@@ -12,8 +12,8 @@
   registry.example.org/equipe/atelier-web:1.0      ← RÉFÉRENCE (nom lisible, modifiable)
                     │
                     ▼
-  ┌──────────── INDEX (si plusieurs plateformes) ────────────┐
-  │   linux/amd64 → manifeste A      linux/arm64 → manifeste B │
+  ┌──────────── INDEX (si plusieurs plateformes) ─────────────┐
+  │  linux/amd64 → manifeste A    linux/arm64 → manifeste B   │
   └───────────────────────────────────────────────────────────┘
                     │                                          ← DIGEST (empreinte, fixe)
                     ▼
@@ -21,9 +21,9 @@
             ├── CONFIGURATION (JSON) : commande, variables, utilisateur, répertoire…
             └── COUCHES DE FICHIERS (lecture seule), empilées :
                   ┌───────────────────────────────────┐
-                  │ couche 3 : copie de l'application  │
-                  │ couche 2 : utilisateur applicatif  │
-                  │ couche 1 : Python + bibliothèques  │  ← image de base
+                  │ couche 3 : copie de l'application │
+                  │ couche 2 : utilisateur applicatif │
+                  │ couche 1 : Python + bibliothèques │  ← image de base
                   └───────────────────────────────────┘
 ```
 

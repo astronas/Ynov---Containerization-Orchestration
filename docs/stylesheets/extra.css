@@ -1,0 +1,489 @@
+/* Grille de logos stack technique */
+.tech-logos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.tech-logos img {
+  height: 48px !important;
+  width: auto !important;
+  max-width: 140px !important;
+  object-fit: contain !important;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* SVGs monochromes (simple-icons) : rendre visibles en dark mode */
+[data-md-color-scheme="slate"] .tech-logos img[src$=".svg"] {
+  filter: brightness(0) invert(1);
+}
+
+/* Logos PNG sombres (Proxmox noir, Arista bleu marine) : couleurs d'origine en
+   mode clair, passés en blanc en mode sombre pour rester lisibles. Cible la
+   grille .tech-logos ET les usages inline (via le nom de fichier). */
+[data-md-color-scheme="slate"] img[src*="proxmox.png"],
+[data-md-color-scheme="slate"] img[src*="arista.png"],
+[data-md-color-scheme="slate"] img[src*="netbox.png"],
+[data-md-color-scheme="slate"] img[src*="opnsense.png"] {
+  filter: brightness(0) invert(1);
+}
+
+/* Logos "hero" en tête des pages services : boîte uniforme (hauteur ET largeur
+   bornées) pour un rendu homogène quel que soit le ratio du logo. */
+.md-typeset img.logo-hero {
+  height: auto;
+  width: auto;
+  max-height: 92px;
+  max-width: 280px;
+}
+
+/* Vault : logo jaune (variante fond sombre) illisible sur blanc en mode clair.
+   Puce sombre derrière le logo pour rester lisible dans les deux thèmes. */
+.md-typeset img.logo-ondark {
+  background: #16161d;
+  border-radius: 10px;
+  padding: 7px 11px;
+}
+
+.tech-logos img:hover {
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+/* Logos inline dans le texte */
+.inline-logo {
+  height: 18px !important;
+  width: auto !important;
+  vertical-align: middle !important;
+  margin: 0 3px;
+  display: inline !important;
+}
+
+/* Logo YNOV Campus (badge avec texte) */
+.inline-logo-ynov {
+  height: 26px !important;
+  width: auto !important;
+  vertical-align: middle !important;
+  margin: 0 4px;
+  display: inline !important;
+}
+
+[data-md-color-scheme="slate"] img.inline-logo[src$=".svg"] {
+  filter: brightness(0) invert(1);
+}
+
+/* Logo YNOV Campus Sophia — fond blanc en dark mode pour préserver les couleurs */
+img[src*="logo_ynov_campus_sophia"] {
+  transition: background 0.2s ease, padding 0.2s ease, border-radius 0.2s ease;
+}
+
+/* Fond blanc derrière le logo SEULEMENT dans le contenu (.md-typeset) en mode
+   sombre — surtout PAS sur le logo du header (qui doit rester blanc, voir plus bas). */
+[data-md-color-scheme="slate"] .md-typeset img[src*="logo_ynov_campus_sophia"] {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+/* ---- Deux figures côte à côte (switch + serveurs) ------------------ */
+.md-typeset .figure-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 24px 0;
+}
+.md-typeset .figure-row figure {
+  margin: 0;
+  text-align: center;
+}
+.md-typeset .figure-row figcaption {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: var(--md-default-fg-color--light);
+}
+
+/* ---- Équipe : icônes de personnages centrées ---------------------- */
+.team-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 28px 0;
+}
+
+.md-typeset .team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 150px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease;
+}
+.md-typeset .team-member:hover {
+  transform: translateY(-4px);
+  text-decoration: none;
+}
+
+/* Avatar rond avec icône de personnage (mask SVG) — une couleur par membre */
+.team-avatar {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--ynov-blue-500), var(--ynov-cyan));
+  box-shadow: 0 6px 18px rgba(13, 71, 161, 0.28);
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.md-typeset .team-member:hover .team-avatar {
+  transform: scale(1.05);
+}
+
+/* Couleur distincte par bulle (palette cohérente avec le diagramme Mermaid) */
+.team-member:nth-child(1) .team-avatar {
+  background: linear-gradient(150deg, #1e88e5, #29b6f6); /* bleu YNOV */
+  box-shadow: 0 6px 18px rgba(30, 136, 229, 0.32);
+}
+.team-member:nth-child(2) .team-avatar {
+  background: linear-gradient(150deg, #6a1b9a, #ab47bc); /* violet Ceph */
+  box-shadow: 0 6px 18px rgba(106, 27, 154, 0.32);
+}
+.team-member:nth-child(3) .team-avatar {
+  background: linear-gradient(150deg, #2d6a4f, #40c057); /* vert */
+  box-shadow: 0 6px 18px rgba(45, 106, 79, 0.32);
+}
+.team-member:nth-child(4) .team-avatar {
+  background: linear-gradient(150deg, #e65c00, #ff922b); /* orange OPNsense */
+  box-shadow: 0 6px 18px rgba(230, 92, 0, 0.32);
+}
+
+/* Silhouette de personnage en blanc, via mask (Material "account" icon) */
+.team-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4Z'/%3E%3C/svg%3E") center / 56% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4Z'/%3E%3C/svg%3E") center / 56% no-repeat;
+}
+
+.team-name {
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+.team-handle {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+  transition: color 0.18s ease;
+}
+.md-typeset .team-member:hover .team-handle {
+  color: var(--ynov-blue-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset .team-member:hover,
+  .md-typeset .team-member:hover .team-avatar {
+    transform: none;
+  }
+}
+
+/* =====================================================================
+   POLISH — palette de marque YNOV, header, cards, tables, code…
+   ===================================================================== */
+
+/* ---- Couleurs de marque (palette "custom" Material) ---------------- */
+:root {
+  --ynov-blue-900: #0d47a1;
+  --ynov-blue-700: #1565c0;
+  --ynov-blue-500: #1e88e5;
+  --ynov-cyan: #29b6f6;
+}
+
+/* Forcé sur toute valeur de l'attribut (custom ET fallback indigo au 1er paint),
+   chargé après le CSS de Material -> le bleu YNOV s'applique toujours. */
+[data-md-color-primary] {
+  --md-primary-fg-color: var(--ynov-blue-700);
+  --md-primary-fg-color--light: var(--ynov-blue-500);
+  --md-primary-fg-color--dark: var(--ynov-blue-900);
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+}
+
+[data-md-color-accent] {
+  --md-accent-fg-color: var(--ynov-cyan);
+  --md-accent-fg-color--transparent: rgba(41, 182, 246, 0.1);
+}
+
+/* Sélection de texte aux couleurs de marque */
+::selection {
+  background: rgba(30, 136, 229, 0.28);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---- Header & onglets en dégradé ----------------------------------- */
+.md-header {
+  background: linear-gradient(
+    120deg,
+    var(--ynov-blue-900) 0%,
+    var(--ynov-blue-700) 55%,
+    var(--ynov-blue-500) 100%
+  );
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.md-tabs {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Logo YNOV du header : TOUJOURS blanc (clair ET sombre), jamais de fond/boîte. */
+.md-header__button.md-logo img,
+[data-md-color-scheme="slate"] .md-header__button.md-logo img {
+  filter: brightness(0) invert(1);
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  height: 1.5rem;
+}
+
+/* Onglet de navigation actif souligné */
+.md-tabs__link {
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+.md-tabs__link:hover,
+.md-tabs__link--active {
+  opacity: 1;
+}
+
+/* ---- Bannière d'annonce -------------------------------------------- */
+.md-banner {
+  background: linear-gradient(90deg, var(--ynov-blue-900), var(--ynov-blue-700));
+  color: #fff;
+}
+.md-banner__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+}
+.ynov-announce-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  color: #fff !important;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.ynov-announce-link:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+.ynov-announce-link svg {
+  height: 0.9em;
+  width: 0.9em;
+  fill: currentColor;
+}
+
+/* ---- Titres -------------------------------------------------------- */
+.md-typeset h1 {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.md-typeset h2 {
+  font-weight: 700;
+  padding-bottom: 0.2em;
+  border-bottom: 2px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset h2::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 1.1em;
+  margin-right: 0.5rem;
+  vertical-align: -0.18em;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--ynov-blue-500), var(--ynov-cyan));
+}
+
+/* ---- Cartes de navigation (grid cards) ----------------------------- */
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid > .card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.md-typeset .grid.cards > ul > li:hover,
+.md-typeset .grid > .card:hover {
+  transform: translateY(-4px);
+  border-color: var(--ynov-blue-500);
+  box-shadow: 0 10px 26px rgba(13, 71, 161, 0.18);
+}
+.md-typeset .grid.cards .twemoji,
+.md-typeset .grid.cards :is(.lg, .xl) {
+  color: var(--ynov-blue-500);
+}
+
+/* ---- Boutons ------------------------------------------------------- */
+.md-typeset .md-button {
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.md-typeset .md-button--primary {
+  background: var(--ynov-blue-700);
+  border-color: var(--ynov-blue-700);
+}
+.md-typeset .md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(13, 71, 161, 0.25);
+}
+
+/* ---- Tableaux ------------------------------------------------------ */
+.md-typeset table:not([class]) {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset table:not([class]) th {
+  background: var(--md-primary-fg-color);
+  color: #fff;
+  font-weight: 600;
+}
+.md-typeset table:not([class]) tr:hover td {
+  background: var(--md-accent-fg-color--transparent);
+}
+
+/* ---- Blocs de code ------------------------------------------------- */
+.md-typeset pre > code,
+.md-typeset .highlight {
+  border-radius: 10px;
+}
+.md-typeset .highlight {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- Admonitions / détails ---------------------------------------- */
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 10px;
+  border-left-width: 4px;
+}
+
+/* ---- Liens contenus ------------------------------------------------ */
+.md-typeset a {
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+.md-typeset a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--md-accent-fg-color);
+}
+
+/* ---- Mermaid centré ------------------------------------------------ */
+.md-typeset .mermaid {
+  display: flex;
+  justify-content: center;
+  margin: 1.2em 0;
+}
+
+/* ---- Flèches Mermaid animées (le flux "coule" vers la pointe) ------- */
+/* !important obligatoire : Mermaid injecte un <style> interne (sélecteur #id,
+   spécificité supérieure) qui rend les arêtes solides -> sans !important le
+   stroke-dasharray est écrasé et l'animation du dashoffset reste invisible. */
+.mermaid .flowchart-link,
+.mermaid .edgePaths path,
+.mermaid .edgePath .path {
+  stroke-dasharray: 6 5 !important;
+  animation: mermaid-flow 1.1s linear infinite !important;
+}
+@keyframes mermaid-flow {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mermaid .flowchart-link,
+  .mermaid .edgePaths path,
+  .mermaid .edgePath .path {
+    animation: none !important;
+    stroke-dasharray: none !important;
+  }
+}
+
+/* ---- Barre de défilement personnalisée ----------------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ynov-blue-500) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--ynov-blue-500);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--ynov-blue-700);
+  background-clip: content-box;
+}
+
+/* ---- Pied de page -------------------------------------------------- */
+.md-footer-meta {
+  background: var(--ynov-blue-900);
+}
+
+/* ---- "Dernière mise à jour" (git-revision-date) -------------------- */
+.md-source-file__fact {
+  font-size: 0.66rem;
+}
+
+/* ---- Accessibilité : respect de prefers-reduced-motion ------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .md-typeset .grid.cards > ul > li:hover,
+  .md-typeset .grid > .card:hover,
+  .md-typeset .md-button:hover,
+  .ynov-announce-link:hover {
+    transform: none;
+  }
+}
+
+/* ---- Schémas en caractères (blocs ``` sans langage) ------------------
+   JetBrains Mono servie par Google Fonts n'inclut pas les caractères de
+   bordure (─ │ ┌ ┐) : le navigateur les prendrait dans une autre police,
+   plus étroite, et les cadres se décaleraient. Ces blocs utilisent donc une
+   police système monospace qui les contient tous, à largeur égale. */
+.md-typeset .language-text code {
+  font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", "Liberation Mono", Menlo, monospace;
+  font-variant-ligatures: none;
+  line-height: 1.35;
+}

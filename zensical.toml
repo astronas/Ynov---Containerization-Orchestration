@@ -1,38 +1,52 @@
+# ============================================================================
+# Configuration Zensical · cours Conteneurisation et orchestration
+# Doc : https://zensical.org/docs/
+# ============================================================================
+
 [project]
-site_name = "Conteneurisation et orchestration"
-site_url = "https://astronas.github.io/Ynov---Containerization-Orchestration/"
-site_description = "Cours de conteneurisation et d'orchestration : Docker, Compose, sécurité, Kubernetes."
+site_name = "Conteneurisation & orchestration"
+site_description = "Cours complet : conteneurs, images, Docker Compose, sécurité et Kubernetes, avec cas d'usage, schémas et mini-labs."
 site_author = "Thibaut Gianola"
+site_url = "https://astronas.github.io/Ynov---Containerization-Orchestration/"
 repo_url = "https://github.com/astronas/Ynov---Containerization-Orchestration"
 repo_name = "astronas/Ynov---Containerization-Orchestration"
-# Sources générées par scripts/preparer_site.py à partir de README.md et docs/.
+edit_uri = "edit/main/docs/"
+copyright = """
+Copyright &copy; 2026 Thibaut Gianola · YNOV Campus Sophia-Antipolis · M2 Expert Cloud, Sécurité &amp; Infrastructure
+"""
+
+# Sources générées par scripts/preparer_site.py à partir de docs/.
 docs_dir = "build_docs"
+site_dir = "site"
+
+extra_css = ["stylesheets/extra.css"]
+
 nav = [
   { "Accueil" = "index.md" },
-  { "1 · Comprendre les conteneurs" = [
+  { "Comprendre" = [
     { "Du monolithe aux microservices" = "Du-monolithe-aux-microservices.md" },
     { "Machine virtuelle ou conteneur" = "Machine-virtuelle-ou-conteneur.md" },
     { "Isolation : namespaces, cgroups, protections" = "Isolation-des-conteneurs.md" },
     { "Image et cycle de vie" = "Image-et-cycle-de-vie.md" },
   ] },
-  { "2 · Construire des images" = [
+  { "Images" = [
     { "Les couches d'une image" = "Couches-d-une-image.md" },
     { "Écrire un Dockerfile" = "Ecrire-un-Dockerfile.md" },
     { "Contexte de build et cache" = "Contexte-de-build-et-cache.md" },
     { "Versionner et publier" = "Versionner-et-publier-une-image.md" },
   ] },
-  { "3 · Application complète" = [
+  { "Application complète" = [
     { "Réseaux et ports" = "Reseaux-et-ports.md" },
     { "Stockage et volumes" = "Stockage-et-volumes.md" },
     { "Docker Compose" = "Docker-Compose.md" },
     { "Démarré n'est pas disponible" = "Demarre-n-est-pas-disponible.md" },
   ] },
-  { "4 · Sécuriser" = [
+  { "Sécurité" = [
     { "Sécurité des images" = "Securite-des-images.md" },
     { "Identités et privilèges" = "Identites-et-privileges.md" },
     { "Secrets, fichiers, réseau, ressources" = "Secrets-fichiers-reseau-ressources.md" },
   ] },
-  { "5 · Orchestrer" = [
+  { "Orchestration" = [
     { "Pourquoi orchestrer ?" = "Pourquoi-orchestrer.md" },
     { "Kubernetes : état désiré" = "Kubernetes-etat-desire.md" },
     { "Pod, Deployment, ReplicaSet" = "Pod-Deployment-ReplicaSet.md" },
@@ -42,67 +56,104 @@ nav = [
   ] },
 ]
 
+# ----------------------------------------------------------------------------
+# Thème
+# ----------------------------------------------------------------------------
 [project.theme]
 language = "fr"
+custom_dir = "overrides"
+logo = "assets/logo_ynov_campus_sophia.png"
+favicon = "assets/favicon.svg"
+
 features = [
-  "content.code.annotate",
-  "content.code.copy",
-  "content.code.select",
-  "content.footnote.tooltips",
-  "content.tabs.link",
-  "content.tooltips",
-  "navigation.footer",
-  "navigation.indexes",
+  "announce.dismiss",
   "navigation.instant",
-  "navigation.instant.prefetch",
-  "navigation.path",
-  "navigation.sections",
-  "navigation.top",
+  "navigation.instant.progress",
   "navigation.tracking",
-  "search.highlight",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.sections",
+  "navigation.indexes",
+  "navigation.top",
+  "navigation.footer",
   "toc.follow",
+  "search.highlight",
+  "content.code.copy",
+  "content.code.annotate",
+  "content.code.select",
+  "content.tooltips",
+  "content.action.edit",
+  "content.action.view",
 ]
 
-[[project.theme.palette]]
-media = "(prefers-color-scheme)"
-toggle.icon = "lucide/sun-moon"
-toggle.name = "Passer en mode clair"
+[project.theme.font]
+text = "Inter"
+code = "JetBrains Mono"
 
+# Palette : couleurs de marque YNOV via "custom" (variables dans docs/stylesheets/extra.css).
 [[project.theme.palette]]
 media = "(prefers-color-scheme: light)"
 scheme = "default"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/sun"
-toggle.name = "Passer en mode sombre"
+toggle.name = "Basculer en mode sombre"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
 scheme = "slate"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/moon"
-toggle.name = "Suivre le système"
+toggle.name = "Basculer en mode clair"
 
-[project.markdown_extensions]
-abbr = {}
-admonition = {}
-attr_list = {}
-def_list = {}
-footnotes = {}
-md_in_html = {}
-tables = {}
-toc.permalink = true
-pymdownx.betterem = {}
-pymdownx.caret = {}
-pymdownx.details = {}
-pymdownx.highlight.anchor_linenums = true
-pymdownx.highlight.line_spans = "__span"
-pymdownx.highlight.pygments_lang_class = true
-pymdownx.inlinehilite = {}
-pymdownx.keys = {}
-pymdownx.magiclink = {}
-pymdownx.mark = {}
-pymdownx.smartsymbols = {}
-pymdownx.superfences.custom_fences = [
+# ----------------------------------------------------------------------------
+# Pied de page
+# ----------------------------------------------------------------------------
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/astronas/Ynov---Containerization-Orchestration"
+name = "Dépôt GitHub du cours"
+
+[[project.extra.social]]
+icon = "fontawesome/solid/graduation-cap"
+link = "https://www.ynov.com"
+name = "YNOV Campus"
+
+# ----------------------------------------------------------------------------
+# Extensions Markdown
+# ----------------------------------------------------------------------------
+[project.markdown_extensions.abbr]
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.def_list]
+[project.markdown_extensions.footnotes]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.tables]
+[project.markdown_extensions.toc]
+permalink = true
+title = "Sur cette page"
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
   { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
 ]
-pymdownx.tabbed.alternate_style = true
-pymdownx.tasklist.custom_checkbox = true
-pymdownx.tilde = {}
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.keys]
+[project.markdown_extensions.pymdownx.mark]
+[project.markdown_extensions.pymdownx.caret]
+[project.markdown_extensions.pymdownx.tilde]
+[project.markdown_extensions.pymdownx.smartsymbols]
+[project.markdown_extensions.pymdownx.betterem]
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "zensical.extensions.emoji.twemoji"
+emoji_generator = "zensical.extensions.emoji.to_svg"

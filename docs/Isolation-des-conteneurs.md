@@ -9,17 +9,21 @@
 ### Le modèle mental
 
 ```
-            ┌───────────────────────────────┐
-            │  PROTECTIONS : que peut-il FAIRE ?   (UID, capabilities, seccomp…)
-            │  ┌─────────────────────────┐  │
-            │  │ CGROUPS : que peut-il CONSOMMER ?  (mémoire, CPU, processus)
-            │  │  ┌───────────────────┐  │  │
-            │  │  │ NAMESPACES : que peut-il VOIR ?  (processus, réseau, fichiers)
-            │  │  │   ┌───────────┐   │  │  │
-            │  │  │   │ processus │   │  │  │
-            │  │  │   └───────────┘   │  │  │
-            └──┴──┴───────────────────┴──┴──┘
-                       noyau Linux partagé
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PROTECTIONS : que peut-il FAIRE ?  (UID, capabilities, seccomp…)            │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ CGROUPS : que peut-il CONSOMMER ?  (mémoire, CPU, processus)          │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │  │
+│  │  │ NAMESPACES : que peut-il VOIR ?  (processus, réseau, fichiers)  │  │  │
+│  │  │                         ┌─────────────┐                         │  │  │
+│  │  │                         │  processus  │                         │  │  │
+│  │  │                         └─────────────┘                         │  │  │
+│  │  └─────────────────────────────────────────────────────────────────┘  │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                              noyau Linux partagé
 ```
 
 | Mécanisme | Question | Sans lui… | Réglage Docker typique |
