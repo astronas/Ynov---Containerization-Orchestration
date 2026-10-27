@@ -1,0 +1,77 @@
+{
+  "titre": "Isolation d'un conteneur",
+  "etapes": [
+    {
+      "titre": "Lancer un conteneur limité",
+      "consigne": "Lance nginx en arrière-plan, nommé demo, avec 128 Mo de mémoire et 32 programmes au plus.",
+      "commande": "docker run -d --name demo --memory 128m --pids-limit 32 nginx:stable",
+      "attendu": "^docker run (?=.*(-d|--detach)\\b)(?=.*--name[ =]demo\\b)(?=.*(--memory|-m)[ =]128m)(?=.*--pids-limit[ =]32).*nginx",
+      "indice": "il faut -d, --name demo, --memory 128m et --pids-limit 32, puis l'image nginx:stable.",
+      "bravo": "Le conteneur tourne en arrière-plan. La longue suite de caractères est son identifiant."
+    },
+    {
+      "titre": "Vérifier qu'il tourne",
+      "consigne": "Affiche les conteneurs dont le nom contient demo.",
+      "commande": "docker ps --filter name=demo",
+      "attendu": "^docker (container )?(ps|ls)\\b",
+      "bravo": "STATUS « Up » : il tourne."
+    },
+    {
+      "titre": "Il se croit seul",
+      "consigne": "Lis le nom du programme n° 1, vu de l'intérieur du conteneur.",
+      "commande": "docker exec demo cat /proc/1/cmdline",
+      "attendu": "^docker exec demo cat /proc/1/cmdline",
+      "bravo": "nginx est le programme n° 1 : il ne voit que lui-même (namespace PID)."
+    },
+    {
+      "titre": "Son propre nom de machine",
+      "consigne": "Demande au conteneur comment s'appelle sa machine.",
+      "commande": "docker exec demo hostname",
+      "attendu": "^docker exec demo hostname",
+      "bravo": "C'est l'identifiant du conteneur : il a son propre nom de machine (namespace UTS)."
+    },
+    {
+      "titre": "Ses limites, vues par le noyau",
+      "consigne": "Lis la limite de mémoire et le nombre maximal de programmes.",
+      "commande": "docker exec demo cat /sys/fs/cgroup/memory.max /sys/fs/cgroup/pids.max",
+      "attendu": "^docker exec demo cat .*memory\\.max",
+      "bravo": "134217728 octets = 128 Mo, et 32 programmes au plus : ce sont les cgroups."
+    },
+    {
+      "titre": "Ses droits d'administrateur",
+      "consigne": "Affiche ses capabilities effectives.",
+      "commande": "docker exec demo grep CapEff /proc/1/status",
+      "attendu": "^docker exec demo grep CapEff",
+      "bravo": "a80425fb : les 14 capabilities que Docker laisse par défaut."
+    },
+    {
+      "titre": "Tester le plafond de programmes",
+      "consigne": "Essaie d'en lancer 60 d'un coup, alors que la limite est 32.",
+      "commande": "docker exec demo sh -c 'for i in $(seq 1 60); do sleep 30 & done'",
+      "attendu": "^docker exec demo sh -c .*seq 1 \\d+",
+      "bravo": "Refusé au-delà du plafond : le reste de la machine est protégé."
+    },
+    {
+      "titre": "Une fuite de mémoire",
+      "consigne": "Lance un conteneur limité à 64 Mo qui remplit la mémoire sans fin.",
+      "commande": "docker run --name gourmand --memory 64m alpine:3.22 sh -c 'tail /dev/zero'",
+      "attendu": "^docker run (?=.*(--memory|-m)[ =]\\d+).*tail /dev/zero",
+      "indice": "sans --memory, rien ne l'arrêterait : ajoute --memory 64m.",
+      "bravo": "Le noyau l'a arrêté net : code de sortie 137."
+    },
+    {
+      "titre": "Comprendre pourquoi",
+      "consigne": "Demande à Docker si c'est bien la limite de mémoire qui l'a tué.",
+      "commande": "docker inspect -f '{{.State.OOMKilled}}' gourmand",
+      "attendu": "^docker inspect .*OOMKilled",
+      "bravo": "true : c'est la limite mémoire (OOM = Out Of Memory)."
+    },
+    {
+      "titre": "Faire le ménage",
+      "consigne": "Supprime les deux conteneurs.",
+      "commande": "docker rm -f demo gourmand",
+      "attendu": "^docker rm (?=.*-f).*",
+      "bravo": "Machine propre."
+    }
+  ]
+}

@@ -72,6 +72,12 @@ docker run --rm hello-world   # (1)!
     | `Cannot connect to the Docker daemon` | le moteur n'est pas démarré | `sudo systemctl start docker` |
     | `pull access denied` ou délai dépassé | pas d'accès Internet | vérifie la connexion, le proxy |
 
+!!! example "Pas encore installé ? Essaie ici"
+
+    Ce terminal simule une machine Docker dans ta page. Tape `docker run --rm hello-world`, puis `docker run -d --name web -p 127.0.0.1:8080:80 nginx:stable`, `docker ps` et `curl http://127.0.0.1:8080`. Tape `help` pour voir tout ce qu'il sait faire.
+
+<div class="terminal-sim"></div>
+
 ## :material-numeric-3-circle-outline: Lire une commande
 
 Dans tout le cours, les commandes se lisent ainsi :

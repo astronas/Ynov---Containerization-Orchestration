@@ -164,6 +164,14 @@ docker run -d --name app --memory 256m --cpus 0.5 --pids-limit 64 nginx:stable  
 
 ## :material-flask-outline: À toi de jouer
 
+!!! tip "Sans rien installer : le terminal ci-dessous"
+
+    C'est une **machine Docker simulée**, rien que pour toi, directement dans la page. En mode **Guidé**, tu suis les étapes du lab (tape la commande ou clique sur « Insérer la commande »). En mode **Libre**, tu essaies ce que tu veux : tu ne peux rien casser. Les sorties reprennent le format du vrai Docker ; pour la vraie machine, refais le lab ci-dessous sur ton poste.
+
+<div class="terminal-sim" data-lab="isolation"></div>
+
+**Sur ton poste**, le même lab pas à pas :
+
 Cinq étapes, environ 5 minutes. Tape les commandes une par une et compare avec ce que tu dois voir.
 
 **Étape 1 · Lancer un conteneur avec des limites**

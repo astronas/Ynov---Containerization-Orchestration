@@ -371,3 +371,74 @@ html { scroll-behavior: smooth; }
 .md-typeset hr { margin: 3em 0; }
 .md-typeset .admonition, .md-typeset details { font-size: 0.76rem; line-height: 1.7; }
 .md-typeset .admonition-title, .md-typeset summary { font-size: 0.8rem; }
+
+/* =====================================================================
+   Terminal simulé (javascripts/dockersim.js), aux couleurs des captures
+   ===================================================================== */
+.terminal-sim {
+  margin: 2em 0 2.4em;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a0006;
+  box-shadow: 0 14px 34px rgba(10, 0, 6, 0.35);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+.terminal-sim::before { content: ""; display: block; height: 5px; background: var(--ynov-grad); }
+.ts-barre {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; background: #1d1d1d; color: #a0a4a0;
+  font-family: var(--ynov-titre);
+}
+.ts-points i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; background: #ff5f56; }
+.ts-points i:nth-child(2) { background: #ffbd2e; }
+.ts-points i:nth-child(3) { background: #27c93f; }
+.ts-titre { flex: 1; text-align: center; font-size: 0.68rem; letter-spacing: 0.02em; }
+.ts-modes { display: inline-flex; border: 1px solid #3a3a3a; border-radius: 999px; overflow: hidden; }
+.ts-mode, .ts-reset, .ts-inserer {
+  font: inherit; font-size: 0.66rem; cursor: pointer; border: 0;
+  background: transparent; color: #eaf0eb; padding: 3px 12px;
+}
+.ts-mode[aria-selected="true"] { background: var(--ynov-teal); color: #fff; }
+.ts-reset { font-size: 0.9rem; padding: 0 6px; color: #a0a4a0; }
+.ts-reset:hover { color: #fff; }
+.ts-etape {
+  padding: 10px 16px 12px; background: #12322f; color: #eaf0eb;
+  border-bottom: 1px solid #1f9e91; font-family: var(--md-text-font-family);
+}
+.ts-num { font-size: 0.62rem; color: #5affb6; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+.ts-consigne { font-size: 0.74rem; }
+.ts-consigne strong { color: #fff; }
+.ts-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.ts-actions code {
+  background: #0a0006 !important; color: #eeff57 !important; padding: 3px 8px !important;
+  border-radius: 6px; font-size: 0.68rem !important; white-space: pre-wrap; word-break: break-all;
+}
+.ts-inserer { background: #1f9e91; border-radius: 999px; color: #fff; padding: 4px 14px; }
+.ts-inserer:hover { background: #187b73; }
+.ts-fin { color: #5affb6; font-weight: 600; }
+.ts-ecran {
+  height: 22rem; overflow-y: auto; padding: 12px 16px;
+  font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", Menlo, monospace;
+  color: #eaf0eb; cursor: text;
+}
+.ts-sortie, .ts-cmd { white-space: pre-wrap; word-break: break-word; tab-size: 8; }
+.ts-cmd { color: #fff; font-weight: 600; margin-top: 4px; }
+.ts-invite { color: #1f9e91; font-weight: 700; }
+.ts-erreur { color: #ff8a8a; }
+.ts-info { color: #a0a4a0; font-style: italic; }
+.ts-ok { color: #5affb6; font-weight: 600; margin: 4px 0; }
+.ts-indice { color: #eeff57; margin: 4px 0; }
+.ts-ligne {
+  display: flex; align-items: center; gap: 8px; margin: 0;
+  padding: 10px 16px; border-top: 1px solid #2a2027; background: #0a0006;
+  font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", Menlo, monospace;
+}
+.ts-saisie {
+  flex: 1; background: transparent; border: 0; outline: none;
+  color: #fff; font: inherit; caret-color: #5affb6;
+}
+@media (max-width: 600px) { .ts-titre { display: none; } .ts-ecran { height: 18rem; } }
+.ts-ecran { overflow-x: auto; }
+.ts-sortie { white-space: pre; word-break: normal; }
+.ts-sortie.ts-info, .ts-sortie.ts-ok, .ts-sortie.ts-indice, .ts-sortie.ts-erreur { white-space: pre-wrap; }
