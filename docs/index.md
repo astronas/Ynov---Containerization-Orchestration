@@ -13,6 +13,12 @@ hide:
 Un parcours complet pour comprendre ce qu'est vraiment un conteneur, construire des images propres, faire tourner une application multiconteneurs avec **Docker** <img src="assets/logos/docker.png" class="inline-logo" alt=""> et **Compose**, la sécuriser, puis passer à l'orchestration avec **Kubernetes** <img src="assets/logos/kubernetes.png" class="inline-logo" alt="">.  
 Chaque notion part d'une question simple et s'appuie sur des commandes réelles, avec ce qu'on observe vraiment sur une machine.
 
+!!! tip "Nouveau ? Commence ici"
+
+    Jamais touché à Docker ? La page **Bien démarrer** installe ce qu'il faut, lance ton premier conteneur et explique comment lire les commandes et les captures du cours. Les mots techniques soulignés en pointillés ont une définition au survol, et tout est rassemblé dans le **Glossaire**.
+
+    [Bien démarrer :material-arrow-right:](Bien-demarrer.md){ .md-button .md-button--primary } [Glossaire](Glossaire.md){ .md-button }
+
 ## Le parcours
 
 <div class="grid cards" markdown>

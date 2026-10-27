@@ -23,6 +23,7 @@ extra_css = ["stylesheets/extra.css"]
 
 nav = [
   { "Accueil" = "index.md" },
+  { "Bien démarrer" = "Bien-demarrer.md" },
   { "Comprendre" = [
     { "Du monolithe aux microservices" = "Du-monolithe-aux-microservices.md" },
     { "Machine virtuelle ou conteneur" = "Machine-virtuelle-ou-conteneur.md" },
@@ -54,6 +55,7 @@ nav = [
     { "De Compose à Kubernetes" = "De-Compose-a-Kubernetes.md" },
     { "Virtualisation et orchestration" = "Virtualisation-et-orchestration.md" },
   ] },
+  { "Glossaire" = "Glossaire.md" },
 ]
 
 # ----------------------------------------------------------------------------
@@ -140,6 +142,10 @@ anchor_linenums = true
 line_spans = "__span"
 pygments_lang_class = true
 [project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.snippets]
+base_path = ["includes"]
+auto_append = ["glossaire.md"]
+check_paths = true
 [project.markdown_extensions.pymdownx.superfences]
 custom_fences = [
   { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },

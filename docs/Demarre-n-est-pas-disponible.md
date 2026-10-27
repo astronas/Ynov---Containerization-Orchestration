@@ -4,6 +4,20 @@
 
 ![Le feu de santé starting, healthy, unhealthy et la frise db / web : web attend le feu vert, puis reste Up quand db tombe](assets/illustrations/feu-vert.png){ .hero }
 
+!!! abstract "Dans cette page"
+
+    **Tu vas comprendre :**
+
+    - pourquoi un conteneur « allumé » peut quand même renvoyer des erreurs ;
+    - comment faire attendre le site jusqu'à ce que sa base soit vraiment prête ;
+    - comment trouver la cause d'une erreur 503 sans tout casser.
+
+    **Prérequis :** [Docker Compose](Docker-Compose.md). **Durée :** 40 min. **Niveau :** débutant.
+
+!!! quote "En clair"
+
+    Un restaurant qui a **ouvert ses portes** n'est pas forcément **prêt à servir** : la cuisine chauffe encore. Le healthcheck, c'est le serveur qui passe en cuisine toutes les 5 secondes demander « on peut envoyer ? ». `service_healthy`, c'est attendre ce feu vert avant de faire entrer les clients. La limite : si la cuisine prend feu plus tard, le serveur le **constate**, mais il n'appelle personne.
+
 ## L'essentiel en 30 secondes
 
 <div class="grid cards" markdown>
@@ -12,19 +26,19 @@
 
     ---
 
-    Le PID 1 est lancé. La base peut encore initialiser ses fichiers et refuser les connexions.
+    Le programme principal est lancé. La base peut encore préparer ses fichiers et refuser les connexions.
 
 -   :material-heart-pulse:{ .lg .middle } __Prêt · healthcheck__
 
     ---
 
-    Une commande exécutée périodiquement dans le conteneur : code 0 = sain. Elle **mesure**, elle ne répare pas.
+    Une commande lancée régulièrement dans le conteneur : code 0 = sain. Elle **mesure**, elle ne répare pas.
 
 -   :material-traffic-light-outline:{ .lg .middle } __Attendre · `service_healthy`__
 
     ---
 
-    `web` ne démarre qu'une fois `db` **healthy**. La forme courte `depends_on: [db]` n'attend que le lancement.
+    `web` ne démarre qu'une fois `db` déclaré **healthy**. La forme courte `depends_on: [db]` n'attend que le lancement.
 
 -   :material-alert-outline:{ .lg .middle } __Le piège · `unhealthy` ne déclenche rien__
 
@@ -36,58 +50,82 @@
 
 !!! warning "À retenir"
 
-    **`running` ≠ prêt.** `docker compose ps` peut afficher `Up` pendant que l'application renvoie des 503. **Santé, réparation, supervision et haute disponibilité** sont quatre fonctions différentes. Et un `down -v` « pour repartir propre » efface les preuves, et la base.
+    **Allumé ne veut pas dire prêt.** `docker compose ps` peut afficher `Up` pendant que l'application renvoie des erreurs 503 (« service indisponible »). **Mesurer la santé, réparer, prévenir quelqu'un et tenir malgré une panne** sont quatre choses différentes. Et un `down -v` « pour repartir propre » efface les indices, et la base.
 
 ## :material-timer-sand: Démarré, mais pas prêt
 
 | État | Ce qui est vrai | Comment le voir |
 |---|---|---|
-| **Démarré** (`running`) | le PID 1 du conteneur est lancé | `docker compose ps` : `Up` |
+| **Démarré** (`running`) | le programme principal du conteneur (PID 1) est lancé | `docker compose ps` : `Up` |
 | **Serveur actif** | le serveur tourne, mais n'accepte peut-être pas encore de connexions | journaux du service |
 | **Prêt** | le service accepte **et traite** les requêtes | healthcheck, requête de bout en bout |
 
 ???+ example "En vrai : forme courte de `depends_on`, seconde par seconde"
 
+    **Ce qu'on fait :** on lance le site et sa base avec la forme courte `depends_on: [db]`, puis on interroge le site toutes les secondes en notant l'état des deux conteneurs et le code HTTP reçu.
+
     ![Les deux services sont running dès la première seconde, mais l'application répond 000 puis 503 avant 200](assets/captures/app_demarre.png)
 
-    Au premier lancement, le point d'entrée de MariaDB initialise les fichiers, démarre un **serveur temporaire sans port réseau** pour exécuter les scripts d'init, puis redémarre le vrai serveur. Pendant ce temps, PHP reçoit `Connection refused`. **L'ordre de création ne garantit pas la disponibilité.**
+    **Ce qu'il faut regarder :**
+
+    - ① `web` démarre aussitôt après `db`, sans attendre.
+    - ② À la première seconde, `000` : Apache n'écoute même pas encore.
+    - ③ Les deux conteneurs sont `running`, et pourtant le site répond `503`.
+    - ④ Le site devient disponible après quelques secondes seulement.
+    - ⑤ Le journal de `web` explique : MariaDB refusait les connexions (`Connection refused`).
+    - ⑥ Le journal de `db` montre pourquoi : au premier lancement, un serveur temporaire exécute l'initialisation, puis le vrai serveur démarre.
+
+    **L'ordre de lancement ne garantit pas la disponibilité.**
 
 ## :material-heart-pulse: Le healthcheck : une mesure
 
-| Paramètre | Rôle | MariaDB |
-|---|---|---|
-| `test` | la commande ; code 0 = sain | `healthcheck.sh --connect --innodb_initialized` |
-| `interval` / `timeout` | délai entre deux tests / durée maximale d'un test | `5s` / `3s` |
-| `retries` | échecs consécutifs avant `unhealthy` | `15` |
-| `start_period` | période de grâce : les échecs n'y comptent pas | `20s` |
+!!! quote "En clair"
+
+    Le healthcheck est un **thermomètre** : on prend la température à intervalle régulier. Il dit « malade » ou « en forme », il ne soigne rien.
 
 ```yaml
 services:
   db:
     image: mariadb:11.4
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 3s
-      retries: 15
-      start_period: 20s
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]   # (1)!
+      interval: 5s        # (2)!
+      timeout: 3s         # (3)!
+      retries: 15         # (4)!
+      start_period: 20s   # (5)!
   web:
     depends_on:
       db:
-        condition: service_healthy     # forme courte [db] = service_started
+        condition: service_healthy   # (6)!
 ```
+
+1. La commande de test, lancée **dans** le conteneur. Code de sortie 0 = sain. Ici, un outil fourni par l'image MariaDB vérifie qu'on peut se connecter et que le moteur de stockage est prêt.
+2. Un test toutes les 5 secondes.
+3. Un test qui dure plus de 3 secondes compte comme un échec.
+4. 15 échecs **de suite** avant de déclarer le conteneur `unhealthy`.
+5. Période de grâce au démarrage : pendant 20 s, les échecs ne comptent pas (un succès, lui, compte tout de suite).
+6. `web` ne démarre que lorsque `db` est `healthy`. La forme courte `depends_on: [db]` équivaut à `service_started` : attendre seulement le lancement.
 
 ???+ example "En vrai : `Waiting`, puis `Healthy`, puis seulement `web`"
 
+    **Ce qu'on fait :** on relance l'application avec `condition: service_healthy`, puis on recrée la base seule et on note son état chaque seconde.
+
     ![Compose attend que db soit healthy avant de démarrer web ; db reste running / starting pendant 4 secondes](assets/captures/app_sante.png)
 
-    `healthcheck.sh` est fourni par les images MariaDB récentes : pour une autre image, on prend l'outil adapté (`pg_isready` pour PostgreSQL, une requête HTTP pour un serveur web). Un script d'automatisation attend la même chose avec `docker compose up -d --wait`. L'historique des derniers tests (début, fin, code, sortie) se lit avec `docker inspect -f '{{json .State.Health.Log}}' <conteneur>`.
+    **Ce qu'il faut regarder :**
+
+    - ① Compose retient `web` (`Waiting`) jusqu'à ce que `db` soit `Healthy`.
+    - ② Alors seulement, `web` démarre.
+    - ③ Pendant 4 secondes, `db` est `running` mais `starting` : lancé, pas encore prêt.
+    - ④ Le healthcheck réussit : `healthy`.
+
+    `healthcheck.sh` est fourni par les images MariaDB récentes : pour une autre image, on prend l'outil adapté (`pg_isready` pour PostgreSQL, une requête HTTP pour un serveur web). Un script d'automatisation attend la même chose avec `docker compose up -d --wait`. L'historique des derniers tests se lit avec `docker inspect -f '{{json .State.Health.Log}}' <conteneur>`.
 
 | Forme de `depends_on` | Compose attend… | Garantie |
 |---|---|---|
 | `[db]` (courte) | que `db` soit **lancé** | un ordre de démarrage et d'arrêt |
-| `condition: service_healthy` | que le healthcheck de `db` soit **healthy** | une dépendance prête, **au démarrage** |
-| `condition: service_completed_successfully` | qu'un service ponctuel (migration, init) **sorte en 0** | une tâche préalable réussie |
+| `condition: service_healthy` | que le healthcheck de `db` dise **healthy** | une dépendance prête, **au démarrage** |
+| `condition: service_completed_successfully` | qu'un service ponctuel (migration, init) **se termine sans erreur** (code 0) | une tâche préalable réussie |
 
 ## :material-flash-alert-outline: Une panne après le démarrage
 
@@ -95,24 +133,45 @@ Ici `web` a aussi un healthcheck (`curl` sur sa propre page), qui dépend donc d
 
 ???+ danger "En vrai : la base tombe, `web` reste `Up`"
 
+    **Ce qu'on fait :** l'application tourne. On arrête la base, puis on observe le site, ses journaux et l'état de `web` pendant 10 secondes.
+
     ![db arrêtée : 503, nom db inconnu, web passe unhealthy mais reste running, zéro redémarrage](assets/captures/app_panne.png)
 
-    Un conteneur arrêté **sort du DNS** de Docker, d'où `Name or service not known`. Apache et PHP fonctionnent toujours et le code renvoie proprement `503`. Personne n'est prévenu, rien n'est relancé.
+    **Ce qu'il faut regarder :**
+
+    - ① Le site répond `503` : Apache et PHP fonctionnent, le code signale proprement que la base manque.
+    - ② Le journal dit `Name or service not known` : un conteneur arrêté **sort du DNS** de Docker.
+    - ③ Confirmé depuis `web` : le nom `db` est devenu inconnu.
+    - ④ `web` passe `unhealthy`… et reste `running`.
+    - ⑤ Zéro redémarrage : personne ne répare, personne n'est prévenu.
 
 ???+ example "En vrai : la base revient, l'application se rétablit seule"
 
+    **Ce qu'on fait :** on relance seulement la base, et on suit l'état des deux services toutes les 2 secondes.
+
     ![Après docker compose start db, web redevient healthy sans redémarrage et répond 200](assets/captures/app_retour.png)
 
-    `web` ouvre une nouvelle connexion à chaque requête : il n'a pas besoin d'être redémarré. Un client robuste prévoit des délais de connexion courts, des nouvelles tentatives avec attente progressive, une réponse `503` explicite (éventuellement avec `Retry-After`), sans planter ni journaliser de secret.
+    **Ce qu'il faut regarder :**
+
+    - ① On relance la base, sans toucher à `web`.
+    - ② Tant que `db` démarre, `web` reste `unhealthy`.
+    - ③ `web` redevient `healthy` tout seul, sans redémarrage : il ouvre une nouvelle connexion à chaque requête.
+    - ④ Retour à la normale : `200`.
+
+    Un client robuste prévoit des délais de connexion courts, de nouvelles tentatives espacées de plus en plus, une réponse `503` claire (éventuellement avec `Retry-After`), sans planter ni écrire de secret dans ses journaux.
 
 | Fonction | Question | Avec Docker seul |
 |---|---|---|
 | **Santé** | Le service répond-il ? | le healthcheck, qui **observe** |
-| **Réparation** | Qui relance ou remplace ? | `restart:`, seulement si le **processus s'arrête** |
+| **Réparation** | Qui relance ou remplace ? | `restart:`, seulement si le **programme s'arrête** |
 | **Supervision** | Qui est prévenu ? | rien par défaut : il faut un outil d'alerte |
-| **Haute disponibilité** | Survit-on à la perte d'une instance, d'un hôte ? | rien : plusieurs instances et un [orchestrateur](Pourquoi-orchestrer.md) |
+| **Haute disponibilité** | Tient-on si un conteneur ou une machine tombe ? | rien : plusieurs copies et un [orchestrateur](Pourquoi-orchestrer.md) |
 
 ## :material-magnify: Diagnostiquer un 503, couche par couche
+
+!!! quote "En clair"
+
+    Comme un médecin : on écoute le symptôme, on lit le dossier (les journaux), on examine organe par organe. On n'opère pas avant d'avoir trouvé.
 
 Le même symptôme a eu trois causes différentes sur la même application : pilote PHP absent, base pas encore prête, base arrêtée. On **lit l'erreur dans son contexte** avant de corriger.
 
@@ -122,14 +181,14 @@ Le même symptôme a eu trois causes différentes sur la même application : pil
 | `Name or service not known` | **réseau / DNS** : pas de réseau commun, conteneur arrêté | réseaux, nom du service |
 | `Connection refused` (2002) | **disponibilité** : la base ne répond pas (encore) | santé de `db`, ses journaux |
 | `Access denied` (1045) | **authentification** | identifiants, secret, droits SQL |
-| HTTP `500`, `PHP Fatal error` | **code applicatif** | journal web, avec une base `healthy` |
+| HTTP `500`, `PHP Fatal error` | **code de l'application** | journal web, avec une base `healthy` |
 
 | # | Question | Commande |
 |---|---|---|
 | 1 | `web` est-il `running` ? | `docker compose ps` |
 | 2 | Apache/PHP répond-il ? | `curl -i http://127.0.0.1:8080/` (un 503 prouve déjà que oui) |
-| 3 | `db` est-il résolu depuis `web` ? | `docker compose exec web getent hosts db` |
-| 4 | Le port SQL est-il accessible ? | `docker compose exec web bash -c 'echo > /dev/tcp/db/3306' && echo ouvert` |
+| 3 | `db` est-il trouvé depuis `web` ? | `docker compose exec web getent hosts db` |
+| 4 | Le port SQL est-il joignable ? | `docker compose exec web bash -c 'echo > /dev/tcp/db/3306' && echo ouvert` |
 | 5 | MariaDB est-il sain, la base initialisée ? | `docker compose ps`, `docker compose logs --tail=80 db` |
 | 6 | Identifiants et droits valides ? | `docker compose logs --tail=80 web` (`Access denied` ?) |
 
@@ -142,71 +201,199 @@ flowchart TB
     L -->|"Access denied 1045"| U["Authentification : secret, utilisateur, droits"]
 ```
 
-## :material-recycle: Prouver la reproductibilité
+## :material-flask-outline: À toi de jouer
 
-Une application peut ne marcher que grâce à un état caché : un fichier modifié par `exec`, un vieux volume déjà initialisé, une variable du shell, un réseau oublié. La seule preuve est un démarrage **depuis un environnement propre**, sous un autre nom de projet.
+Six étapes, environ 10 minutes. Un service `lent` qui met volontairement 10 secondes à être prêt, et un `client` qui doit l'attendre.
+
+**Étape 1 · Écrire le fichier**
 
 ```bash
-git clone <depot> /tmp/essai-propre && cd /tmp/essai-propre
-mkdir -p secrets && openssl rand -hex 18 > secrets/db_root_password \
-                 && openssl rand -hex 18 > secrets/db_app_password
-docker compose -p essai-propre up --build -d --wait
-curl -s http://127.0.0.1:8080/
-docker compose -p essai-propre down -v      # ici seulement : projet jetable, volume de test
+mkdir sante && cd sante   # (1)!
+nano compose.yaml         # (2)!
 ```
 
-!!! tip "Ce que contient un projet livrable"
+1. Crée le dossier du projet et entre dedans.
+2. Colle le fichier ci-dessous, puis ++ctrl+o++, ++enter++ et ++ctrl+x++.
 
-    `Dockerfile` et `.dockerignore` ; fichiers applicatifs et scripts SQL ; `compose.yaml` ; la procédure de création des secrets ; les instructions de démarrage et de vérification ; les justifications et des preuves ciblées. **Jamais** les fichiers de secrets, les données réelles ni les sauvegardes.
+```yaml
+services:
+  lent:
+    image: alpine:3.22
+    command: sh -c 'echo "lent lancé à $$(date +%T)"; sleep 10; touch /tmp/pret; sleep infinity'   # (1)!
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/pret"]   # (2)!
+      interval: 2s
+      timeout: 1s
+      retries: 3                                  # (3)!
+      start_period: 15s                           # (4)!
+  client:
+    image: alpine:3.22
+    command: sh -c 'echo "client démarré à $$(date +%T)"; sleep infinity'
+    depends_on:
+      lent:
+        condition: service_healthy                # (5)!
+```
+
+1. Le service note l'heure, attend 10 s, crée le fichier `/tmp/pret`, puis reste allumé. `$$` : Compose remplace les `$` par des variables ; doubler le `$` le fait arriver tel quel dans le conteneur.
+2. La sonde : « le fichier `/tmp/pret` existe-t-il ? ». `CMD-SHELL` lance le test dans un shell.
+3. 3 échecs de suite (un test toutes les 2 s) suffisent pour passer `unhealthy`.
+4. Pendant les 15 premières secondes, les échecs ne comptent pas : le temps de se préparer.
+5. `client` attend que `lent` soit `healthy`.
+
+**Étape 2 · Lancer et observer l'attente**
+
+```bash
+docker compose up -d   # (1)!
+```
+
+1. La commande ne rend la main qu'après une dizaine de secondes : Compose attend le feu vert de `lent`.
+
+Tu dois voir, à la fin, `lent` passer de `Waiting` à `Healthy`, et alors seulement `client` démarrer (extrait) :
+
+```text
+ Container sante-lent-1 Started
+ Container sante-lent-1 Waiting
+ Container sante-lent-1 Healthy
+ Container sante-client-1 Starting
+ Container sante-client-1 Started
+```
+
+**Étape 3 · Vérifier l'ordre**
+
+```bash
+docker compose ps     # (1)!
+docker compose logs   # (2)!
+```
+
+1. L'état des deux conteneurs, avec la santé de `lent` entre parenthèses.
+2. Les messages des deux services, préfixés par leur nom.
+
+Tu dois voir `lent` en `(healthy)`, puis deux heures séparées d'environ 10 secondes (les tiennes seront différentes) :
+
+```text
+NAME             IMAGE         COMMAND                   SERVICE   CREATED          STATUS                    PORTS
+sante-client-1   alpine:3.22   "sh -c 'echo \"client…"   client    11 seconds ago   Up Less than a second
+sante-lent-1     alpine:3.22   "sh -c 'echo \"lent l…"   lent      11 seconds ago   Up 11 seconds (healthy)
+lent-1    | lent lancé à 15:44:59
+client-1  | client démarré à 15:45:10
+```
+
+**Étape 4 · Provoquer une panne**
+
+```bash
+docker compose exec lent rm /tmp/pret                      # (1)!
+sleep 10                                                   # (2)!
+docker compose ps
+docker inspect -f '{{.RestartCount}}' sante-lent-1         # (3)!
+```
+
+1. Supprime le fichier testé par la sonde : le service « tombe malade ».
+2. Attend 10 secondes, le temps de 3 échecs de suite.
+3. Combien de fois Docker a relancé `lent`.
+
+Tu dois voir `lent` en `(unhealthy)` mais toujours `Up`, et aucun redémarrage :
+
+```text
+NAME             IMAGE         COMMAND                   SERVICE   CREATED          STATUS                      PORTS
+sante-client-1   alpine:3.22   "sh -c 'echo \"client…"   client    23 seconds ago   Up 12 seconds
+sante-lent-1     alpine:3.22   "sh -c 'echo \"lent l…"   lent      23 seconds ago   Up 23 seconds (unhealthy)
+0
+```
+
+**Étape 5 · Soigner**
+
+```bash
+docker compose exec lent touch /tmp/pret                                  # (1)!
+sleep 3
+docker compose ps --format "table {{.Service}}\t{{.Status}}"              # (2)!
+```
+
+1. Recrée le fichier : la prochaine sonde réussira.
+2. Affiche seulement le service et son état.
+
+Tu dois voir `lent` de nouveau `(healthy)`, sans avoir été redémarré :
+
+```text
+SERVICE   STATUS
+client    Up 16 seconds
+lent      Up 27 seconds (healthy)
+```
+
+**Étape 6 · Faire le ménage**
+
+```bash
+docker compose down       # (1)!
+cd .. && rm -r sante
+```
+
+1. Supprime les deux conteneurs et le réseau du projet.
+
+Tu dois voir (extrait) :
+
+```text
+ Container sante-client-1 Removed
+ Container sante-lent-1 Removed
+ Network sante_default Removed
+```
+
+??? tip "Ça ne marche pas ?"
+
+    | Message | Cause | Solution |
+    |---|---|---|
+    | `dependency failed to start: container sante-lent-1 is unhealthy` | la sonde n'a jamais réussi : fichier testé jamais créé, faute de frappe, `start_period` trop court | compare la ligne `test` et la ligne `command`, puis `docker compose down` et recommence |
+    | `up -d` rend la main tout de suite et `lent` n'a pas de `(healthy)` | le bloc `healthcheck` est mal décalé ou absent | `docker compose config` pour voir ce que Compose a compris |
+    | `service "lent" is not running` | le conteneur s'est arrêté | `docker compose ps -a`, `docker compose logs lent` |
+    | `no configuration file provided: not found` | tu n'es pas dans le dossier `sante` | `cd sante` |
+    | `Error: no such object: sante-lent-1` | le nom réel du conteneur est différent | prends le nom affiché par `docker compose ps` |
+
+## :material-help-circle-outline: Vérifie que tu as compris
+
+??? question "1. `docker compose ps` affiche `Up` pour la base. Le site peut-il quand même répondre 503 ?"
+
+    **Oui.** `Up` dit seulement que le programme principal tourne. La base peut être en train de s'initialiser et refuser les connexions. Seul un healthcheck, ou une vraie requête, dit si elle est prête.
+
+??? question "2. Ta base passe `unhealthy` en pleine nuit. Que fait Docker ?"
+
+    **Rien.** Il note l'état, c'est tout : pas de redémarrage (on l'a vu à l'étape 4, compteur à 0), pas d'alerte. Réparer, prévenir et tenir malgré la panne demandent d'autres outils.
+
+??? question "3. Le site renvoie 503 et le journal de `web` dit `Name or service not known`. Faut-il reconstruire l'image ?"
+
+    **Non.** Ce message vise la couche **réseau / DNS** : le nom `db` n'est pas trouvé, parce que la base est arrêtée ou que les deux services ne partagent pas de réseau. On vérifie `docker compose ps` et les réseaux, pas le Dockerfile.
+
+!!! success "Et ensuite ?"
+
+    Ton application démarre dans le bon ordre et tu sais lire ses pannes. Page suivante : [Sécurité des images](Securite-des-images.md), pour durcir ce que tu as construit.
+
+## :material-server: Pour aller plus loin
+
+??? note "Prouver qu'un projet se relance depuis zéro"
+
+    Une application peut ne marcher que grâce à un état caché : un fichier modifié par `exec`, un vieux volume déjà initialisé, une variable du terminal, un réseau oublié. La seule preuve est un démarrage **depuis un environnement propre**, sous un autre nom de projet.
+
+    ```bash
+    git clone <depot> /tmp/essai-propre && cd /tmp/essai-propre
+    mkdir -p secrets && openssl rand -hex 18 > secrets/db_root_password \
+                     && openssl rand -hex 18 > secrets/db_app_password
+    docker compose -p essai-propre up --build -d --wait
+    curl -s http://127.0.0.1:8080/
+    docker compose -p essai-propre down -v      # ici seulement : projet jetable, volume de test
+    ```
+
+    Un projet livrable contient : `Dockerfile` et `.dockerignore` ; fichiers de l'application et scripts SQL ; `compose.yaml` ; la procédure de création des secrets ; les instructions de démarrage et de vérification ; les justifications et des preuves ciblées. **Jamais** les fichiers de secrets, les données réelles ni les sauvegardes.
 
 ??? note "Récapitulatif : faire tourner une application complète"
 
     | Ne pas confondre | Avec |
     |---|---|
     | Port écouté dans le conteneur | Port publié sur l'hôte ([Réseaux et ports](Reseaux-et-ports.md)) |
-    | Adresse IP d'une instance | Nom logique du service ([Réseaux et ports](Reseaux-et-ports.md)) |
+    | Adresse IP d'un conteneur | Nom du service ([Réseaux et ports](Reseaux-et-ports.md)) |
     | Couche inscriptible | Volume persistant ([Stockage et volumes](Stockage-et-volumes.md)) |
     | Persistance | Sauvegarde ([Stockage et volumes](Stockage-et-volumes.md)) |
     | `depends_on` | Disponibilité effective (cette page) |
-    | Healthcheck | Auto-réparation, haute disponibilité (cette page) |
-    | Compose | Orchestrateur multi-hôtes ([Docker Compose](Docker-Compose.md)) |
+    | Healthcheck | Réparation automatique, haute disponibilité (cette page) |
+    | Compose | Orchestrateur multi-machines ([Docker Compose](Docker-Compose.md)) |
 
-    Trois niveaux complémentaires : l'**image** (ce que l'application contient), le **service Compose** (comment elle s'exécute et communique), l'**exploitation** (observer, sauvegarder, diagnostiquer, restaurer). `compose.yaml` ne remplace ni une stratégie de sauvegarde, ni une supervision.
-
-    La suite : identités et privilèges, capabilities, secrets, images et surface d'attaque, à partir de [Sécurité des images](Securite-des-images.md).
-
-## :material-flask-outline: À toi de jouer
-
-Un service qui met volontairement 10 s à être prêt, et un client qui l'attend :
-
-```yaml
-services:
-  lent:
-    image: alpine:3.22
-    command: sh -c 'sleep 10; touch /tmp/pret; sleep infinity'
-    healthcheck:
-      test: ["CMD-SHELL", "test -f /tmp/pret"]
-      interval: 2s
-      timeout: 1s
-      retries: 10
-  client:
-    image: alpine:3.22
-    command: sh -c 'echo "démarré à $$(date +%T)"; sleep infinity'   # $$ : un $ littéral pour Compose
-    depends_on:
-      lent:
-        condition: service_healthy
-```
-
-```bash
-docker compose up -d                                 # observer "Waiting" puis "Healthy"
-docker compose ps                                    # lent ... (healthy)
-docker compose logs client                           # démarré environ 10 s après lent
-docker compose exec lent rm /tmp/pret                # au bout de 10 échecs : (unhealthy)
-docker compose ps                                    # lent (unhealthy) : toujours Up, rien n'est relancé
-docker compose down
-```
-
-Pour aller plus loin : [Identités, privilèges et capabilities](Identites-et-privileges.md), [Pourquoi orchestrer ?](Pourquoi-orchestrer.md).
+    Trois niveaux complémentaires : l'**image** (ce que l'application contient), le **service Compose** (comment elle s'exécute et communique), l'**exploitation** (observer, sauvegarder, diagnostiquer, restaurer). `compose.yaml` ne remplace ni une stratégie de sauvegarde, ni une supervision. Pour aller vers la sécurité : [Identités, privilèges et capabilities](Identites-et-privileges.md) ; vers l'orchestration : [Pourquoi orchestrer ?](Pourquoi-orchestrer.md).
 
 ??? abstract "Pour les créateurs : script de motion design « Le feu passe au vert » (65 s)"
 
