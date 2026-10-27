@@ -21,6 +21,10 @@ site_dir = "site"
 
 extra_css = ["stylesheets/extra.css"]
 extra_javascript = ["javascripts/dockersim.js"]
+# Pages de lab interactif : ouvertes depuis les pages du cours, hors du menu.
+not_in_nav = """
+/labs/
+"""
 
 nav = [
   { "Accueil" = "index.md" },

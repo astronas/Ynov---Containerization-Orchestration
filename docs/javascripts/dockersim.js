@@ -759,6 +759,7 @@ To generate this message, Docker took the following steps:
 
     function accueil() {
       ecran.innerHTML = "";
+      if (el.dataset.seul) { ecrire("Ta machine Docker simulée. Suis le tutoriel à droite : clique sur « Insérer dans le terminal », puis appuie sur Entrée. Tu peux aussi taper ce que tu veux.", "ts-info"); return; }
       ecrire(mode === "guide"
         ? "Mode guidé : suis les étapes du lab. Tape la commande, ou clique sur « Insérer la commande »."
         : "Mode libre : une machine Docker simulée rien que pour toi. Essaie, casse, recommence. Tape « help » pour la liste des commandes.", "ts-info");
@@ -794,7 +795,32 @@ To generate this message, Docker took the following steps:
       }
     }
 
-    function lancer(cmd) {
+    // Temps de réponse réaliste : une commande ne répond jamais instantanément.
+    let occupe = false; let interrompu = false;
+    const attendre = (ms) => new Promise((ok) => setTimeout(ok, ms));
+    const entre = (a, b) => a + Math.random() * (b - a);
+    function latence(cmd) {
+      const mots = decouper(cmd.replace(/^\s*sudo\s+/, ""));
+      const [outil, sous] = mots;
+      let avant = entre(10, 60);
+      if (outil === "docker") {
+        avant = {
+          run: entre(350, 900), create: entre(250, 600), pull: entre(300, 700), stop: entre(400, 1200), restart: entre(500, 1300),
+          start: entre(250, 700), kill: entre(150, 400), rm: entre(150, 450), rmi: entre(200, 500), exec: entre(120, 350),
+          stats: entre(900, 1600), inspect: entre(60, 180), ps: entre(60, 200), images: entre(60, 200), logs: entre(50, 150),
+          top: entre(100, 250), version: entre(100, 300), info: entre(150, 400),
+        }[sous] || entre(80, 220);
+      } else if (outil === "curl" || outil === "wget") avant = entre(40, 180);
+      const ligne = (l, i) => {
+        if (/Pull complete/.test(l)) return entre(250, 700);
+        if (/Pulling from|Downloaded newer image|Image is up to date/.test(l)) return entre(150, 400);
+        if (/^Digest:|^Unable to find/.test(l)) return entre(80, 180);
+        return i === 0 ? 0 : entre(3, 14);
+      };
+      return { avant, ligne };
+    }
+
+    async function lancer(cmd) {
       ecrireCommande(cmd);
       if (!cmd.trim()) return;
       historique.push(cmd); posHist = historique.length;
@@ -803,17 +829,34 @@ To generate this message, Docker took the following steps:
       if (t === "reset") { hote.m.reinitialiser(); accueil(); ecrire("Machine remise à zéro.", "ts-info"); return; }
       if (t === "help") { hote.executer("docker help").sortie.forEach((l) => ecrire(l)); return; }
       const res = hote.executer(cmd);
-      res.sortie.forEach((l) => ecrire(l, res.code && /^(docker:|Error|curl:|sh:|cat:|\(simulateur)/.test(l) ? "ts-erreur" : ""));
-      verifier(cmd);
+      const lat = latence(cmd);
+      occupe = true; interrompu = false; saisie.readOnly = true; el.classList.add("ts-occupe");
+      await attendre(lat.avant);
+      for (let i = 0; i < res.sortie.length && !interrompu; i++) {
+        const d = lat.ligne(res.sortie[i], i);
+        if (d) await attendre(d);
+        if (interrompu) break;
+        const l = res.sortie[i];
+        ecrire(l, res.code && /^(docker:|Error|curl:|sh:|cat:|\(simulateur)/.test(l) ? "ts-erreur" : "");
+      }
+      if (interrompu) ecrire("^C");
+      occupe = false; saisie.readOnly = false; el.classList.remove("ts-occupe");
+      ecran.scrollTop = ecran.scrollHeight;
+      if (!interrompu) {
+        verifier(cmd);
+        el.dispatchEvent(new CustomEvent("ts-commande", { detail: { cmd, code: res.code, sortie: res.sortie } }));
+      }
     }
 
     saisie.addEventListener("keydown", (ev) => {
+      if (occupe) { if (ev.key === "c" && ev.ctrlKey) interrompu = true; ev.preventDefault(); return; }
       if (ev.key === "Enter") { const v = saisie.value; saisie.value = ""; lancer(v); ev.preventDefault(); }
       else if (ev.key === "ArrowUp") { if (posHist > 0) { posHist--; saisie.value = historique[posHist]; } ev.preventDefault(); }
       else if (ev.key === "ArrowDown") { if (posHist < historique.length - 1) { posHist++; saisie.value = historique[posHist]; } else { posHist = historique.length; saisie.value = ""; } ev.preventDefault(); }
       else if (ev.key === "l" && ev.ctrlKey) { ecran.innerHTML = ""; ev.preventDefault(); }
     });
     ecran.addEventListener("click", () => saisie.focus());
+    el.addEventListener("ts-inserer", (ev) => { saisie.value = ev.detail; saisie.focus(); });
 
     const choisirMode = (m) => {
       mode = m;
@@ -822,10 +865,14 @@ To generate this message, Docker took the following steps:
       accueil(); afficherEtape();
     };
     el.querySelectorAll(".ts-mode").forEach((b) => (b.onclick = () => choisirMode(b.dataset.mode)));
-    el.querySelector(".ts-reset").onclick = () => { hote.m.reinitialiser(); etape = 0; accueil(); afficherEtape(); };
+    el.querySelector(".ts-reset").onclick = () => { hote.m.reinitialiser(); etape = 0; accueil(); afficherEtape(); el.dispatchEvent(new CustomEvent("ts-reset")); };
 
     const nomLab = el.dataset.lab;
-    if (nomLab && scriptCourant) {
+    if (el.dataset.seul) {
+      // Terminal d'une page de lab : le tutoriel est à côté, pas dans le terminal.
+      el.querySelector(".ts-modes").hidden = true;
+      choisirMode("libre");
+    } else if (nomLab && scriptCourant) {
       fetch(new URL(`../assets/labs/${nomLab}.json`, scriptCourant)).then((r) => r.json()).then((j) => { lab = j; choisirMode("guide"); })
         .catch(() => choisirMode("libre"));
     } else {
@@ -834,7 +881,103 @@ To generate this message, Docker took the following steps:
     }
   }
 
-  function tout() { document.querySelectorAll(".terminal-sim").forEach(creer); }
+
+  /* --------------------------------------------- page de lab : terminal + tutoriel */
+  const echapper = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // Mise en forme légère dans les textes du tutoriel : **gras** et `code`.
+  const enrichir = (s) => echapper(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`([^`]+)`/g, "<code>$1</code>");
+
+  function creerLab(racine) {
+    if (racine.dataset.pret) return;
+    racine.dataset.pret = "1";
+    const nom = racine.dataset.lab;
+    racine.innerHTML = `<div class="lab-split">
+        <section class="lab-gauche"><div class="terminal-sim" data-seul="1"></div></section>
+        <aside class="lab-droite"><div class="lab-chargement">Chargement du lab…</div></aside>
+      </div>`;
+    const term = racine.querySelector(".terminal-sim");
+    const guide = racine.querySelector(".lab-droite");
+    creer(term);
+    fetch(new URL(`../assets/labs/${nom}.json`, scriptCourant)).then((r) => r.json()).then((lab) => {
+      let courant = 0;
+      const etapes = lab.etapes;
+      guide.innerHTML = `
+        <header class="lab-entete">
+          <div class="lab-sur">Lab interactif${lab.duree ? " · " + echapper(lab.duree) : ""}</div>
+          <h2 class="lab-titre">${echapper(lab.titre)}</h2>
+          ${lab.intro ? `<p class="lab-intro">${enrichir(lab.intro)}</p>` : ""}
+          <div class="lab-progression"><div class="lab-barre"><span></span></div><span class="lab-compte"></span></div>
+        </header>
+        <ol class="lab-etapes">${etapes.map((e, i) => `
+          <li class="lab-etape" data-i="${i}">
+            <button type="button" class="lab-tete"><span class="lab-pastille">${i + 1}</span><span class="lab-nom">${echapper(e.titre)}</span></button>
+            <div class="lab-corps">
+              ${e.pourquoi ? `<p class="lab-pourquoi">${enrichir(e.pourquoi)}</p>` : ""}
+              <p class="lab-consigne"><strong>À faire :</strong> ${enrichir(e.consigne)}</p>
+              <div class="lab-commande"><code>${echapper(e.commande)}</code>
+                <span class="lab-boutons"><button type="button" class="lab-inserer">Insérer dans le terminal</button><button type="button" class="lab-copier">Copier</button></span></div>
+              ${e.options && e.options.length ? `<dl class="lab-options">${e.options.map(([o, x]) => `<dt><code>${echapper(o)}</code></dt><dd>${enrichir(x)}</dd>`).join("")}</dl>` : ""}
+              ${e.sortie ? `<div class="lab-attendu"><div class="lab-libelle">Tu dois voir à peu près :</div><pre>${echapper(e.sortie)}</pre></div>` : ""}
+              ${e.remarque ? `<p class="lab-remarque"><strong>À remarquer :</strong> ${enrichir(e.remarque)}</p>` : ""}
+              ${e.indice ? `<details class="lab-indice"><summary>Besoin d'un indice ?</summary><p>${enrichir(e.indice)}</p></details>` : ""}
+              <p class="lab-bravo" hidden></p>
+            </div>
+          </li>`).join("")}
+        </ol>
+        <div class="lab-final" hidden>
+          <div class="lab-final-titre">✓ Lab terminé !</div>
+          ${lab.conclusion ? `<p>${enrichir(lab.conclusion)}</p>` : ""}
+          ${lab.retour ? `<p><a class="md-button md-button--primary" href="${echapper(lab.retour.lien)}">${echapper(lab.retour.texte)}</a></p>` : ""}
+        </div>`;
+      const items = [...guide.querySelectorAll(".lab-etape")];
+      const maj = () => {
+        items.forEach((li, i) => {
+          li.classList.toggle("fait", i < courant);
+          li.classList.toggle("actif", i === courant);
+          li.classList.toggle("ouvert", i === courant || li.classList.contains("deplie"));
+        });
+        const pct = Math.round((Math.min(courant, etapes.length) / etapes.length) * 100);
+        guide.querySelector(".lab-barre span").style.width = pct + "%";
+        guide.querySelector(".lab-compte").textContent = `${Math.min(courant, etapes.length)} / ${etapes.length} étapes`;
+        guide.querySelector(".lab-final").hidden = courant < etapes.length;
+      };
+      items.forEach((li, i) => {
+        const e = etapes[i];
+        li.querySelector(".lab-tete").onclick = () => { li.classList.toggle("deplie"); maj(); };
+        li.querySelector(".lab-inserer").onclick = () => term.dispatchEvent(new CustomEvent("ts-inserer", { detail: e.commande }));
+        li.querySelector(".lab-copier").onclick = (ev) => {
+          const bouton = ev.currentTarget;
+          (navigator.clipboard ? navigator.clipboard.writeText(e.commande) : Promise.reject(new Error("presse-papiers indisponible")))
+            .then(() => { bouton.textContent = "Copié ✓"; }, () => { bouton.textContent = "Sélectionne et copie"; });
+          setTimeout(() => { bouton.textContent = "Copier"; }, 1600);
+        };
+      });
+      const norm = (s) => s.replace(/\s+/g, " ").trim();
+      term.addEventListener("ts-commande", (ev) => {
+        if (courant >= etapes.length) return;
+        const e = etapes[courant];
+        const re = new RegExp(e.attendu || "^" + norm(e.commande).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$");
+        const li = items[courant];
+        if (re.test(norm(ev.detail.cmd))) {
+          const b = li.querySelector(".lab-bravo");
+          b.hidden = false; b.innerHTML = "✓ " + enrichir(e.bravo || "Bien joué !");
+          courant++; maj();
+          const suivant = items[courant] || guide.querySelector(".lab-final");
+          setTimeout(() => suivant.scrollIntoView({ behavior: "smooth", block: "nearest" }), 250);
+        } else if (e.indice) {
+          const d = li.querySelector(".lab-indice"); if (d) d.open = true;
+        }
+      });
+      term.addEventListener("ts-reset", () => {
+        courant = 0;
+        items.forEach((li) => { li.classList.remove("deplie"); li.querySelector(".lab-bravo").hidden = true; });
+        maj();
+      });
+      maj();
+    }).catch(() => { guide.innerHTML = '<p class="lab-chargement">Impossible de charger le tutoriel de ce lab.</p>'; });
+  }
+
+  function tout() { document.querySelectorAll(".lab-page").forEach(creerLab); document.querySelectorAll(".terminal-sim").forEach(creer); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", tout); else tout();
   if (window.document$ && window.document$.subscribe) window.document$.subscribe(tout);
   new MutationObserver(tout).observe(document.documentElement, { childList: true, subtree: true });

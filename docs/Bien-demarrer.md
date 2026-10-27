@@ -72,11 +72,11 @@ docker run --rm hello-world   # (1)!
     | `Cannot connect to the Docker daemon` | le moteur n'est pas démarré | `sudo systemctl start docker` |
     | `pull access denied` ou délai dépassé | pas d'accès Internet | vérifie la connexion, le proxy |
 
-!!! example "Pas encore installé ? Essaie ici"
+!!! example "Pas encore installé ? Essaie dans le navigateur"
 
-    Ce terminal simule une machine Docker dans ta page. Tape `docker run --rm hello-world`, puis `docker run -d --name web -p 127.0.0.1:8080:80 nginx:stable`, `docker ps` et `curl http://127.0.0.1:8080`. Tape `help` pour voir tout ce qu'il sait faire.
+    Le **lab Premiers pas** t'ouvre une machine Docker simulée, avec un tutoriel pas à pas à côté : premier conteneur, serveur web, `docker ps`, journaux, arrêt et ménage. Dix minutes, rien à installer.
 
-<div class="terminal-sim"></div>
+    [:material-console: Ouvrir le lab Premiers pas](labs/premiers-pas.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
 
 ## :material-numeric-3-circle-outline: Lire une commande
 

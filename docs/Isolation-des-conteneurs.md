@@ -164,11 +164,11 @@ docker run -d --name app --memory 256m --cpus 0.5 --pids-limit 64 nginx:stable  
 
 ## :material-flask-outline: À toi de jouer
 
-!!! tip "Sans rien installer : le terminal ci-dessous"
+!!! tip "Pratique sans rien installer : le lab interactif"
 
-    C'est une **machine Docker simulée**, rien que pour toi, directement dans la page. En mode **Guidé**, tu suis les étapes du lab (tape la commande ou clique sur « Insérer la commande »). En mode **Libre**, tu essaies ce que tu veux : tu ne peux rien casser. Les sorties reprennent le format du vrai Docker ; pour la vraie machine, refais le lab ci-dessous sur ton poste.
+    Une **machine Docker simulée** à gauche, le **tutoriel pas à pas** à droite. Chaque commande est expliquée option par option, tu vois ce que tu dois obtenir, et chaque étape se valide toute seule. Tu ne peux rien casser.
 
-<div class="terminal-sim" data-lab="isolation"></div>
+    [:material-console: Ouvrir le lab interactif](labs/isolation.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
 
 **Sur ton poste**, le même lab pas à pas :
 
